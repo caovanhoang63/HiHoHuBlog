@@ -11,7 +11,7 @@
 @layout NonLayout
 
 <div  class="h-screen flex">
-    <EditForm FormName="plk"  Model="User" OnSubmit=@Submit  EditContext=@editContext class="w-96 m-auto form-control ">
+    <EditForm FormName="SignupForm"  Model="User" OnSubmit=@Submit  EditContext=@editContext class="w-96 m-auto form-control ">
         <label class="form-control w-full ">
             <div class="label">
                 <span class="label-text">First name</span>
@@ -53,9 +53,8 @@
 @code {
     private EditContext? editContext;
     
-    [SupplyParameterFromForm(FormName = "plk")]
+    [SupplyParameterFromForm(FormName = "SignupForm")]
     private UserSignUp? User { get; set; } = new UserSignUp();
-
 
     private async Task Submit(EditContext obj)
     {

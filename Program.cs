@@ -5,6 +5,7 @@ using HiHoHuBlog.Modules.User.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
@@ -12,7 +13,6 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddScoped<IUserSignUpStore, DummyData>();
 builder.Services.AddScoped<IUserSignUpBiz,UserSignUpBiz>();
-
 
 var app = builder.Build();
 
@@ -33,5 +33,6 @@ app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
 
 app.Run();
