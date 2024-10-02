@@ -1,0 +1,21 @@
+﻿@using HiHoHuBlog.Components.Layout.Components
+@inherits LayoutComponentBase
+
+
+<div class="h-screen bg-white relative">
+    <header class="sticky top-0">
+        <NavMenu/>
+    </header>
+    <main class="h-full">
+        @Body
+    </main>
+    <footer>
+    </footer>
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+</div>
+
+

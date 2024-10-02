@@ -1,0 +1,65 @@
+@page "/signup"
+@using HiHoHuBlog.Components.Layout
+@using HiHoHuBlog.modules.user.model;
+
+@using Microsoft.AspNetCore.Components.Forms
+@inject NavigationManager NavigationManager
+@layout NonLayout
+
+<div  class="h-screen flex">
+    <EditForm FormName="plk"  Model="User" OnSubmit=@Submit  EditContext=@editContext class="w-96 m-auto form-control ">
+        <label class="form-control w-full ">
+            <div class="label">
+                <span class="label-text">First name</span>
+            </div>
+            @if (User != null)
+            {
+                <InputText @bind-Value="User.FirstName" type="text" placeholder="John" class="input input-bordered w-full "/>
+                @:</label>
+                <label class="form-control w-full ">
+                    <div class="label">
+                        <span class="label-text">Last name</span>
+                    </div>
+                    <InputText @bind-Value="User.LastName" type="text" placeholder="Cena" class="input input-bordered w-full "/>
+                </label>
+                <label class="form-control w-full ">
+                    <div class="label">
+                        <span class="label-text">Email</span>
+                    </div>
+                    <InputText @bind-Value="User.Email" type="email" placeholder="john.cena@email.com" class="input input-bordered w-full"/>
+                </label>
+                <label class="form-control w-full ">
+                    <div class="label">
+                        <span class="label-text">Password</span>
+                    </div>
+                    <InputText @bind-Value="User.Password" type="password" placeholder="Type here" class="input input-bordered w-full"/>
+                </label>
+                @:<label class="form-control w-full ">
+                <div class="label">
+                    <span class="label-text">Confirm password</span>
+                </div>
+                <InputText @bind-Value="User.ConfirmPassword" type="password" placeholder="Type here" class="input input-bordered w-full"/>
+            }
+        </label>
+        <input type="submit" class="btn mt-10" value="Sign Up"/>
+        <a href="/login" class="link text-center">Already have an account?</a>
+    </EditForm>
+</div>
+
+@code {
+    private EditContext? editContext;
+    
+    [SupplyParameterFromForm(FormName = "plk")]
+    private UserSignUp? User { get; set; } = new UserSignUp();
+
+
+    private void Submit(EditContext obj)
+    {
+        Console.WriteLine(User);
+        if (User?.Password != User?.ConfirmPassword)
+        {
+            // if (User != null) UserSignUpUpBiz.SignUp(User);
+        }
+    }
+
+}
