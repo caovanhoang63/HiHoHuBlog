@@ -11,7 +11,10 @@ builder.Services.AddRazorComponents()
 
 
 builder.Services.AddScoped<IUserSignUpStore, DummyData>();
+builder.Services.AddScoped<IUserLoginStore, DummyData>();
+
 builder.Services.AddScoped<IUserSignUpBiz,UserSignUpBiz>();
+builder.Services.AddScoped<IUserLoginBiz,UserLoginBiz>();
 
 var app = builder.Build();
 

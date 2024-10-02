@@ -4,12 +4,12 @@ using HiHoHuBlog.Modules.User.Model;
 namespace HiHoHuBlog.Modules.User.Biz;
 
 
-interface IUserLoginBiz
+public interface IUserLoginBiz
 {
     Task Login(UserLogin userLogin);
 }
 
-interface IUserLoginStore
+public interface IUserLoginStore
 {
     Task Login(UserLogin userLogin);
 }
@@ -18,7 +18,7 @@ public class UserLoginBiz : IUserLoginBiz
 {
     private readonly IUserLoginStore _userLoginStore;
 
-    UserLoginBiz(IUserLoginStore userLoginStore)
+    public UserLoginBiz(IUserLoginStore userLoginStore)
     {
         _userLoginStore = userLoginStore;
     }

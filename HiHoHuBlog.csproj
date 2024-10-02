@@ -16,7 +16,6 @@
       <Folder Include="Modules\Blog\Biz\" />
       <Folder Include="Modules\Blog\Data\" />
       <Folder Include="Modules\Blog\Model\" />
-      <Folder Include="Modules\Blog\Presentation\" />
     </ItemGroup>
 
 </Project>

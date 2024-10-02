@@ -16,7 +16,6 @@ public class UserSignUpBiz : IUserSignUpBiz
 {
     private readonly IUserSignUpStore _userSignUpStore;
 
-
     public UserSignUpBiz(IUserSignUpStore userSignUpStore)
     {
         _userSignUpStore = userSignUpStore;

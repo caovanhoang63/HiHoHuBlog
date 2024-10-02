@@ -1,9 +1,14 @@
 @page "/login"
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@rendermode InteractiveServer
 @using HiHoHuBlog.Components.Layout
+@using HiHoHuBlog.Modules.User.Biz
 @using HiHoHuBlog.Modules.User.Model
 @layout NonLayout
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Forms
+@inject NavigationManager NavigationManager
+@inject IUserLoginBiz UserLoginBiz
 <div class="h-screen flex">
     <EditForm FormName="LoginForm" Model=@User OnSubmit=@OnSubmit  EditContext="_editContext"  class="w-96 m-auto form-control gap-2 ">
         <label class="input input-bordered flex items-center gap-2">
@@ -36,6 +41,9 @@
         <input type="submit" class="btn" value="Login"/>
         <a href="/signup" class="link text-center">Do not an account?</a>
     </EditForm>
+    
+    
+    
 </div>
 
 @code {
@@ -47,6 +55,15 @@
     private async Task OnSubmit(EditContext editContext)
     {
         Console.WriteLine(User);
-        await Task.Delay(100);
+        if (User != null)
+            try
+            {
+                await UserLoginBiz.Login(User);
+                NavigationManager.NavigateTo("/");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
     }
 }

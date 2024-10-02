@@ -1,0 +1,13 @@
+<div class="m-auto h-full max-w-7xl  @ContainerClass">
+    @ChildContent
+</div>
+
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+    
+    [Parameter]
+    public string? ContainerClass { get; set; }
+    
+}
