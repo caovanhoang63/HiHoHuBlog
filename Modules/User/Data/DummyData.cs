@@ -6,13 +6,13 @@ namespace HiHoHuBlog.Modules.User.Data;
 
 public class DummyData : IUserSignUpStore, IUserLoginStore
 {
-    public async Task UserSignUp(UserSignUp userSignUp)
+    public async Task Login(UserLogin userLogin)
     {
         Console.WriteLine("Dummy Data");
         await Task.Delay(100);
     }
 
-    public async Task Login(UserLogin userLogin)
+    public async Task UserSignUp(UserSignUp userSignUp)
     {
         Console.WriteLine("Dummy Data");
         await Task.Delay(100);

@@ -11,7 +11,6 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddSingleton<IConfiguration>(Configuration);
+        services.AddSingleton(Configuration);
     }
-
 }

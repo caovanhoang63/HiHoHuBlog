@@ -1,16 +1,16 @@
 @page "/signup"
-@using static Microsoft.AspNetCore.Components.Web.RenderMode
-@rendermode InteractiveServer
 @using HiHoHuBlog.Components.Layout
 @using HiHoHuBlog.Modules.User.Biz
-@using HiHoHuBlog.modules.user.model;
+@using HiHoHuBlog.modules.user.model
 @using Microsoft.AspNetCore.Components.Forms
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@rendermode InteractiveServer
 @inject NavigationManager NavigationManager
 @inject IUserSignUpBiz UserSignUpBiz 
 @layout NonLayout
 
-<div  class="h-screen flex">
-    <EditForm FormName="SignupForm"  Model="User" OnSubmit=@Submit  EditContext=@_editContext class="w-96 m-auto form-control ">
+<div class="h-screen flex">
+    <EditForm FormName="SignupForm" Model="User" OnSubmit="@Submit" EditContext="@_editContext" class="w-96 m-auto form-control ">
         <label class="form-control w-full ">
             <div class="label">
                 <span class="label-text">First name</span>
@@ -51,9 +51,9 @@
 
 @code {
     private EditContext? _editContext;
-    
+
     [SupplyParameterFromForm(FormName = "SignupForm")]
-    private UserSignUp? User { get; set; } = new UserSignUp();
+    private UserSignUp? User { get; } = new();
 
     private async Task Submit(EditContext obj)
     {
@@ -63,15 +63,14 @@
         {
             try
             {
-               await UserSignUpBiz.SignUp(User);
-               NavigationManager.NavigateTo("/login");
-
+                await UserSignUpBiz.SignUp(User);
+                NavigationManager.NavigateTo("/login");
             }
             catch (Exception e)
             {
-
                 Console.WriteLine(e);
             }
         }
     }
+
 }

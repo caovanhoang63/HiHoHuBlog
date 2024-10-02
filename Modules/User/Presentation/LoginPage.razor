@@ -1,16 +1,15 @@
 @page "/login"
-@using static Microsoft.AspNetCore.Components.Web.RenderMode
-@rendermode InteractiveServer
 @using HiHoHuBlog.Components.Layout
 @using HiHoHuBlog.Modules.User.Biz
 @using HiHoHuBlog.Modules.User.Model
-@layout NonLayout
-@using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Forms
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@rendermode InteractiveServer
+@layout NonLayout
 @inject NavigationManager NavigationManager
 @inject IUserLoginBiz UserLoginBiz
 <div class="h-screen flex">
-    <EditForm FormName="LoginForm" Model=@User OnSubmit=@OnSubmit  EditContext="_editContext"  class="w-96 m-auto form-control gap-2 ">
+    <EditForm FormName="LoginForm" Model="@User" OnSubmit="@OnSubmit" EditContext="_editContext" class="w-96 m-auto form-control gap-2 ">
         <label class="input input-bordered flex items-center gap-2">
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -22,7 +21,7 @@
                 <path
                     d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z"/>
             </svg>
-            <InputText  @bind-Value=@User.Email type="email" class="grow" placeholder="Email"/>
+            <InputText @bind-Value="@User.Email" type="email" class="grow" placeholder="Email"/>
         </label>
         <label class="input input-bordered flex items-center gap-2">
             <svg
@@ -41,16 +40,15 @@
         <input type="submit" class="btn" value="Login"/>
         <a href="/signup" class="link text-center">Do not an account?</a>
     </EditForm>
-    
-    
-    
+
+
 </div>
 
 @code {
     private EditContext? _editContext;
-    
+
     [SupplyParameterFromForm(FormName = "LoginForm")]
-    private UserLogin? User { get; set; } = new UserLogin();
+    private UserLogin? User { get; } = new();
 
     private async Task OnSubmit(EditContext editContext)
     {
@@ -66,4 +64,5 @@
                 Console.WriteLine(e);
             }
     }
+
 }

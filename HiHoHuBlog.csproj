@@ -8,14 +8,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <_ContentIncludedByDefault Remove="wwwroot\bootstrap\bootstrap.min.css" />
-      <_ContentIncludedByDefault Remove="wwwroot\bootstrap\bootstrap.min.css.map" />
+        <_ContentIncludedByDefault Remove="wwwroot\bootstrap\bootstrap.min.css"/>
+        <_ContentIncludedByDefault Remove="wwwroot\bootstrap\bootstrap.min.css.map"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Modules\Blog\Biz\" />
-      <Folder Include="Modules\Blog\Data\" />
-      <Folder Include="Modules\Blog\Model\" />
+        <Folder Include="Modules\Blog\Biz\"/>
+        <Folder Include="Modules\Blog\Data\"/>
+        <Folder Include="Modules\Blog\Model\"/>
     </ItemGroup>
 
 </Project>

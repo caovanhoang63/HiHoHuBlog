@@ -1,5 +1,5 @@
 using HiHoHuBlog.modules.user.model;
-using Microsoft.AspNetCore.Components;
+
 namespace HiHoHuBlog.Modules.User.Biz;
 
 public interface IUserSignUpBiz
@@ -20,11 +20,10 @@ public class UserSignUpBiz : IUserSignUpBiz
     {
         _userSignUpStore = userSignUpStore;
     }
-    
-    public async Task  SignUp(UserSignUp userSignUp)
+
+    public async Task SignUp(UserSignUp userSignUp)
     {
-        
-        if (userSignUp.Password != userSignUp.ConfirmPassword) 
+        if (userSignUp.Password != userSignUp.ConfirmPassword)
             throw new Exception("Passwords don't match");
         Console.WriteLine("Ok1");
         await _userSignUpStore.UserSignUp(userSignUp);
