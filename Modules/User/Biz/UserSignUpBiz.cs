@@ -1,7 +1,11 @@
-using HiHoHuBlog.modules.user.biz;
 using HiHoHuBlog.modules.user.model;
 using Microsoft.AspNetCore.Components;
 namespace HiHoHuBlog.Modules.User.Biz;
+
+public interface IUserSignUpBiz
+{
+    Task SignUp(UserSignUp userSignUp);
+}
 
 public interface IUserSignUpStore
 {
