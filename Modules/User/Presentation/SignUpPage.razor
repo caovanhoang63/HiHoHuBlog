@@ -1,9 +1,13 @@
 @page "/signup"
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
 @using HiHoHuBlog.Components.Layout
+@using HiHoHuBlog.modules.user.biz
 @using HiHoHuBlog.modules.user.model;
 
 @using Microsoft.AspNetCore.Components.Forms
+@rendermode InteractiveServer
 @inject NavigationManager NavigationManager
+@inject IUserSignUpBiz UserSignUpBiz 
 @layout NonLayout
 
 <div  class="h-screen flex">
@@ -53,12 +57,24 @@
     private UserSignUp? User { get; set; } = new UserSignUp();
 
 
-    private void Submit(EditContext obj)
+    private async Task Submit(EditContext obj)
     {
         Console.WriteLine(User);
-        if (User?.Password != User?.ConfirmPassword)
+
+
+        if (User != null)
         {
-            // if (User != null) UserSignUpUpBiz.SignUp(User);
+            try
+            {
+               await UserSignUpBiz.SignUp(User);
+               NavigationManager.NavigateTo("/login");
+
+            }
+            catch (Exception e)
+            {
+
+                Console.WriteLine(e);
+            }
         }
     }
 

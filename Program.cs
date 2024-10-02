@@ -1,4 +1,7 @@
 using HiHoHuBlog.Components;
+using HiHoHuBlog.modules.user.biz;
+using HiHoHuBlog.Modules.User.Biz;
+using HiHoHuBlog.Modules.User.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,7 +9,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+
+builder.Services.AddScoped<IUserSignUpStore, DummyData>();
+builder.Services.AddScoped<IUserSignUpBiz,UserSignUpBiz>();
+
+
 var app = builder.Build();
+
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

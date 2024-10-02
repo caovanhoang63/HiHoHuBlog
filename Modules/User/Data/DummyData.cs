@@ -3,10 +3,11 @@ using HiHoHuBlog.modules.user.model;
 
 namespace HiHoHuBlog.Modules.User.Data;
 
-public class DummyData :IUseSignUpStore
+public class DummyData : IUserSignUpStore
 {
-    public void UseSignStore(UserSignUp userSignUp)
+    public async Task UserSignUp(UserSignUp userSignUp)
     {
         Console.WriteLine("Dummy Data");
+        await Task.Delay(100);
     }
 }

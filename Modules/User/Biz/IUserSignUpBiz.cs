@@ -2,7 +2,7 @@ using HiHoHuBlog.modules.user.model;
 
 namespace HiHoHuBlog.modules.user.biz;
 
-public interface IUseSignUpBiz
+public interface IUserSignUpBiz
 {
-    void SignUp(UserSignUp userSignUp);
+    Task SignUp(UserSignUp userSignUp);
 }
