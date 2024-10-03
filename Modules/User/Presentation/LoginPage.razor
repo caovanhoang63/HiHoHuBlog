@@ -48,7 +48,7 @@
     private EditContext? _editContext;
 
     [SupplyParameterFromForm(FormName = "LoginForm")]
-    private UserLogin? User { get; } = new();
+    private UserLogin? User { get; set; } = new UserLogin();
 
     private async Task OnSubmit(EditContext editContext)
     {

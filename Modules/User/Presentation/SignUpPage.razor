@@ -53,7 +53,7 @@
     private EditContext? _editContext;
 
     [SupplyParameterFromForm(FormName = "SignupForm")]
-    private UserSignUp? User { get; } = new();
+    private UserSignUp? User { get; set; } = new UserSignUp();
 
     private async Task Submit(EditContext obj)
     {
