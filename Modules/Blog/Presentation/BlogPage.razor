@@ -1,0 +1,26 @@
+@page "/{UserName}/{Slug}"
+@rendermode InteractiveServer
+@using HiHoHuBlog.Components.Components
+
+<Container>
+    <h3>@UserName + @Slug</h3>
+    <p>@count</p>
+    <button  @onclick="onClick" class="btn-ghost btn">CCC</button>
+</Container>
+
+@code {
+    [Parameter]
+    public string UserName { get; set; }
+    [Parameter]
+    public string Slug { get; set; }
+
+    private int count = 0;
+
+    private void onClick()
+    {
+        count++;
+        Console.WriteLine("OK");
+    }
+    
+    
+}

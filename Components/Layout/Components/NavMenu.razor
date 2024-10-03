@@ -1,4 +1,16 @@
-﻿<div class="navbar border-b-[1px]">
+﻿@using System.Net.Http
+@using System.Net.Http.Json
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.JSInterop
+@using HiHoHuBlog
+@using HiHoHuBlog.Components
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+<div class="navbar border-b-[1px]">
     <div class="flex-1">
         <a class="btn btn-ghost  text-xl">Hihohu</a>
         <label class="input input-bordered flex items-center gap-2 bg-white">
@@ -16,7 +28,7 @@
         </label>
     </div>
     <div class="flex-none gap-2">
-        <button class="btn btn-ghost sm">
+        <button @onclick="OnWrite" class="btn btn-ghost sm">
             <span>
                 Write
             </span>
@@ -53,3 +65,15 @@
         </div>
     </div>
 </div>
+
+@code {
+
+
+    private async  Task OnWrite()
+    {
+        Console.Write("Ok");
+        NavigationManager.NavigateTo("/new-blog");
+
+    }
+
+}
