@@ -3,26 +3,28 @@
 @rendermode InteractiveServer
 
 @using HiHoHuBlog.Components.Components
-<Container ContainerClass="h-full">
-        <div class="flex justify-between py-10">
-            <h1>Title</h1>
-            <button @onclick="OnClick" class="btn btn-primary">Save</button>
+<div class="h-screen ">
+    <Container ContainerClass="pb-80">
+        <div class="flex justify-between py-10 ">
+            <input placeholder="title" class="text-4xl w-full input focus:ring-0 border-transparent focus:border-transparent !outline-none" @bind="Title"/>
         </div>
         <div class="h-full">
             <TextEditor Toolbar="new Toolbar { ShowFullToolbar = true }" EditorContainerId="TestId" @ref="@MyEditor"
                         Placeholder="Enter non HTML format like centering...">
             </TextEditor>
         </div>
-    @count
-</Container>
+        @Title
+    </Container>
+</div>
+
 
 @code {
     private string count = "";
     TextEditor MyEditor;
 
+    private string Title { get; set; } = "";
+    
     private async Task OnClick()
     {
-        count = await MyEditor.GetText();
     }
-
 }
