@@ -6,6 +6,12 @@ namespace HiHoHuBlog;
 
 public class Startup
 {
+    public Startup (IConfiguration configuration)
+    {
+        Configuration = configuration;
+    }
+    public IConfiguration Configuration { get; }
+
     public void ConfigureServices(IServiceCollection services)
     {
         // Register your services here
@@ -14,6 +20,10 @@ public class Startup
 
         services.AddScoped<IUserSignUpStore, DummyData>();
         services.AddScoped<IUserSignUpBiz, UserSignUpBiz>();
+        
+        var connectionString = Configuration.GetConnectionString("DefaultConnection");
+        Console.WriteLine(connectionString);
+
     }
 
     public void Configure(WebApplication app)

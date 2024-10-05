@@ -2,3 +2,4 @@
 - dotnet watch 
 - Link Figma: https://www.figma.com/design/PhxS2VbYVg5enKW5Q01R7z/Untitled?m=auto&t=m9kIkEZbdCCcvBsT-6
 - Tiny editor: https://www.tiny.cloud/solutions/wysiwyg-blazor-rich-text-editor/
+- Set Connection String: `dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Your_Connection_String_Here"`
