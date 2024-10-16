@@ -8,10 +8,7 @@ using MySqlConnector;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = new MySqlConnectionStringBuilder();
 
-// connectionString.Server = "database-1.c7k00k46qm5n.ap-southeast-1.rds.amazonaws.com";
-// connectionString.UserID = "admin";
-// connectionString.Password = "GVo22W0i6Niv94xXB4lt";
-// connectionString.Database = "blog";
+
 
 
 
