@@ -1,12 +1,11 @@
 @page "/signup"
 @using HiHoHuBlog.Components.Layout
-@using HiHoHuBlog.Modules.User.Biz
-@using HiHoHuBlog.modules.user.model
-@using Microsoft.AspNetCore.Components.Forms
-@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@using HiHoHuBlog.Modules.User.Entity
+@using HiHoHuBlog.Modules.User.Service
+@using HiHoHuBlog.Modules.User.Service.Interface
 @rendermode InteractiveServer
 @inject NavigationManager NavigationManager
-@inject IUserSignUpBiz UserSignUpBiz 
+@inject IUserSignUpService UserSignUpService 
 @layout NonLayout
 
 <div class="h-screen flex">
@@ -17,31 +16,31 @@
             </div>
             @if (User != null)
             {
-                <InputText @bind-Value="User.FirstName" type="text" placeholder="John" class="input input-bordered w-full "/>
+                <InputText tabindex="1" @bind-Value="User.FirstName" type="text" placeholder="John" class="input input-bordered w-full"/>
                 @:</label>
                 <label class="form-control w-full ">
                     <div class="label">
                         <span class="label-text">Last name</span>
                     </div>
-                    <InputText @bind-Value="User.LastName" type="text" placeholder="Cena" class="input input-bordered w-full "/>
+                    <InputText tabindex="2" @bind-Value="User.LastName" type="text" placeholder="Cena" class="input input-bordered w-full "/>
                 </label>
                 <label class="form-control w-full ">
                     <div class="label">
                         <span class="label-text">Email</span>
                     </div>
-                    <InputText @bind-Value="User.Email" type="email" placeholder="john.cena@email.com" class="input input-bordered w-full"/>
+                    <InputText tabindex="3"  @bind-Value="User.Email" type="email" placeholder="john.cena@email.com" class="input input-bordered w-full"/>
                 </label>
                 <label class="form-control w-full ">
                     <div class="label">
                         <span class="label-text">Password</span>
                     </div>
-                    <InputText @bind-Value="User.Password" type="password" placeholder="Type here" class="input input-bordered w-full"/>
+                    <InputText tabindex="4"  @bind-Value="User.Password" type="password" placeholder="Type here" class="input input-bordered w-full"/>
                 </label>
                 @:<label class="form-control w-full ">
                 <div class="label">
                     <span class="label-text">Confirm password</span>
                 </div>
-                <InputText @bind-Value="User.ConfirmPassword" type="password" placeholder="Type here" class="input input-bordered w-full"/>
+                <InputText tabindex="5"  @bind-Value="User.ConfirmPassword" type="password" placeholder="Type here" class="input input-bordered w-full"/>
             }
         </label>
         <input type="submit" class="btn mt-10" value="Sign Up"/>
@@ -61,15 +60,13 @@
 
         if (User != null)
         {
-            try
+            var r = await UserSignUpService.SignUp(User);
+            if (!r.IsOk)
             {
-                await UserSignUpBiz.SignUp(User);
-                NavigationManager.NavigateTo("/login");
+                Console.WriteLine(r.Error);
+                return;
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
+            NavigationManager.NavigateTo("/login");
         }
     }
 

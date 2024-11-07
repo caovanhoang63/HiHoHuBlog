@@ -43,7 +43,7 @@ CREATE TABLE `users` (
                          PRIMARY KEY (`id`),
                          KEY `status` (`status`) USING BTREE,
                          UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;;
 
 DROP TABLE IF EXISTS `user_follow`;
 CREATE TABLE `user_follow` (
@@ -51,7 +51,7 @@ CREATE TABLE `user_follow` (
                                `user_following` INT,
                                `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                PRIMARY KEY (`user_id`,`user_following`)
-)ENGINE=InnoDB;
+)ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;;
 
 DROP TABLE IF EXISTS `user_details`;
 CREATE TABLE `user_details` (
@@ -61,7 +61,7 @@ CREATE TABLE `user_details` (
                                 `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
                                 `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                 PRIMARY KEY (`id`)
-)ENGINE=InnoDB;
+)ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;;
 
 DROP TABLE IF EXISTS `blogs`;
 CREATE TABLE `blogs` (
@@ -78,7 +78,7 @@ CREATE TABLE `blogs` (
                          `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                          PRIMARY KEY (`id`),
                          KEY `status` (`status`) USING BTREE
-)ENGINE=InnoDB;
+)ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;;
 
 DROP TABLE IF EXISTS `categories`;
 CREATE TABLE  `categories` (
@@ -88,7 +88,7 @@ CREATE TABLE  `categories` (
                                `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                PRIMARY KEY (`id`),
                                KEY `status` (`status`) USING BTREE
-)ENGINE=InnoDB;
+)ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;;
 
 DROP TABLE IF EXISTS `blog_category`;
 CREATE TABLE `blog_category` (
@@ -96,7 +96,7 @@ CREATE TABLE `blog_category` (
                                  `category_id` INT,
                                  `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
                                  PRIMARY KEY (`blog_id`,`category_id`)
-)ENGINE=InnoDB;
+)ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;;
 
 DROP TABLE IF EXISTS `user_like_blog`;
 CREATE TABLE  `user_like_blog` (
@@ -104,7 +104,7 @@ CREATE TABLE  `user_like_blog` (
                                    `blog_id` INT,
                                    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                    PRIMARY KEY (`user_id`,`blog_id`)
-)ENGINE=InnoDB;
+)ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;;
 
 DROP TABLE IF EXISTS `bookmarks`;
 CREATE TABLE  `bookmarks` (
@@ -112,7 +112,7 @@ CREATE TABLE  `bookmarks` (
                               `blog_id` INT,
                               `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                               PRIMARY KEY (`user_id`,`blog_id`)
-)ENGINE=InnoDB;
+)ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;;
 
 DROP TABLE IF EXISTS `user_read_blogs`;
 CREATE TABLE  `user_read_blogs` (
@@ -120,7 +120,7 @@ CREATE TABLE  `user_read_blogs` (
                                     `blog_id` INT,
                                     `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                     PRIMARY KEY (`user_id`,`blog_id`)
-)ENGINE=InnoDB;
+)ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;;
 
 DROP TABLE IF EXISTS `comments`;
 CREATE TABLE `comments` (
@@ -129,4 +129,4 @@ CREATE TABLE `comments` (
                             `content` text,
                             `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                             PRIMARY KEY (`user_id`,`blog_id`)
-)ENGINE=InnoDB;
+)ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;;

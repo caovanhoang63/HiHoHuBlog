@@ -1,29 +1,35 @@
 using HiHoHuBlog;
 using HiHoHuBlog.Components;
-using HiHoHuBlog.Modules.User.Biz;
-using HiHoHuBlog.Modules.User.Data;
+using HiHoHuBlog.Modules.User;
+using HiHoHuBlog.Modules.User.Service;
+using HiHoHuBlog.Modules.User.Repository;
+using HiHoHuBlog.Modules.User.Repository.Implementation;
+using HiHoHuBlog.Modules.User.Service.Implementation;
+using HiHoHuBlog.Modules.User.Service.Interface;
 using Microsoft.EntityFrameworkCore;
-using MySqlConnector;
+using Microsoft.EntityFrameworkCore.Design;
+
 
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = new MySqlConnectionStringBuilder();
-
-
-
-
+builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddScoped<IUserSignUpStore, EFData>();
-builder.Services.AddScoped<IUserLoginStore, EFData>();
+builder.Services.AddScoped<IUserRepository, EfRepo>();
 
-builder.Services.AddScoped<IUserSignUpBiz, UserSignUpBiz>();
-builder.Services.AddScoped<IUserLoginBiz, UserLoginBiz>();
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(connectionString.ToString(), new MySqlServerVersion("8.0.35"))
-    // The following three options help with debugging, but should
-    // be changed or removed for production.
+builder.Services.AddScoped<IUserSignUpService, UserSignUpService>();
+builder.Services.AddScoped<IUserLoginService, UserLoginService>();
+
+builder.Services.AddAutoMapper(typeof(UserMappingProfile));
+
+
+Console.WriteLine(builder.Configuration.GetConnectionString("DefaultConnection"));
+
+builder.Services.AddDbContext<ApplicationDbContext>(
+    options => options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
+            new MySqlServerVersion("8.0.35"))
     .LogTo(Console.WriteLine, LogLevel.Information)
     .EnableSensitiveDataLogging()
     .EnableDetailedErrors());

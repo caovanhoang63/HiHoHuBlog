@@ -1,13 +1,12 @@
 @page "/login"
 @using HiHoHuBlog.Components.Layout
-@using HiHoHuBlog.Modules.User.Biz
-@using HiHoHuBlog.Modules.User.Model
-@using Microsoft.AspNetCore.Components.Forms
-@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@using HiHoHuBlog.Modules.User.Service
+@using HiHoHuBlog.Modules.User.Entity
+@using HiHoHuBlog.Modules.User.Service.Interface
 @rendermode InteractiveServer
 @layout NonLayout
 @inject NavigationManager NavigationManager
-@inject IUserLoginBiz UserLoginBiz
+@inject IUserLoginService UserLoginService
 <div class="h-screen flex">
     <EditForm FormName="LoginForm" Model="@User" OnSubmit="@OnSubmit" EditContext="_editContext" class="w-96 m-auto form-control gap-2 ">
         <label class="input input-bordered flex items-center gap-2">
@@ -56,7 +55,7 @@
         if (User != null)
             try
             {
-                await UserLoginBiz.Login(User);
+                await UserLoginService.Login(User);
                 NavigationManager.NavigateTo("/");
             }
             catch (Exception e)
