@@ -1,3 +1,4 @@
+using Blazored.Toast;
 using HiHoHuBlog;
 using HiHoHuBlog.Components;
 using HiHoHuBlog.Modules.User;
@@ -34,6 +35,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(
     .EnableSensitiveDataLogging()
     .EnableDetailedErrors());
 
+builder.Services.AddBlazoredToast();
 
 var app = builder.Build();
 
