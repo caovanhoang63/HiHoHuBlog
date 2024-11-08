@@ -41,7 +41,11 @@ public class UserSignUpService(IUserRepository userRepo) : IUserSignUpService
         byte[] buffer = Encoding.UTF8.GetBytes(u.Password + u.Salt);
         u.Password=  Encoding.UTF8.GetString(SHA256.HashData(buffer));
         
-        await userRepo.Create(u);
+        var i= await userRepo.Create(u);
+        if (!i.IsOk)
+        {
+            return Result<Unit, Err>.Err(i.Error);
+        }
         return Result<Unit, Err>.Ok(new Unit());
     }
 }

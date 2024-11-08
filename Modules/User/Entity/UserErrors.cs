@@ -12,4 +12,8 @@ public static class UserErrors
     {
         return new Err($"Password does not match.");
     }
+    public static Err ErrInvalidEmailOrPassword()
+    {
+        return new Err("Invalid email or password.");
+    }
 }
