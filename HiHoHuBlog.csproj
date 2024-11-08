@@ -194,9 +194,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Modules\Blog\Biz\" />
-        <Folder Include="Modules\Blog\Data\" />
-        <Folder Include="Modules\Blog\Model\" />
         <Folder Include="wwwroot\lib\" />
     </ItemGroup>
 
@@ -208,6 +205,7 @@
       <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.10" />
       <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2" />
       <PackageReference Include="Pomelo.EntityFrameworkCore.MySql.Design" Version="1.1.2" />
+      <PackageReference Include="System.Reactive" Version="6.0.1" />
       <PackageReference Include="System.Text.Json" Version="8.0.5" />
       <PackageReference Include="WYSIWYGTextEditor" Version="1.0.1" />
     </ItemGroup>

@@ -11,4 +11,15 @@ public static class UtilErrors
     {
         return new Err(msg[0],404);
     }
+
+    public static Err ErrEntityNotFound(string entityName)
+    {
+        return new Err($"{entityName} not found");
+    }
+
+
+    public static Err ErrNoPermission()
+    {
+        return new Err("You do not have permission to access this resource");
+    }
 }

@@ -1,30 +1,82 @@
 @page "/new-blog"
+@using System.Reactive.Linq
+@using System.Reactive.Subjects
 @using WYSIWYGTextEditor
 @rendermode InteractiveServer
-
 @using HiHoHuBlog.Components.Components
+@using HiHoHuBlog.Modules.Blog.Entity
+@using HiHoHuBlog.Modules.Blog.Service.Interface
+@using HiHoHuBlog.Utils
+@inject NavigationManager NavigationManager
+@inject ICreateBlogService CreateBlogService
+@inject IBlogUpdateService BlogUpdateService
+
 <div class="h-screen ">
     <Container ContainerClass="pb-80">
         <div class="flex justify-between py-10 ">
-            <input placeholder="title" class="text-4xl w-full input focus:ring-0 border-transparent focus:border-transparent !outline-none" @bind="Title"/>
+            <input @oninput="OnSearchQueryInput" placeholder="title" class="text-4xl w-full input focus:ring-0 border-transparent focus:border-transparent !outline-none"/>
         </div>
         <div class="h-full">
-            <TextEditor Toolbar="new Toolbar { ShowFullToolbar = true }" EditorContainerId="TestId" @ref="@MyEditor"
-                        Placeholder="Enter non HTML format like centering...">
+            <TextEditor  Toolbar="new Toolbar { ShowFullToolbar = true }" EditorContainerId="TestId" @ref="@TextEditor"
+                         Placeholder="Enter non HTML format like centering...">
             </TextEditor>
         </div>
-        @Title
     </Container>
 </div>
 
 
 @code {
-    private string count = "";
-    TextEditor MyEditor;
-
-    private string Title { get; set; } = "";
+    TextEditor TextEditor;
+    private readonly BlogCreate _blog = new BlogCreate();
     
-    private async Task OnClick()
+   
+    private IDisposable? _titleSubscription;
+    private Subject<string?> titleSubject = new();
+    private IDisposable? _contentSubscription;
+    private Subject<string?> contentSubject = new();
+    
+    
+    private IRequester _requester = new Requester();
+    private bool _firstChange = false;
+
+    private void OnSearchQueryInput(ChangeEventArgs args)
     {
+        var title = args.Value?.ToString();
+        
+        titleSubject.OnNext(title?.Trim());
     }
+    
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        _titleSubscription = titleSubject
+            .Throttle(TimeSpan.FromMilliseconds(300))
+            .Subscribe(async title =>
+            {
+                _blog.Title = title;
+                if (!_firstChange)
+                {
+                    _firstChange = true;
+                    await CreateBlogService.CreateNewBlog(_requester, _blog);
+                }
+                else
+                {
+                    var r = await BlogUpdateService.UpdateTitle(_requester, _blog.Id, title);
+                }
+            });
+    }
+    
+    
+    
+    public void Dispose()
+    {
+        _titleSubscription?.Dispose();
+    }
+
+    private async void Callback(ChangeEventArgs obj)
+    {
+        Console.WriteLine(await TextEditor.GetHTML());
+    }
+
 }
