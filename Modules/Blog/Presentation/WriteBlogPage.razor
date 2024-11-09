@@ -3,19 +3,25 @@
 @rendermode InteractiveServer
 
 @using HiHoHuBlog.Components.Components
-<div class="h-screen ">
-    <Container ContainerClass="pb-80">
-        <div class="flex justify-between py-10 ">
-            <input placeholder="title" class="text-4xl w-full input focus:ring-0 border-transparent focus:border-transparent !outline-none" @bind="Title"/>
-        </div>
-        <div class="h-full">
-            <TextEditor Toolbar="new Toolbar { ShowFullToolbar = true }" EditorContainerId="TestId" @ref="@MyEditor"
-                        Placeholder="Enter non HTML format like centering...">
-            </TextEditor>
-        </div>
-        @Title
-    </Container>
-</div>
+
+<AuthorizeView Roles="admin, user">
+    <Authorized>
+    <div class="h-screen ">
+        <Container ContainerClass="pb-80">
+            <div class="flex justify-between py-10 ">
+
+                <input placeholder="title" class="text-4xl w-full input focus:ring-0 border-transparent focus:border-transparent !outline-none" @bind="Title"/>
+            </div>
+            <div class="h-full">
+                <TextEditor Toolbar="new Toolbar { ShowFullToolbar = true }" EditorContainerId="TestId" @ref="@MyEditor"
+                            Placeholder="Enter non HTML format like centering...">
+                </TextEditor>
+            </div>
+            @Title
+        </Container>
+    </div>
+    </Authorized>
+</AuthorizeView>
 
 
 @code {

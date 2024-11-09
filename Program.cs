@@ -21,7 +21,7 @@ builder.Services.AddScoped<IUserRepository, EfRepo>();
 
 builder.Services.AddScoped<IUserSignUpService, UserSignUpService>();
 builder.Services.AddScoped<IUserLoginService, UserLoginService>();
-
+builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 builder.Services.AddAutoMapper(typeof(UserMappingProfile));
 
 
@@ -35,6 +35,22 @@ builder.Services.AddDbContext<ApplicationDbContext>(
     .EnableDetailedErrors());
 
 
+
+builder.Services.AddAuthentication(AuthConstant.Scheme)
+    .AddCookie(AuthConstant.Scheme, options =>
+    {
+        options.Cookie.Name = AuthConstant.CookieName;
+        options.LoginPath = "/login";
+        options.LogoutPath = "/logout";
+        options.Cookie.HttpOnly = true;
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SameSite = SameSiteMode.Strict;
+        options.SlidingExpiration = true;
+        
+    });
+
+builder.Services.AddCascadingAuthenticationState();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -46,9 +62,11 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseStaticFiles();
 app.UseAntiforgery();
+
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();

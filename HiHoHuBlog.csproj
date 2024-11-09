@@ -202,6 +202,8 @@
 
     <ItemGroup>
       <PackageReference Include="AutoMapper" Version="13.0.1" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.10" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.10" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="8.0.10" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="8.0.10" />
