@@ -69,7 +69,8 @@
                 ReadOnly,
                 Placeholder,
                 Theme,
-                DebugLevel, Fonts);
+                DebugLevel,
+                Fonts);
             // Bind the editor change event if OnChange is specified
             if (OnChange.HasDelegate)
             {
@@ -81,7 +82,7 @@
     
     
     [JSInvokable]
-    public async Task OnChangeHandler(string content)
+    public  async Task OnChangeHandler(string content)
     {
         await OnChange.InvokeAsync(content);
     }

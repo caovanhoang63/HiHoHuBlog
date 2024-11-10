@@ -27,15 +27,15 @@
         },
 
         bindOnChangeEvent: function (element, dotNetHelper) {
-            if (!element || !element.quill) return;
+            if (!element || !element.__quill) return;
 
-            element.quill.on('text-change', function () {
-                var content = element.quill.root.innerHTML;
+            element.__quill.on('text-change', function () {
+                var content = element.__quill.root.innerHTML;
                 dotNetHelper.invokeMethodAsync('OnChangeHandler', content);
             });
         },
 
-
+    
         getQuillContent: function(quillElement) {
             return JSON.stringify(quillElement.__quill.getContents());
         },

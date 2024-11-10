@@ -36,8 +36,8 @@
             </div>    
         }
         <div class="h-full">
-            <TextEditor  Toolbar="new Toolbar { ShowFullToolbar = true }" EditorContainerId="TestId" @ref="@TextEditor"
-                         Placeholder="Write your own words...">
+            <TextEditor OnChange="OnChange" Toolbar="new Toolbar { ShowFullToolbar = true }" EditorContainerId="TestId" @ref="@TextEditor"
+                          Placeholder="Write your own words...">
             </TextEditor>
         </div>
         
@@ -55,6 +55,12 @@
     {
         Console.WriteLine(await TextEditor.GetHTML());
     }
+
+    private  async void OnChange(string args)
+    {
+        Console.WriteLine("OK");
+    }
+    
     private bool _isSaving = false;
     private readonly BlogCreate _blog = new BlogCreate();
    
