@@ -8,7 +8,6 @@ public class BlogUpdateService(IBlogRepository blogRepo) : IBlogUpdateService
 {
     private readonly IBlogRepository _blogRepo = blogRepo;
 
-
     public async Task<Result<Unit, Err>> UpdateTitle(IRequester requester, int id, string title)
     {
         var old = await blogRepo.GetBlogById(id);
