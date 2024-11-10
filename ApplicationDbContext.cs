@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using HiHoHuBlog.Modules.Blog.Entity;
 using HiHoHuBlog.Modules.User.Entity;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,10 +12,12 @@ public class ApplicationDbContext : DbContext
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options):base(options){}
     
     public DbSet<User> Users { get; set; }
+    public DbSet<Blog> Blogs { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Ignore<JsonDocument>();
         modelBuilder.Entity<User>().ToTable("users");
+        modelBuilder.Entity<Blog>().ToTable("blogs");
         
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
         {

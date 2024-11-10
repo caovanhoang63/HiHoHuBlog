@@ -61,15 +61,17 @@ CREATE TABLE `user_details` (
                                 `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
                                 `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                 PRIMARY KEY (`id`)
-)ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;;
+)ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
+
+SELECT * from blogs;
 
 DROP TABLE IF EXISTS `blogs`;
 CREATE TABLE `blogs` (
                          `id` INT NOT NULL AUTO_INCREMENT,
                          `user_id` INT NOT NULL,
                          `title` varchar(255) DEFAULT NULL,
-                         `slug` varchar(255) NOT NULL,
                          `is_published` boolean,
+                         `content` TEXT, 
                          `total_view` INT NOT NULL DEFAULT 0,
                          `total_like` INT NOT NULL DEFAULT 0,
                          `total_mark` INT NOT NULL DEFAULT 0,
@@ -78,7 +80,7 @@ CREATE TABLE `blogs` (
                          `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                          PRIMARY KEY (`id`),
                          KEY `status` (`status`) USING BTREE
-)ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;;
+)ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
 
 DROP TABLE IF EXISTS `categories`;
 CREATE TABLE  `categories` (
