@@ -56,9 +56,9 @@
         Console.WriteLine(await TextEditor.GetHTML());
     }
 
-    private  async void OnChange(string args)
+    private async void OnChange(string args)
     {
-        Console.WriteLine("OK");
+        // Console.WriteLine(args);
     }
     
     private bool _isSaving = false;
@@ -73,10 +73,9 @@
     private IRequester _requester = new Requester();
     private bool _firstChange = false;
 
-    private  void OnSearchQueryInput(ChangeEventArgs args)
+    private void OnSearchQueryInput(ChangeEventArgs args)
     {
             _isSaving = true;
-
             var title = args.Value?.ToString();
             titleSubject.OnNext(title?.Trim());
             _isSaving = false;

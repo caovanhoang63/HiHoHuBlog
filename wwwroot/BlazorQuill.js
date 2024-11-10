@@ -2,19 +2,31 @@
     window.QuillFunctions = {        
         createQuill: function (
             quillElement, toolBar, readOnly,
-            placeholder, theme, debugLevel, customFonts) {  
-
+            placeholder, theme, debugLevel, customFonts) {
+            Quill.register("modules/imageUploader", ImageUploader);
             Quill.register('modules/blotFormatter', QuillBlotFormatter.default);
 
             var options = {
                 debug: debugLevel,
                 modules: {
                     toolbar: toolBar,
-                    blotFormatter: {}
+                    blotFormatter: {},
+                    imageUploader: {
+                        upload: (file) => {
+                            console.warn(123);
+                            return new Promise((resolve, reject) => {
+                                setTimeout(() => {
+                                    resolve(
+                                        "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/JavaScript-logo.png/480px-JavaScript-logo.png"
+                                    );
+                                }, 3500);
+                            });
+                        }}
+                    
                 },
                 placeholder: placeholder,
                 readOnly: readOnly,
-                theme: theme
+                theme: theme,
             };
 
             if (customFonts != null) {
@@ -28,14 +40,13 @@
 
         bindOnChangeEvent: function (element, dotNetHelper) {
             if (!element || !element.__quill) return;
-
             element.__quill.on('text-change', function () {
                 var content = element.__quill.root.innerHTML;
                 dotNetHelper.invokeMethodAsync('OnChangeHandler', content);
             });
         },
 
-    
+      
         getQuillContent: function(quillElement) {
             return JSON.stringify(quillElement.__quill.getContents());
         },
@@ -62,6 +73,7 @@
             if (quillElement.__quill.getSelection() !== null) {
                 editorIndex = quillElement.__quill.getSelection().index;
             }
+            console.error(123)
 
             return quillElement.__quill.updateContents(
                 new Delta()

@@ -35,6 +35,9 @@ builder.Services.AddScoped<IBlogUpdateService, BlogUpdateService>();
 
 builder.Services.AddAutoMapper(typeof(UserMappingProfile));
 builder.Services.AddAutoMapper(typeof(BlogMappingProfile));
+builder.Services.AddSignalR(e => {
+    e.MaximumReceiveMessageSize = 102400000;
+});
 
 
 Console.WriteLine(builder.Configuration.GetConnectionString("DefaultConnection"));
