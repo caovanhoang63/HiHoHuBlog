@@ -2,10 +2,10 @@
     window.QuillFunctions = {        
         createQuill: function (
             quillElement, toolBar, readOnly,
-            placeholder, theme, debugLevel, customFonts) {
+            placeholder, theme, debugLevel, customFonts,dotNetHelper) {
             Quill.register("modules/imageUploader", ImageUploader);
             Quill.register('modules/blotFormatter', QuillBlotFormatter.default);
-
+            
             var options = {
                 debug: debugLevel,
                 modules: {
@@ -13,13 +13,28 @@
                     blotFormatter: {},
                     imageUploader: {
                         upload: (file) => {
-                            console.warn(123);
                             return new Promise((resolve, reject) => {
-                                setTimeout(() => {
-                                    resolve(
-                                        "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/JavaScript-logo.png/480px-JavaScript-logo.png"
-                                    );
-                                }, 3500);
+                                const reader = new FileReader();
+                                reader.readAsDataURL(file);
+                                reader.onload = () => {
+                                        // Convert ArrayBuffer to Byte Array
+                                    dotNetHelper.invokeMethodAsync('OnUpload',file.name,file.type,reader.result)
+                                        .then(
+                                            r => {
+                                                console.error(r)
+                                                resolve(r);
+                                            },
+                                        )
+                                        .catch(
+                                            err => {
+                                                reject(err);
+                                                console.error(err);
+                                            }
+                                        )
+                                }
+                                
+                                
+                                
                             });
                         }}
                     

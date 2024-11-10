@@ -5,20 +5,19 @@ namespace HiHoHuBlog.Modules.Blog.Presentation.Components.TextEditor
 {
     public static class Interop
     {
-        internal static ValueTask<object> CreateQuill(
-            IJSRuntime jsRuntime,
+        internal static ValueTask<object> CreateQuill(IJSRuntime jsRuntime,
             ElementReference quillElement,
             ElementReference toolbar,
             bool readOnly,
             string placeholder,
             string theme,
             string debugLevel,
-            List<string> customFonts=null)
+            List<string> customFonts = null, DotNetObjectReference<TextEditor> dotNetRef =null)
         {
             return jsRuntime.InvokeAsync<object>(
                 "QuillFunctions.createQuill", 
                 quillElement, toolbar, readOnly, 
-                placeholder, theme, debugLevel, customFonts);
+                placeholder, theme, debugLevel, customFonts,dotNetRef);
         }
 
         internal static ValueTask<string> GetText(
