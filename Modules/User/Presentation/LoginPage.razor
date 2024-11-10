@@ -7,6 +7,7 @@
 @layout NonLayout
 @inject NavigationManager NavigationManager
 @inject IUserLoginService UserLoginService
+@inject IToastService toastService
 <div class="h-screen flex">
     <EditForm FormName="LoginForm" Model="@User" OnSubmit="@OnSubmit" class="w-96 m-auto form-control gap-2 ">
         <label class="input input-bordered flex items-center gap-2">
@@ -45,29 +46,23 @@
 
 @code {
     private EditContext? _editContext;
-    
+
     [SupplyParameterFromForm(FormName = "LoginForm")]
     private UserLogin? User { get; set; } = new UserLogin();
-    
+
     private async Task OnSubmit(EditContext editContext)
     {
-       
         Console.WriteLine(User);
         if (User != null)
-        {
-            
-            var i = await UserLoginService.Login(User);
-            if (!i.IsOk)
-            { 
-                //toastService.ShowError(i.Error.Message);
-                Console.WriteLine(i.Error.Message);
-            }
-            else
+            try
             {
-                //toastService.ShowSuccess("Login Success");
-                Console.WriteLine("dang nhap thanh cong");
+                await UserLoginService.Login(User);
                 NavigationManager.NavigateTo("/");
             }
-        }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
     }
+
 }
