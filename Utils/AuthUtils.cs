@@ -5,7 +5,7 @@ namespace HiHoHuBlog.Utils;
 
 public static class AuthUtils
 {
-    public static async Task<Requester> GetInfo(Task<AuthenticationState> authenticationStateTask)
+    public static async Task<IRequester> GetInfo(Task<AuthenticationState> authenticationStateTask)
     {
         var authUser = await authenticationStateTask;
         var user = authUser.User;
