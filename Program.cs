@@ -1,11 +1,18 @@
+using Blazored.Toast;
 using HiHoHuBlog;
 using HiHoHuBlog.Components;
+using HiHoHuBlog.Modules.Blog;
+using HiHoHuBlog.Modules.Blog.Repository;
+using HiHoHuBlog.Modules.Blog.Repository.Implementation;
+using HiHoHuBlog.Modules.Blog.Service.Implementation;
+using HiHoHuBlog.Modules.Blog.Service.Interface;
 using HiHoHuBlog.Modules.User;
 using HiHoHuBlog.Modules.User.Service;
 using HiHoHuBlog.Modules.User.Repository;
 using HiHoHuBlog.Modules.User.Repository.Implementation;
 using HiHoHuBlog.Modules.User.Service.Implementation;
 using HiHoHuBlog.Modules.User.Service.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
@@ -17,12 +24,18 @@ builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, relo
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+
 builder.Services.AddScoped<IUserRepository, EfRepo>();
+builder.Services.AddScoped<IBlogRepository, EfBlogRepo>();
 
 builder.Services.AddScoped<IUserSignUpService, UserSignUpService>();
 builder.Services.AddScoped<IUserLoginService, UserLoginService>();
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
+builder.Services.AddScoped<ICreateBlogService,CreateBlogService>();
+builder.Services.AddScoped<IBlogUpdateService, BlogUpdateService>();
+
 builder.Services.AddAutoMapper(typeof(UserMappingProfile));
+builder.Services.AddAutoMapper(typeof(BlogMappingProfile));
 
 
 Console.WriteLine(builder.Configuration.GetConnectionString("DefaultConnection"));
@@ -34,6 +47,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(
     .EnableSensitiveDataLogging()
     .EnableDetailedErrors());
 
+builder.Services.AddBlazoredToast();
 
 
 builder.Services.AddAuthentication(AuthConstant.Scheme)
@@ -60,6 +74,8 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

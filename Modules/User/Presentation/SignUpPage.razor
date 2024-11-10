@@ -6,10 +6,11 @@
 @rendermode InteractiveServer
 @inject NavigationManager NavigationManager
 @inject IUserSignUpService UserSignUpService 
+@inject IToastService ToastService
 @layout NonLayout
 
 <div class="h-screen flex">
-    <EditForm FormName="SignupForm" Model="User" OnSubmit="@Submit" EditContext="@_editContext" class="w-96 m-auto form-control ">
+    <EditForm FormName="SignupForm" Model="User" OnSubmit="@Submit" class="w-96 m-auto form-control ">
         <label class="form-control w-full ">
             <div class="label">
                 <span class="label-text">First name</span>
@@ -49,8 +50,6 @@
 </div>
 
 @code {
-    private EditContext? _editContext;
-
     [SupplyParameterFromForm(FormName = "SignupForm")]
     private UserSignUp? User { get; set; } = new UserSignUp();
 
@@ -63,7 +62,7 @@
             var r = await UserSignUpService.SignUp(User);
             if (!r.IsOk)
             {
-                Console.WriteLine(r.Error);
+                ToastService.ShowError(r.Error.Message);
                 return;
             }
             NavigationManager.NavigateTo("/login");

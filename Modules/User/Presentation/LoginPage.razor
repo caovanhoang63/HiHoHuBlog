@@ -10,9 +10,10 @@
 @layout NonLayout
 @inject NavigationManager NavigationManager
 @inject IUserLoginService UserLoginService
+@inject IToastService toastService
 @inject IAuthenticateService AuthenticateService
 <div class="h-screen flex">
-    <EditForm FormName="LoginForm" Model="@User" OnSubmit="@OnSubmit"  class="w-96 m-auto form-control gap-2 ">
+    <EditForm FormName="LoginForm" Model="@User" OnSubmit="@OnSubmit" class="w-96 m-auto form-control gap-2 ">
         <label class="input input-bordered flex items-center gap-2">
             <svg
                 xmlns="http://www.w3.org/2000/svg"
