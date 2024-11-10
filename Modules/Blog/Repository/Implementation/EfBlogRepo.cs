@@ -67,9 +67,19 @@ public class EfBlogRepo : IBlogRepository
         }
     }
 
-    public Task<Result<Unit, Err>> DeleteBlog(int id)
+    public async Task<Result<Unit, Err>> DeleteBlog(int id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            await _dbSet.Where(b => b.Id == id).ExecuteUpdateAsync(
+                b => b.SetProperty(u => u.Status, 0));
+            await _context.SaveChangesAsync();
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception ex)
+        {
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(ex));
+        }
     }
 
     public async Task<Result<Entity.Blog?, Err>> GetBlogById(int id)
@@ -77,6 +87,7 @@ public class EfBlogRepo : IBlogRepository
         try
         {
             var entity = await _dbSet.SingleOrDefaultAsync(b => b.Id == id);
+            
             return Result<Entity.Blog?, Err>.Ok(entity);
         }
         catch (Exception e)
@@ -85,10 +96,6 @@ public class EfBlogRepo : IBlogRepository
         }
     }
 
-    public Task<Result<Entity.Blog, Err>> GetBlogBySlug(string slug)
-    {
-        throw new NotImplementedException();
-    }
 
     public async Task<Result<Unit, Err>> UpdateTitle(int id, string title)
     {

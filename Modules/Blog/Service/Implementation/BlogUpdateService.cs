@@ -18,7 +18,7 @@ public class BlogUpdateService(IBlogRepository blogRepo) : IBlogUpdateService
             return Result<Unit, Err>.Err(old.Error);
         }
 
-        if (old.Value is null)
+        if (old.Value is null || old.Value.Status == 0 )
         {
             return Result<Unit, Err>.Err(UtilErrors.ErrEntityNotFound(nameof(Blog)));
         }
@@ -48,7 +48,7 @@ public class BlogUpdateService(IBlogRepository blogRepo) : IBlogUpdateService
             return Result<Unit, Err>.Err(old.Error);
         }
 
-        if (old.Value is null)
+        if (old.Value is null || old.Value.Status == 0)
         {
             return Result<Unit, Err>.Err(UtilErrors.ErrEntityNotFound(nameof(Blog)));
         }
