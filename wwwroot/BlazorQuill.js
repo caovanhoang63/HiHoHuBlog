@@ -5,7 +5,6 @@
             placeholder, theme, debugLevel, customFonts,dotNetHelper) {
             Quill.register("modules/imageUploader", ImageUploader);
             Quill.register('modules/blotFormatter', QuillBlotFormatter.default);
-            
             var options = {
                 debug: debugLevel,
                 modules: {
@@ -21,20 +20,15 @@
                                     dotNetHelper.invokeMethodAsync('OnUpload',file.name,file.type,reader.result)
                                         .then(
                                             r => {
-                                                console.error(r)
                                                 resolve(r);
                                             },
                                         )
                                         .catch(
                                             err => {
                                                 reject(err);
-                                                console.error(err);
                                             }
                                         )
                                 }
-                                
-                                
-                                
                             });
                         }}
                     
