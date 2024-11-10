@@ -50,24 +50,30 @@
 
 @code {
     TextEditor TextEditor;
-
+   
+    private IDisposable? _titleSubscription;
+    private readonly Subject<string?> _titleSubject = new();
+    
+    private IDisposable? _contentSubscription;
+    private readonly Subject<string?> _contentSubject = new();
+    
+    
     private async void Onclick()
     {
         Console.WriteLine(await TextEditor.GetHTML());
     }
 
-    private async void OnChange(string args)
+    private  void OnChange(string args)
     {
-        // Console.WriteLine(args);
+        _isSaving = true;
+        var content = args;
+        _contentSubject.OnNext(content);
+        _isSaving = false;
     }
     
     private bool _isSaving = false;
     private readonly BlogCreate _blog = new BlogCreate();
-   
-    private IDisposable? _titleSubscription;
-    private Subject<string?> titleSubject = new();
-    private IDisposable? _contentSubscription;
-    private Subject<string?> contentSubject = new();
+
     
     
     private IRequester _requester = new Requester();
@@ -77,7 +83,7 @@
     {
             _isSaving = true;
             var title = args.Value?.ToString();
-            titleSubject.OnNext(title?.Trim());
+            _titleSubject.OnNext(title?.Trim());
             _isSaving = false;
     }
     
@@ -85,7 +91,30 @@
     {
         base.OnInitialized();
 
-        _titleSubscription = titleSubject
+        _contentSubscription = _contentSubject
+            .Throttle(TimeSpan.FromMilliseconds(1500))
+            .Subscribe(async content =>
+            {
+                await InvokeAsync(async () =>
+                {
+                    _isSaving = true;
+                    StateHasChanged();
+                    _blog.Content = content;
+                    if (!_firstChange)
+                    {
+                        _firstChange = true;
+                        await CreateBlogService.CreateNewBlog(_requester, _blog);
+                    }
+                    else
+                    {
+                        var r = await BlogUpdateService.UpdateContent(_requester, _blog.Id, content);
+                    }
+                    _isSaving = false;
+                    StateHasChanged();
+                });
+            });
+        
+        _titleSubscription = _titleSubject
             .Throttle(TimeSpan.FromMilliseconds(300))
             .Subscribe(async title =>
             {
@@ -114,6 +143,7 @@
     public void Dispose()
     {
         _titleSubscription?.Dispose();
+        _contentSubscription?.Dispose();
     }
 
     private async void Callback(ChangeEventArgs obj)

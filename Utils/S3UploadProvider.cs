@@ -13,8 +13,6 @@ public class S3UploadProvider : IUploadProvider
         _s3Client = (AmazonS3Client)s3Client;
         _bucketName = configuration["AWS:BucketName"];
         _cdnUrl = configuration["AWS:CdnUrl"];
-        Console.WriteLine($"Bucket: {_bucketName}");
-        Console.WriteLine($"CDN URL: {_cdnUrl}");
     }
 
     public async Task<Result<Image, Err>> UploadImage(byte[] data, string dst)
