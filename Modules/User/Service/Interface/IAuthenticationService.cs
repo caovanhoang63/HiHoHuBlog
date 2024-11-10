@@ -2,5 +2,5 @@
 
 public interface IAuthenticateService
 {
-    Task SignInUserAsync(HttpContext context, string email, string role);
+    Task SignInUserAsync(HttpContext context,string id, string email, string role);
 }

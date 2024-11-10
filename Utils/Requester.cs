@@ -9,6 +9,13 @@ public interface IRequester
 
 public class Requester : IRequester
 {
+    private string id, role;
+
+    public Requester(string id, string role)
+    {
+        this.id = id;
+        this.role = role;
+    }
     public int GetId()
     {
         return 0;

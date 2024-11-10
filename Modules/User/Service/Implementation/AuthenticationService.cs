@@ -8,10 +8,11 @@ namespace HiHoHuBlog.Modules.User.Service.Implementation;
 
 public class AuthenticateService : IAuthenticateService
 {
-    public async Task SignInUserAsync(HttpContext context, string email, string role)
+    public async Task SignInUserAsync(HttpContext context,string id, string email, string role)
     {
         var claims = new List<Claim>
         {
+            new Claim(ClaimTypes.NameIdentifier, id),
             new Claim(ClaimTypes.Email, email),
             new Claim(ClaimTypes.Role, role),
         };
