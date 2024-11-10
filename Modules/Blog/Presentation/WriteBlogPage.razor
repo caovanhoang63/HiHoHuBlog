@@ -13,9 +13,27 @@
 
 <div class="h-screen ">
     <Container ContainerClass="pb-80">
-        <div class="flex justify-between py-10 ">
-            <input @oninput="OnSearchQueryInput" placeholder="title" class="text-4xl w-full input focus:ring-0 border-transparent focus:border-transparent !outline-none"/>
+        <div class="flex justify-between pt-10 ">
+            <input @oninput="OnSearchQueryInput" placeholder="title" class="text-4xl w-full input focus:ring-0 border-transparent focus:border-transparent px-0 !outline-none"/>
         </div>
+        @if (_firstChange)
+        {
+            <div class="py-2">
+                @if (_isSaving)
+                {
+                    <div class="flex align-middle text-gray-500 space-x-2">
+                        <span class="loading loading-spinner loading-md"></span>
+                        <span class="">saving...</span>
+                    </div>  
+                }
+                else
+                {
+                    <div class="flex align-middle text-gray-500 space-x-2">
+                        <span class="">Saved</span>
+                    </div>    
+                }
+            </div>    
+        }
         <div class="h-full">
             <TextEditor  Toolbar="new Toolbar { ShowFullToolbar = true }" EditorContainerId="TestId" @ref="@TextEditor"
                          Placeholder="Enter non HTML format like centering...">
@@ -27,8 +45,9 @@
 
 @code {
     TextEditor TextEditor;
+
+    private bool _isSaving = false;
     private readonly BlogCreate _blog = new BlogCreate();
-    
    
     private IDisposable? _titleSubscription;
     private Subject<string?> titleSubject = new();
@@ -39,11 +58,15 @@
     private IRequester _requester = new Requester();
     private bool _firstChange = false;
 
-    private void OnSearchQueryInput(ChangeEventArgs args)
+    private  void OnSearchQueryInput(ChangeEventArgs args)
     {
-        var title = args.Value?.ToString();
-        
-        titleSubject.OnNext(title?.Trim());
+            _isSaving = true;
+
+            var title = args.Value?.ToString();
+            titleSubject.OnNext(title?.Trim());
+            _isSaving = false;
+
+
     }
     
     protected override void OnInitialized()
@@ -54,16 +77,24 @@
             .Throttle(TimeSpan.FromMilliseconds(300))
             .Subscribe(async title =>
             {
-                _blog.Title = title;
-                if (!_firstChange)
+                await InvokeAsync(async () =>
                 {
-                    _firstChange = true;
-                    await CreateBlogService.CreateNewBlog(_requester, _blog);
-                }
-                else
-                {
-                    var r = await BlogUpdateService.UpdateTitle(_requester, _blog.Id, title);
-                }
+                    _isSaving = true;
+                    StateHasChanged();
+                    _blog.Title = title;
+                    if (!_firstChange)
+                    {
+                        _firstChange = true;
+                        await CreateBlogService.CreateNewBlog(_requester, _blog);
+                    }
+                    else
+                    {
+                        var r = await BlogUpdateService.UpdateTitle(_requester, _blog.Id, title);
+                    }
+                    _isSaving = false;
+                    StateHasChanged();
+                });
+
             });
     }
     
