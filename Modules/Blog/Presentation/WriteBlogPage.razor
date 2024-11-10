@@ -65,18 +65,7 @@
     
     private IRequester _requester;
     private bool _firstChange = false;
-
-    private async Task<ClaimsPrincipal> GetInfo()
-    {
-        var authUser = await authenticationStateTask;
-        var user = authUser.User;
-        if (user.Identity.IsAuthenticated)
-        {
-            _requester = new Requester(user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value,
-                user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value);
-        }
-        return user;
-    }
+    
     private  void OnSearchQueryInput(ChangeEventArgs args)
     {
             _isSaving = true;
@@ -88,8 +77,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        userClaimsPrincipal = await GetInfo(); 
-        //Console.WriteLine(_requester.GetSystemRole());
+        _requester = await AuthUtils.GetInfo(authenticationStateTask); 
     }
 
     protected override void OnInitialized()

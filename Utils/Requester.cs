@@ -18,11 +18,11 @@ public class Requester : IRequester
     }
     public int GetId()
     {
-        return 0;
+        return int.Parse(this.id);
     }
 
     public string GetSystemRole()
     {
-        return "user";
+        return this.role;
     }
 }
