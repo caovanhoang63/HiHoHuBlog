@@ -7,11 +7,14 @@ public class S3UploadProvider : IUploadProvider
 {
     private readonly AmazonS3Client _s3Client;    
     private readonly string _bucketName;
-
+    private readonly string _cdnUrl;
     public S3UploadProvider(IAmazonS3 s3Client, IConfiguration configuration)
     {
         _s3Client = (AmazonS3Client)s3Client;
         _bucketName = configuration["AWS:BucketName"];
+        _cdnUrl = configuration["AWS:CdnUrl"];
+        Console.WriteLine($"Bucket: {_bucketName}");
+        Console.WriteLine($"CDN URL: {_cdnUrl}");
     }
 
     public async Task<Result<Image, Err>> UploadImage(byte[] data, string dst)
@@ -52,7 +55,7 @@ public class S3UploadProvider : IUploadProvider
                 var imageResult = new Image
                 {
                     Id = Path.GetFileName(dst),
-                    Url = $"https://{_bucketName}.s3.amazonaws.com/{dst}",
+                    Url = $"{_cdnUrl}/{dst}",
                     Width = image.Width.ToString(),
                     Height = image.Height.ToString(),
                     CloudName = "AWS",

@@ -109,19 +109,14 @@
             string extension = Path.GetExtension(name);
             string newFileName = $"{Guid.NewGuid()}{extension}";
             
-            
-            // Set up paths
-            string uploadsFolder = Path.Combine("wwwroot", "uploads");
-            Directory.CreateDirectory(uploadsFolder);
-            string filePath = Path.Combine(uploadsFolder, newFileName);
-            
-            // Save the file
-            await File.WriteAllBytesAsync(filePath, fileData);
-
-            // await UploadProvider.UploadImage(fileData, newFileName);
+            var uR = await UploadProvider.UploadImage(fileData, newFileName);
+            if (!uR.IsOk)
+            {
+                Console.Error.WriteLine($"Upload error: {uR.Error}");
+            }
             
             // Return the URL path
-            return $"/uploads/{newFileName}";
+            return uR.Value.Url;
         }
         catch (Exception ex)
         {
