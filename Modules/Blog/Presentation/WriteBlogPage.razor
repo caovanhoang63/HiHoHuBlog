@@ -9,10 +9,13 @@
 @using HiHoHuBlog.Modules.Blog.Service.Interface
 @using HiHoHuBlog.Modules.User.Entity
 @using HiHoHuBlog.Utils
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.Extensions.Logging.Console
 @inject NavigationManager NavigationManager
 @inject ICreateBlogService CreateBlogService
 @inject IBlogUpdateService BlogUpdateService
+
+@attribute [Authorize]
 <AuthorizeView Roles="admin, user">
     <Authorized>
     <div class="h-screen ">

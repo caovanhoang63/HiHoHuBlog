@@ -56,16 +56,19 @@
 
     [SupplyParameterFromForm(FormName = "LoginForm")]
     private UserLogin? User { get; set; } = new UserLogin();
+
     
+    [SupplyParameterFromQuery] 
+    public string ReturnUrl { get; set; } = "/";
     private async Task OnSubmit(EditContext editContext)
     {
         Console.WriteLine(User);
         if (User != null)
         {
-
             await UserLoginService.Login(User);
             await AuthenticateService.SignInUserAsync(Context,"2" ,"123@gmail.com", "user");
-            NavigationManager.NavigateTo("/", true);
+            Console.WriteLine(ReturnUrl);
+            NavigationManager.NavigateTo(ReturnUrl, true);
         }
         
         
