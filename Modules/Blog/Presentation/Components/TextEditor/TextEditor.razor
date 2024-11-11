@@ -1,5 +1,7 @@
 ﻿@using HiHoHuBlog.Modules.Blog.Presentation.Components.TextEditor.Internal
+@using HiHoHuBlog.Utils
 @inject IJSRuntime JSRuntime
+@inject IUploadProvider UploadProvider
 @namespace HiHoHuBlog.Modules.Blog.Presentation.Components.TextEditor
 <div @ref="@ToolBar">
     @if (Toolbar != null)
@@ -62,6 +64,7 @@
     {
         if (firstRender)
         {
+            _dotNetRef = DotNetObjectReference.Create(this);
             await Interop.CreateQuill(
                 JSRuntime,
                 QuillElement,
@@ -70,20 +73,64 @@
                 Placeholder,
                 Theme,
                 DebugLevel,
-                Fonts);
+                Fonts,
+                _dotNetRef);
             // Bind the editor change event if OnChange is specified
             if (OnChange.HasDelegate)
             {
-                _dotNetRef = DotNetObjectReference.Create(this);
                 await JSRuntime.InvokeVoidAsync("QuillFunctions.bindOnChangeEvent", QuillElement, _dotNetRef);
             }
         }
     }
+
+    [JSInvokable]
+    public async Task<string> OnUpload(string name,string type ,string array)
+    {
+
+        try
+        {
+            // Validate file type
+            if (!type.StartsWith("image/"))
+            {
+                throw new Exception("Only image files are allowed");
+            }
+
+            // Remove data:image/...;base64, prefix if present
+            var base64Data = array;
+            if (base64Data.Contains(","))
+            {
+                base64Data = base64Data.Substring(base64Data.IndexOf(",") + 1);
+            }
+
+            // Convert base64 to bytes
+            byte[] fileData = Convert.FromBase64String(base64Data);
+
+            // Generate unique filename with original extension
+            string extension = Path.GetExtension(name);
+            string newFileName = $"{Guid.NewGuid()}{extension}";
+            
+            var uR = await UploadProvider.UploadImage(fileData, newFileName);
+            if (!uR.IsOk)
+            {
+                Console.Error.WriteLine($"Upload error: {uR.Error}");
+            }
+            
+            // Return the URL path
+            return uR.Value.Url;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Upload error: {ex}");
+            throw;
+        }
     
+    }
     
     [JSInvokable]
     public  async Task OnChangeHandler(string content)
     {
+        // Console.WriteLine(123);
+        
         await OnChange.InvokeAsync(content);
     }
 

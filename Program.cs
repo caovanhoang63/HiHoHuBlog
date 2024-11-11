@@ -1,3 +1,6 @@
+using Amazon.Internal;
+using Amazon.Runtime;
+using Amazon.S3;
 using Blazored.Toast;
 using HiHoHuBlog;
 using HiHoHuBlog.Components;
@@ -12,6 +15,7 @@ using HiHoHuBlog.Modules.User.Repository;
 using HiHoHuBlog.Modules.User.Repository.Implementation;
 using HiHoHuBlog.Modules.User.Service.Implementation;
 using HiHoHuBlog.Modules.User.Service.Interface;
+using HiHoHuBlog.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
@@ -20,7 +24,26 @@ using Microsoft.EntityFrameworkCore.Design;
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
 
+
+
+builder.Services.AddSingleton<IAmazonS3>(sp =>
+{
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    var awsAccessKeyId = configuration["AWS:AccessKeyId"];
+    var awsSecretAccessKey = configuration["AWS:SecretAccessKey"];
+    return new AmazonS3Client(awsAccessKeyId, awsSecretAccessKey);
+});
+
+
+
+builder.Services.AddScoped<IUploadProvider, S3UploadProvider>();
 // Add services to the container.
+builder.Services.AddServerSideBlazor()
+    .AddCircuitOptions(options => 
+    {
+        options.DetailedErrors = builder.Environment.IsDevelopment();
+    });
+
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 

@@ -38,7 +38,7 @@ public class BlogUpdateService(IBlogRepository blogRepo) : IBlogUpdateService
         return !result.IsOk ? result : Result<Unit, Err>.Ok(new Unit());
     }
 
-    public async Task<Result<Unit, Err>> UpdateContent(IRequester requester, int id, string content)
+    public async Task<Result<Unit, Err>> UpdateContent(IRequester requester, int id, string? content)
     {
         var old = await blogRepo.GetBlogById(id);
 

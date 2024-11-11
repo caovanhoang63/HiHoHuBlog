@@ -112,7 +112,7 @@ public class EfBlogRepo : IBlogRepository
         }
     }
 
-    public async Task<Result<Unit, Err>> UpdateContent(int id, string content)
+    public async Task<Result<Unit, Err>> UpdateContent(int id, string? content)
     {
         try
         {
