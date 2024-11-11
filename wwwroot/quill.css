@@ -1,7 +1,32 @@
+
 .ql-toolbar {
     border: 0!important;
 }
 
 .ql-container {
     border: 0!important;
+}
+
+.ql-editor {
+    font-size: 1.2rem!important;
+}
+
+.ql-editor > * {
+    margin-top: 1rem!important;
+}
+
+.ql-editor  a {
+    text-decoration: none!important;
+}
+
+.ql-size-large {
+    font-size: 1.8rem!important;
+}
+
+.ql-size-huge {
+    
+}
+
+.ql-size-small {
+    
 }
