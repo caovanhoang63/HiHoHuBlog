@@ -10,5 +10,7 @@ public class BlogMappingProfile : Profile
     {
         CreateMap<BlogCreate, Entity.Blog>();
         CreateMap<BlogMetaDataUpdate, Entity.Blog>();
+        CreateMap<BlogDetail, Entity.Blog>();
+        CreateMap<Entity.Blog,BlogDetail>();
     }
 }

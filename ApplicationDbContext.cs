@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using HiHoHuBlog.Modules.Blog.Entity;
 using HiHoHuBlog.Modules.User.Entity;
 using Microsoft.EntityFrameworkCore;
+using User = HiHoHuBlog.Modules.User.Entity.User;
 
 namespace HiHoHuBlog;
 

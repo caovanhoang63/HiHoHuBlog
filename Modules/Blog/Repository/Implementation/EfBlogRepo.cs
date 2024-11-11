@@ -96,6 +96,20 @@ public class EfBlogRepo : IBlogRepository
         }
     }
 
+    public async Task<Result<BlogDetail?, Err>> GetBlogDetail(int id)
+    {
+        try
+        {
+            var entity = await _dbSet.SingleOrDefaultAsync(b => b.Id == id);
+            
+            return Result<BlogDetail?, Err>.Ok(_mapper.Map<Entity.Blog?,BlogDetail>(entity));
+        }
+        catch (Exception e)
+        {
+            return Result<BlogDetail?, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+    }
+
 
     public async Task<Result<Unit, Err>> UpdateTitle(int id, string title)
     {

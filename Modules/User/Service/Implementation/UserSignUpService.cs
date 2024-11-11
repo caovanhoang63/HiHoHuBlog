@@ -36,7 +36,8 @@ public class UserSignUpService(IUserRepository userRepo) : IUserSignUpService
         if (u.Password != u.ConfirmPassword)
             return Result<Unit, Err>.Err(UserErrors.PasswordDoNotMatch());
         
-        u.UserName =u.Email;
+        u.UserName = u.Email.Split('@')[0];
+        
         u.Salt = Guid.NewGuid().ToString();
         byte[] buffer = Encoding.UTF8.GetBytes(u.Password + u.Salt);
         u.Password=  Encoding.UTF8.GetString(SHA256.HashData(buffer));

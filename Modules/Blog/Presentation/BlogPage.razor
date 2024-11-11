@@ -1,16 +1,18 @@
-@page "/{UserName}/{Slug}"
+@page "/blog/{Slug}"
 @rendermode InteractiveServer
 @using HiHoHuBlog.Components.Components
+@using HiHoHuBlog.Modules.Blog.Entity
+@using HiHoHuBlog.Modules.Blog.Presentation.Components.TextEditor
+@using HiHoHuBlog.Modules.Blog.Service.Interface
+@using User = HiHoHuBlog.Modules.User.Entity.User
+@inject IBlogGetService BlogGetService
+@inject NavigationManager NavigationManager
 
 <Container>
-    @*<h3>@UserName + @Slug</h3>
-    <p>@count</p>
-    <button  @onclick="onClick" class="btn-ghost btn">CCC</button>*@
-
     <div class="container mx-auto px-4 py-8">
         <!-- Header Section -->
         <div class="mb-8">
-            <h1 class="text-4xl font-bold mb-4">Top 10 Microservices Design Patterns you should know</h1>
+            <h1 class="text-4xl font-bold mb-4">@blog?.Title</h1>
 
             <div class="flex items-center gap-4 mb-4">
                 <div class="avatar">
@@ -64,23 +66,56 @@
             
         </div>
 
+        @* Content *@
+        <div>
+            @if (blog is not null)
+            {
+                <TextEditor ReadOnly="true">
+                    <EditorContent>
+                        @((MarkupString)blog.Content)
+                    </EditorContent>
+                </TextEditor>
+            }
+        </div>
         
     </div>
 </Container>
 
 @code {
     [Parameter]
-    public string UserName { get; set; }
-    [Parameter]
     public string Slug { get; set; }
 
-    private int count = 0;
 
-    private void onClick()
-    {
-        count++;
-        Console.WriteLine("OK");
-    }
+    // TextEditor TextEditor;
     
+    
+    public BlogDetail blog { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine(Slug);
+        var request = Slug.Split('-'); 
+        string idString = request[^1];
+        int id;
+        if (!Int32.TryParse(idString, out id))
+        {
+            return;
+        }
+   
+        var r = await BlogGetService.GetBlog(id);
+        if (!r.IsOk || r.Value is null)
+        {
+            return;
+        }
+
+        blog = r.Value;
+        
+        
+
+       
+        if (Slug != r.Value.Slug)
+        {
+            NavigationManager.NavigateTo($"blog/{r.Value.Slug}",forceLoad: false);
+        }
+    }
     
 }
