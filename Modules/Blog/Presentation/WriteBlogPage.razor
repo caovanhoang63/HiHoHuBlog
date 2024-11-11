@@ -60,9 +60,6 @@
     [CascadingParameter] 
     Task<AuthenticationState> authenticationStateTask { get; set; }
 
-    private bool _isSaving = false;
-    private readonly BlogCreate _blog = new BlogCreate();
-   
     private IDisposable? _titleSubscription;
     private readonly Subject<string?> _titleSubject = new();
     
@@ -84,7 +81,6 @@
     private IRequester _requester;
     private bool _firstChange = false;
 
-    private void OnSearchQueryInput(ChangeEventArgs args)
     
     private  void OnSearchQueryInput(ChangeEventArgs args)
     {
