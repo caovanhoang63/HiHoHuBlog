@@ -1,0 +1,25 @@
+﻿@page "/logout"
+@using HiHoHuBlog.Components.Layout
+@using Microsoft.AspNetCore.Authentication
+@inject NavigationManager NavigationManager
+@layout NonLayout
+
+<div class="h-screen flex">
+    
+</div>
+
+@code{
+
+    [CascadingParameter]
+    public HttpContext HttpContext { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        if (HttpContext.User.Identity.IsAuthenticated)
+        {
+            await HttpContext.SignOutAsync(AuthConstant.Scheme);
+            NavigationManager.NavigateTo("/login",replace:true);
+        }
+    }
+}
