@@ -12,8 +12,11 @@
 @inject IUserLoginService UserLoginService
 @inject IToastService toastService
 @inject IAuthenticateService AuthenticateService
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 <div class="h-screen flex">
     <EditForm FormName="LoginForm" Model="@User" OnSubmit="@OnSubmit" class="w-96 m-auto form-control gap-2 ">
+        <input type="hidden" name="__RequestVerificationToken"
+               value="@Antiforgery.GetAndStoreTokens(Context).RequestToken" />
         <label class="input input-bordered flex items-center gap-2">
             <svg
                 xmlns="http://www.w3.org/2000/svg"
