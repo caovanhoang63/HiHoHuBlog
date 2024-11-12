@@ -7,6 +7,7 @@
 @layout AdminLayout
 @inject IBlogGetService BlogGetService
 @inject IToastService ToastService
+@rendermode InteractiveServer
 
 <div>
     <BlogModal @ref="blogModal" Close="Close" Open="IsOpenDetailModal" Blog="Blog"></BlogModal>
@@ -39,7 +40,7 @@
                                 <input checked="@blog.IsPublished" type="checkbox" class="checkbox checkbox-md"/>
                             </label>
                         </td>
-                        <td>-</td>
+                        <td>@blog.PublishedAt</td>
                     </tr>
                 }
             }
@@ -76,6 +77,7 @@
     {
         try
         {
+            Console.WriteLine(123);
             var r = await BlogGetService.GetBlog(id);
         
             if (!r.IsOk)
