@@ -140,4 +140,46 @@ public class EfBlogRepo : IBlogRepository
             return Result<Unit, Err>.Err(UtilErrors.InternalServerError(ex));
         }
     }
+
+    public  async Task<Result<IEnumerable<BlogList>?, Err>> GetBlogList(Filter? filter, Paging paging)
+    {
+        try
+        {
+            var queryable = _dbSet.AsQueryable();
+            if (filter != null)
+            {
+                if (filter.UserId is not null)
+                {
+                    queryable = queryable.Where(b => b.UserId == filter.UserId);
+                }
+
+                if (filter.Status is not null)
+                {
+                    queryable = queryable.Where(b => b.Status == filter.Status);
+                }
+
+                if (filter.IsPublished is not null)
+                {
+                    queryable = queryable.Where(b => b.IsPublished == filter.IsPublished);
+                }
+
+                if (filter.CreatedAt is not null)
+                {
+                    queryable = queryable.Where(b => b.CreatedAt >= filter.CreatedAt);
+                }
+
+                // if (filter.CategoryId is not null)
+                // {
+                //     queryable = queryable.Where(b =>)
+                // }
+            }
+
+            var r = await queryable.Select(b => _mapper.Map<Entity.Blog, BlogList>(b)).ToListAsync();
+            return Result<IEnumerable<BlogList>?, Err>.Ok(r);
+        }
+        catch (Exception ex)
+        {
+            return Result<IEnumerable<BlogList>?, Err>.Err(UtilErrors.InternalServerError(ex));
+        }
+    }
 }

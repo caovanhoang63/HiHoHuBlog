@@ -12,4 +12,5 @@ public interface IBlogRepository
     Task<Result<BlogDetail?, Err>> GetBlogDetail(int id);
     Task<Result<Unit,Err>> UpdateTitle(int id ,string title);
     Task<Result<Unit,Err>> UpdateContent(int id ,string? content);
+    Task<Result<IEnumerable<BlogList>?, Err>> GetBlogList(Filter? filter,Paging paging);
 }

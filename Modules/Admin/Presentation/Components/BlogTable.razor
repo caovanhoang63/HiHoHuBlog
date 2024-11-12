@@ -1,0 +1,46 @@
+@using HiHoHuBlog.Modules.Blog.Entity
+<div class="overflow-x-auto">
+    <table class="table table-xs text-center">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Last Modified</th>
+            <th>Created At</th>
+            <th>Is Publish</th>
+            <th>Publish At</th>
+        </tr>
+        </thead>
+        <tbody>
+            @if (BlogList is not null)
+            {
+                @foreach (var blog in BlogList)
+                {       
+                    <tr @onclick='() => { 
+                            Console.WriteLine(blog.Id);
+                        
+                        }' >
+                        <th class="hover:bg-amber-200">@blog.Id</th>
+                        <td>@blog.Title</td>
+                        <td>Hoang</td>
+                        <td>@blog.UpdatedAt</td>
+                        <td>@blog.CreatedAt</td>
+                        <td>
+                            <label>
+                                <input checked="@blog.IsPublished" type="checkbox" class="checkbox checkbox-md "/>
+                            </label>
+                        </td>
+                        <td>-</td>
+                    </tr>
+                }
+            }
+
+        </tbody>
+    </table>
+</div>
+@code {
+    [Parameter] public IEnumerable<BlogList>? BlogList { get; set; }
+
+    
+}

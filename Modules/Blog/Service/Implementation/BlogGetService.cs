@@ -25,4 +25,16 @@ public class BlogGetService(IBlogRepository blogRepo) : IBlogGetService
        
        return r.Value;
     }
+
+    public async Task<Result<IEnumerable<BlogList>?, Err>> GetBlogs(Filter? filter, Paging paging)
+    {
+        var r = await blogRepo.GetBlogList(filter, paging);
+        if (!r.IsOk)
+        {
+            return Result<IEnumerable<BlogList>?, Err>.Err(r.Error);
+        }
+
+        return r;
+    }
+    
 }

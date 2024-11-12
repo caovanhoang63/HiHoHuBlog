@@ -1,18 +1,8 @@
-﻿@using System.Net.Http
-@using System.Net.Http.Json
-@using Microsoft.AspNetCore.Components.Forms
-@using Microsoft.AspNetCore.Components.Routing
-@using Microsoft.AspNetCore.Components.Web
-@using static Microsoft.AspNetCore.Components.Web.RenderMode
-@using Microsoft.AspNetCore.Components.Web.Virtualization
-@using Microsoft.JSInterop
-@using HiHoHuBlog
-@using HiHoHuBlog.Components
-@rendermode InteractiveServer
+﻿@rendermode InteractiveServer
 @inject NavigationManager NavigationManager
 <div class="navbar border-b-[1px]">
     <div class="flex-1">
-        <a class="btn btn-ghost  text-xl">Hihohu</a>
+        <a @onclick='() => { NavigationManager.NavigateTo("/"); }' class="btn btn-ghost  text-xl">Hihohu</a>
         <label class="input input-bordered flex items-center gap-2 bg-white">
             <input type="text" class="grow" placeholder="Search"/>
             <svg
@@ -75,13 +65,10 @@
 </div>
 
 @code {
-
-
     private async  Task OnWrite()
     {
         Console.Write("Ok");
         NavigationManager.NavigateTo("/new-blog");
-
     }
 
 }
