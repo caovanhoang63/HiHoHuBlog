@@ -1,0 +1,32 @@
+@using HiHoHuBlog.Modules.Blog.Entity
+@using HiHoHuBlog.Modules.Blog.Presentation.Components.TextEditor
+
+<div >
+    <dialog id="detail_blog_modal" class="modal @(Open ? "modal-open" : " ")">
+        <div class="modal-box max-w-4xl">
+            <button @onclick="Close" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+            <div>
+                @if (Blog is not null)
+                {
+                    <div>
+                        <h2 class="text-4xl font-bold">@Blog.Title</h2>
+                        <TextEditor ReadOnly="true">
+                            <EditorContent>
+                                @((MarkupString)Blog.Content)
+                            </EditorContent>
+                        </TextEditor>
+                    </div>
+                }
+            </div>
+        </div>
+    </dialog>
+</div >
+
+
+
+
+@code {
+    [Parameter] public bool Open { get; set; } = false;
+    [Parameter] public BlogDetail? Blog { get; set; }
+    [Parameter] public EventCallback Close { get; set; }
+}

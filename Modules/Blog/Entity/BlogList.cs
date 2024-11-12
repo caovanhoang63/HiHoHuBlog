@@ -1,15 +1,10 @@
-using System.ComponentModel.DataAnnotations.Schema;
-using HiHoHuBlog.Utils;
-
 namespace HiHoHuBlog.Modules.Blog.Entity;
 
-[Table("blogs")]
-public class Blog : BaseEntity
+public class BlogList
 {
     public int Id { get; set; }
     public int UserId { get; set; }
     public string? Title { get; set; }
-    public string? Content { get; set; }
     public bool IsPublished { get; set; }
     public int TotalView { get; set; } = 0;
     public int TotalMark { get; set; } = 0;

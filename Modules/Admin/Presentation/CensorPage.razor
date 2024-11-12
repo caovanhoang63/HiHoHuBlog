@@ -1,10 +1,99 @@
 @page "/censor"
 @using HiHoHuBlog.Components.Layout
+@using HiHoHuBlog.Modules.Blog.Entity
+@using HiHoHuBlog.Modules.Blog.Service.Interface
+@using HiHoHuBlog.Utils
 @using HiHoHuBlog.Modules.Admin.Presentation.Components
 @layout AdminLayout
+@inject IBlogGetService BlogGetService
+@inject IJSRuntime JSRuntime
+@inject IToastService ToastService
 
-<BlogTable></BlogTable>
+<div>
+    <BlogModal @ref="blogModal" Close="Close" Open="IsOpenDetailModal" Blog="Blog"></BlogModal>
+    <div class="overflow-x-auto">
+        <table class="table table-xs text-center">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Last Modified</th>
+                <th>Created At</th>
+                <th>Is Publish</th>
+                <th>Publish At</th>
+            </tr>
+            </thead>
+            <tbody>
+            @if (BlogList is not null)
+            {
+                @foreach (var blog in BlogList)
+                {
+                    <tr class="hover:bg-base-200" @onclick="async () => await OnRowClick(blog.Id)">
+                        <th>@blog.Id</th>
+                        <td>@blog.Title</td>
+                        <td>Hoang</td>
+                        <td>@blog.UpdatedAt</td>
+                        <td>@blog.CreatedAt</td>
+                        <td>
+                            <label>
+                                <input checked="@blog.IsPublished" type="checkbox" class="checkbox checkbox-md"/>
+                            </label>
+                        </td>
+                        <td>-</td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
 
 @code {
+    [Parameter] public IEnumerable<BlogList>? BlogList { get; set; } = null;
+    [Parameter] public BlogDetail? Blog { get; set; }
+    [Parameter] public bool IsOpenDetailModal { get; set; } = false;
     
+    private BlogModal? blogModal;
+
+    private void Close()
+    {
+        IsOpenDetailModal = false;
+        // await InvokeAsync(StateHasChanged);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        var r = await BlogGetService.GetBlogs(null, new Paging());
+        if (!r.IsOk)
+        {
+            return;
+        }
+        
+        BlogList = r.Value;
+
+    }
+
+    private async Task OnRowClick(int id)
+    {
+        var r = await BlogGetService.GetBlog(id);
+        
+        if (!r.IsOk)
+        {
+            return;
+        }
+        
+        if (r.Value != null)
+        {
+            Blog = r.Value;
+            IsOpenDetailModal = true;
+            await InvokeAsync(() => StateHasChanged());
+        }
+        else
+        {
+            ToastService.ShowError("Not found");
+        }
+    }
 }
+
