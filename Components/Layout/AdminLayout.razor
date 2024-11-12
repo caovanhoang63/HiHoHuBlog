@@ -1,0 +1,17 @@
+@using HiHoHuBlog.Components.Layout.Components
+@inherits LayoutComponentBase
+
+
+<div class="min-h-screen  flex flex-col">
+    <AdminNavMenu></AdminNavMenu>
+    <div class="flex flex-grow ">
+        <AdminSideBar></AdminSideBar>
+        <div class=" mx-10 my-5  flex-grow">
+            @Body
+        </div>
+    </div>
+</div>
+
+@code {
+    
+}
