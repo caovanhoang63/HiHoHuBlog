@@ -6,7 +6,6 @@
 @using HiHoHuBlog.Modules.Admin.Presentation.Components
 @layout AdminLayout
 @inject IBlogGetService BlogGetService
-@inject IJSRuntime JSRuntime
 @inject IToastService ToastService
 
 <div>
@@ -59,7 +58,6 @@
     private void Close()
     {
         IsOpenDetailModal = false;
-        // await InvokeAsync(StateHasChanged);
     }
 
     protected override async Task OnInitializedAsync()
@@ -70,30 +68,44 @@
         {
             return;
         }
-        
         BlogList = r.Value;
 
     }
 
     private async Task OnRowClick(int id)
     {
-        var r = await BlogGetService.GetBlog(id);
+        try
+        {
+            var r = await BlogGetService.GetBlog(id);
         
-        if (!r.IsOk)
-        {
-            return;
-        }
+            if (!r.IsOk)
+            {
+                return;
+            }
         
-        if (r.Value != null)
+            if (r.Value != null || blogModal is not  null)
+            {
+                Console.WriteLine(r.Value.Id);
+                
+                Blog = r.Value;
+                await InvokeAsync(StateHasChanged); 
+
+                IsOpenDetailModal = true;
+            }
+            else
+            {
+                ToastService.ShowError("Not found");
+            }
+        }catch (Exception ex)
         {
-            Blog = r.Value;
-            IsOpenDetailModal = true;
-            await InvokeAsync(() => StateHasChanged());
+            Console.WriteLine($"Error: {ex.Message}");
+            if (blogModal is null)
+            {
+                Console.WriteLine(124);
+            }
         }
-        else
-        {
-            ToastService.ShowError("Not found");
-        }
+
+        
     }
 }
 

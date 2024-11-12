@@ -6,17 +6,18 @@
         <div class="modal-box max-w-4xl">
             <button @onclick="Close" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
             <div>
-                @if (Blog is not null)
-                {
-                    <div>
-                        <h2 class="text-4xl font-bold">@Blog.Title</h2>
-                        <TextEditor ReadOnly="true">
-                            <EditorContent>
-                                @((MarkupString)Blog.Content)
-                            </EditorContent>
-                        </TextEditor>
-                    </div>
-                }
+
+                <div>
+                    <h2 class="text-4xl font-bold">@Blog?.Title</h2>
+                    <TextEditor>
+                    <EditorContent>
+                        @if (Blog?.Content != null)
+                        {
+                            @((MarkupString)Blog?.Content)
+                        }
+                    </EditorContent>
+                    </TextEditor>
+                </div>
             </div>
         </div>
     </dialog>
@@ -26,7 +27,18 @@
 
 
 @code {
-    [Parameter] public bool Open { get; set; } = false;
+    [Parameter] public bool Open { get; set; }
     [Parameter] public BlogDetail? Blog { get; set; }
     [Parameter] public EventCallback Close { get; set; }
+    private TextEditor? textEditor;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Kiểm tra nếu đây là lần render đầu tiên và Blog có nội dung
+        if (firstRender && textEditor != null && Blog?.Content != null)
+        {
+            await textEditor.LoadHTMLContent(Blog.Content); // Gọi phương thức LoadHtmlContent để cập nhật nội dung
+        }
+        
+    }
 }
