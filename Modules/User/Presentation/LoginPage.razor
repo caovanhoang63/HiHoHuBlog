@@ -10,7 +10,7 @@
 @layout NonLayout
 @inject NavigationManager NavigationManager
 @inject IUserLoginService UserLoginService
-@inject IToastService toastService
+@inject IToastService ToastService
 @inject IAuthenticateService AuthenticateService
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 <div class="h-screen flex">
@@ -67,12 +67,17 @@
     {
         if (User != null)
         {
-            await UserLoginService.Login(User);
-            await AuthenticateService.SignInUserAsync(Context,"2" ,"123@gmail.com", "user");
+            var r =  await UserLoginService.Login(User);
+            if (!r.IsOk)
+            {
+                Console.WriteLine(r.Error.Message);
+                ToastService.ShowError(r.Error.Message);
+                return;
+            }
+            
+            await AuthenticateService.SignInUserAsync(Context,r.Value);
             NavigationManager.NavigateTo(ReturnUrl, true);
         }
-        
-        
     }
 
 }
