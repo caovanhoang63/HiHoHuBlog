@@ -11,6 +11,9 @@ public class Blog : BaseEntity
     public string? Title { get; set; }
     public string? Content { get; set; }
     public bool IsPublished { get; set; }
+    public DateTime? PublishedAt { get; set; }
+    
+    public int MinToRead { get; set; }
     public int TotalView { get; set; } = 0;
     public int TotalMark { get; set; } = 0;
     public int TotalLike { get; set; } = 0;

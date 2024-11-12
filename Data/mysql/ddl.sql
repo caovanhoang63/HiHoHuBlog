@@ -71,6 +71,8 @@ CREATE TABLE `blogs` (
                          `user_id` INT NOT NULL,
                          `title` varchar(255) DEFAULT NULL,
                          `is_published` boolean,
+                         `published_at` TIMESTAMP,
+                         `min_to_read` INTEGER DEFAULT 0,  
                          `content` TEXT, 
                          `total_view` INT NOT NULL DEFAULT 0,
                          `total_like` INT NOT NULL DEFAULT 0,

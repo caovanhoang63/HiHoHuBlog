@@ -2,6 +2,7 @@
 @using System.Reactive.Linq
 @using System.Reactive.Subjects
 @using System.Security.Claims
+@inject IUploadProvider UploadProvider
 @rendermode InteractiveServer
 @using HiHoHuBlog.Components.Components
 @using HiHoHuBlog.Modules.Blog.Entity
@@ -44,7 +45,7 @@
             </div>    
         }
         <div class="h-full">
-            <TextEditor OnChange="OnChange" Toolbar="new Toolbar { ShowFullToolbar = true }" EditorContainerId="TestId" @ref="@TextEditor"
+            <TextEditor ImageUploadFunc="OnUpload" OnChange="OnChange" Toolbar="new Toolbar { ShowFullToolbar = true }" EditorContainerId="TestId" @ref="@TextEditor"
                           Placeholder="Write your own words...">
             </TextEditor>
         </div>
@@ -73,6 +74,40 @@
         _contentSubject.OnNext(content);
         _isSaving = false;
     }
+
+    private async Task<Result<string, Err>> OnUpload(string name, string type, string array)
+    {
+         
+            // Validate file type
+            if (!type.StartsWith("image/"))
+            {
+                return Result<string, Err>.Err(new Err("Only image files are allowed"));
+            }
+
+            // Remove data:image/...;base64, prefix if present
+            var base64Data = array;
+            if (base64Data.Contains(","))
+            {
+                base64Data = base64Data.Substring(base64Data.IndexOf(",") + 1);
+            }
+
+            // Convert base64 to bytes
+            byte[] fileData = Convert.FromBase64String(base64Data);
+
+            // Generate unique filename with original extension
+            string extension = Path.GetExtension(name);
+            string newFileName = $"{Guid.NewGuid()}{extension}";
+            
+            var uR = await UploadProvider.UploadImage(fileData, newFileName);
+            if (!uR.IsOk)
+            {
+                return Result<string, Err>.Err(uR.Error);
+            }
+            
+            // Return the URL path
+            Console.WriteLine(uR.Value.Url);
+            return Result<string,Err>.Ok(uR.Value.Url);
+    } 
     
     private bool _isSaving = false;
     private readonly BlogCreate _blog = new BlogCreate();

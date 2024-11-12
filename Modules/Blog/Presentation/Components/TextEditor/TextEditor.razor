@@ -1,7 +1,6 @@
 ﻿@using HiHoHuBlog.Modules.Blog.Presentation.Components.TextEditor.Internal
 @using HiHoHuBlog.Utils
 @inject IJSRuntime JSRuntime
-@inject IUploadProvider UploadProvider
 @namespace HiHoHuBlog.Modules.Blog.Presentation.Components.TextEditor
 <div @ref="@ToolBar">
     @if (Toolbar != null)
@@ -50,7 +49,8 @@
         = "info";
     
     [Parameter]
-    public Func<string, Task<string>> ImageUploadFunc { get; set; }
+    public Func<string, string, string, Task<Result<string, Err>>> ImageUploadFunc { get; set; }
+
 
     private ElementReference QuillElement;
     private ElementReference ToolBar;
@@ -86,51 +86,20 @@
     [JSInvokable]
     public async Task<string> OnUpload(string name,string type ,string array)
     {
+        var r = await  ImageUploadFunc.Invoke(name, type, array);
 
-        try
+        if (!r.IsOk)
         {
-            // Validate file type
-            if (!type.StartsWith("image/"))
-            {
-                throw new Exception("Only image files are allowed");
-            }
-
-            // Remove data:image/...;base64, prefix if present
-            var base64Data = array;
-            if (base64Data.Contains(","))
-            {
-                base64Data = base64Data.Substring(base64Data.IndexOf(",") + 1);
-            }
-
-            // Convert base64 to bytes
-            byte[] fileData = Convert.FromBase64String(base64Data);
-
-            // Generate unique filename with original extension
-            string extension = Path.GetExtension(name);
-            string newFileName = $"{Guid.NewGuid()}{extension}";
-            
-            var uR = await UploadProvider.UploadImage(fileData, newFileName);
-            if (!uR.IsOk)
-            {
-                Console.Error.WriteLine($"Upload error: {uR.Error}");
-            }
-            
-            // Return the URL path
-            return uR.Value.Url;
+            Console.WriteLine($"Upload got an err: {r.Error}");
+            return array;
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Upload error: {ex}");
-            throw;
-        }
-    
+
+        return r.Value;
     }
     
     [JSInvokable]
     public  async Task OnChangeHandler(string content)
     {
-        // Console.WriteLine(123);
-        
         await OnChange.InvokeAsync(content);
     }
 
@@ -168,16 +137,16 @@
 
     public async Task InsertImage(string ImageURL)
     {
-        // If an ImageUploadFunc is provided, use it to upload the image before inserting it.
-        Console.WriteLine(ImageURL);
-        if (ImageUploadFunc != null)
-        {
-            Console.WriteLine("AfterCall");
-            ImageURL = await ImageUploadFunc.Invoke(ImageURL);
-            Console.WriteLine(ImageURL);
-        }
+        // // If an ImageUploadFunc is provided, use it to upload the image before inserting it.
+        // Console.WriteLine(ImageURL);
+        // if (ImageUploadFunc != null)
+        // {
+        //     Console.WriteLine("AfterCall");
+        //     ImageURL = await ImageUploadFunc.Invoke(ImageURL);
+        //     Console.WriteLine(ImageURL);
+        // }
 
-        var QuillDelta = await Interop.InsertQuillImage(JSRuntime, QuillElement, null);
+        var QuillDelta = await Interop.InsertQuillImage(JSRuntime, QuillElement, ImageURL);
     }
 
     public async Task EnableEditor(bool mode)
