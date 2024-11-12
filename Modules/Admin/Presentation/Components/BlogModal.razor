@@ -8,15 +8,16 @@
             <div>
                 <div>
                     <h2 class="text-4xl font-bold">@Blog?.Title</h2>
-             
-                    <TextEditor ReadOnly="true">
-                        <EditorContent>
-                            @if (Blog?.Content != null)
-                            {
+                    <div class="mt-[-1.8rem]">
+                        <TextEditor ReadOnly="true">
+                            <EditorContent>
+                                @if (Blog?.Content != null)
+                                {
                                 @((MarkupString)Blog.Content)
-                            }
-                        </EditorContent>
-                    </TextEditor>
+                                }
+                            </EditorContent>
+                        </TextEditor>    
+                    </div>
                 </div>
             </div>
         </div>
