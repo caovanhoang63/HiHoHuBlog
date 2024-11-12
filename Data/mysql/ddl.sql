@@ -74,6 +74,7 @@ CREATE TABLE `blogs` (
                          `published_at` TIMESTAMP,
                          `min_to_read` INTEGER DEFAULT 0,  
                          `content` TEXT, 
+                         `thumbnail` JSON DEFAULT NULL,
                          `total_view` INT NOT NULL DEFAULT 0,
                          `total_like` INT NOT NULL DEFAULT 0,
                          `total_mark` INT NOT NULL DEFAULT 0,

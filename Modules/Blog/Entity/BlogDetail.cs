@@ -15,6 +15,4 @@ public class BlogDetail
     public int Status { get; set; } = 1;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-    
-    
 }

@@ -182,4 +182,54 @@ public class EfBlogRepo : IBlogRepository
             return Result<IEnumerable<BlogList>?, Err>.Err(UtilErrors.InternalServerError(ex));
         }
     }
+
+    public async Task<Result<Unit, Err>> UpdateThumbnail(int id, Image? thumbnail)
+    {
+        try
+        {
+            await _dbSet.Where(b => b.Id == id)
+                .ExecuteUpdateAsync(
+                    b => b.SetProperty(u => u.Thumbnail, thumbnail));
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception ex)
+        {
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(ex));
+        }
+    }
+
+    public async Task<Result<Unit, Err>> Publish(int id, int minToRead,Image? image)
+    {
+        try
+        {
+            await _dbSet.Where(b => b.Id == id)
+                .ExecuteUpdateAsync(
+                    b => b
+                        .SetProperty(u => u.IsPublished, true)
+                        .SetProperty(u => u.PublishedAt, DateTime.UtcNow)
+                        .SetProperty(u => u.MinToRead, minToRead)
+                        .SetProperty(u => u.Thumbnail,image));
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception ex)
+        {
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(ex));
+        }
+    }
+
+    public async Task<Result<Unit, Err>> UnPublish(int id)
+    {
+        try
+        {
+            await _dbSet.Where(b => b.Id == id)
+                .ExecuteUpdateAsync(
+                    b => b
+                        .SetProperty(u => u.IsPublished, false));
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception ex)
+        {
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(ex));
+        }
+    }
 }

@@ -12,7 +12,6 @@ public class CreateBlogService(IBlogRepository blogRepo ) : ICreateBlogService
         blog.UserId = requester.GetId();
 
         var r = await blogRepo.Create(blog);
-        
         if (!r.IsOk) return r;
         
         return Result<Unit, Err>.Ok(new Unit());

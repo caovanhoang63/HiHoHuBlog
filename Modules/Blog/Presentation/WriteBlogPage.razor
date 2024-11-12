@@ -16,6 +16,7 @@
 @inject NavigationManager NavigationManager
 @inject ICreateBlogService CreateBlogService
 @inject IBlogUpdateService BlogUpdateService
+@inject IToastService ToastService
 
 
 @attribute [Authorize]
@@ -23,7 +24,10 @@
 <Authorized>
 <div class="h-screen ">
     <Container ContainerClass="pb-80">
-        <div class="flex justify-between pt-10 ">
+        <div class="flex flex-row-reverse pt-2">
+            <button @onclick="OnPublish" class="btn btn-success @(_blog.Id == 0 ? "btn-disabled" : " ") text-base-200 btn-sm ">Publish</button>
+        </div>
+        <div class="flex justify-between pt-5 ">
             <input @oninput="OnSearchQueryInput" placeholder="title" class="text-4xl w-full input focus:ring-0 border-transparent focus:border-transparent px-0 !outline-none"/>
         </div>
         @if (_firstChange)
@@ -34,23 +38,23 @@
                     <div class="flex align-middle text-gray-500 space-x-2">
                         <span class="loading loading-spinner loading-md"></span>
                         <span class="">saving...</span>
-                    </div>  
+                    </div>
                 }
                 else
                 {
                     <div class="flex align-middle text-gray-500 space-x-2">
                         <span class="">Saved</span>
-                    </div>    
+                    </div>
                 }
-            </div>    
+            </div>
         }
         <div class="h-full">
             <TextEditor ImageUploadFunc="OnUpload" OnChange="OnChange" Toolbar="new Toolbar { ShowFullToolbar = true }" EditorContainerId="TestId" @ref="@TextEditor"
-                          Placeholder="Write your own words...">
+                        Placeholder="Write your own words...">
             </TextEditor>
         </div>
-        
-        
+
+
     </Container>
 </div>
     </Authorized>
@@ -66,7 +70,7 @@
     
     private IDisposable? _contentSubscription;
     private readonly Subject<string?> _contentSubject = new();
-    
+    private bool _firstImage = false;    
     private  void OnChange(string args)
     {
         _isSaving = true;
@@ -78,35 +82,39 @@
     private async Task<Result<string, Err>> OnUpload(string name, string type, string array)
     {
          
-            // Validate file type
-            if (!type.StartsWith("image/"))
-            {
-                return Result<string, Err>.Err(new Err("Only image files are allowed"));
-            }
+        // Validate file type
+        if (!type.StartsWith("image/"))
+        {
+            return Result<string, Err>.Err(new Err("Only image files are allowed"));
+        }
 
-            // Remove data:image/...;base64, prefix if present
-            var base64Data = array;
-            if (base64Data.Contains(","))
-            {
-                base64Data = base64Data.Substring(base64Data.IndexOf(",") + 1);
-            }
+        // Remove data:image/...;base64, prefix if present
+        var base64Data = array;
+        if (base64Data.Contains(","))
+        {
+            base64Data = base64Data.Substring(base64Data.IndexOf(",") + 1);
+        }
 
-            // Convert base64 to bytes
-            byte[] fileData = Convert.FromBase64String(base64Data);
+        // Convert base64 to bytes
+        byte[] fileData = Convert.FromBase64String(base64Data);
 
-            // Generate unique filename with original extension
-            string extension = Path.GetExtension(name);
-            string newFileName = $"{Guid.NewGuid()}{extension}";
-            
-            var uR = await UploadProvider.UploadImage(fileData, newFileName);
-            if (!uR.IsOk)
-            {
-                return Result<string, Err>.Err(uR.Error);
-            }
-            
-            // Return the URL path
-            Console.WriteLine(uR.Value.Url);
-            return Result<string,Err>.Ok(uR.Value.Url);
+        // Generate unique filename with original extension
+        string extension = Path.GetExtension(name);
+        string newFileName = $"{Guid.NewGuid()}{extension}";
+        
+        var uR = await UploadProvider.UploadImage(fileData, newFileName);
+        if (!uR.IsOk)
+        {
+            return Result<string, Err>.Err(uR.Error);
+        }
+        
+        // Return the URL path
+        if (!_firstImage)
+        {
+            _firstImage = true;
+        }
+        
+        return Result<string,Err>.Ok(uR.Value.Url);
     } 
     
     private bool _isSaving = false;
@@ -181,7 +189,17 @@
 
             });
     }
-    
+
+    public async void OnPublish()
+    {
+        var r = await BlogUpdateService.Publish(_requester, _blog.Id, _blog.Content);
+        if (!r.IsOk)
+        {
+            ToastService.ShowError(r.Error.Message);
+            return;
+        }
+        ToastService.ShowSuccess("Publish success!");
+    }
     
     
     public void Dispose()

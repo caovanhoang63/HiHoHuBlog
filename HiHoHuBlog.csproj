@@ -202,6 +202,7 @@
 
     <ItemGroup>
       <PackageReference Include="AutoMapper" Version="13.0.1" />
+      <PackageReference Include="HtmlAgilityPack.NetCore" Version="1.5.0.1" />
       <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.10" />
       <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.10" />
       <PackageReference Include="AWSSDK.S3" Version="3.7.405.11" />
@@ -210,6 +211,7 @@
       <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="8.0.10" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="8.0.10" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.10" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
       <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2" />
       <PackageReference Include="Pomelo.EntityFrameworkCore.MySql.Design" Version="1.1.2" />
       <PackageReference Include="System.Reactive" Version="6.0.1" />

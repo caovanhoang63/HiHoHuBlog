@@ -1,5 +1,6 @@
-namespace HiHoHuBlog.Utils;
+using Microsoft.EntityFrameworkCore;
 
+namespace HiHoHuBlog.Utils;
 public class Image
 {
     public string Id;

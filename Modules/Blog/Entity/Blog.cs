@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using HiHoHuBlog.Utils;
+using Newtonsoft.Json;
+using ThirdParty.Json.LitJson;
 
 namespace HiHoHuBlog.Modules.Blog.Entity;
 
@@ -8,6 +10,7 @@ public class Blog : BaseEntity
 {
     public int Id { get; set; }
     public int UserId { get; set; }
+    public Image? Thumbnail  {get; set; }
     public string? Title { get; set; }
     public string? Content { get; set; }
     public bool IsPublished { get; set; }
