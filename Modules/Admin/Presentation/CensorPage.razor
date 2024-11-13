@@ -5,12 +5,16 @@
 @using HiHoHuBlog.Utils
 @using HiHoHuBlog.Modules.Admin.Presentation.Components
 @using HiHoHuBlog.Components.Components
+@using HiHoHuBlog.Modules.Admin.Entity
+@using HiHoHuBlog.Modules.Admin.Service.Interface
 @layout AdminLayout
 @inject IBlogGetService BlogGetService
 @inject IToastService ToastService
 @inject IBlogDeleteService BlogDeleteService
 @rendermode InteractiveServer
 @inject NavigationManager NavigationManager
+@inject IReasonBlogBlockService ReasonBlogBlockService
+@inject IBlogBlockedService BlogBlockedService
 @attribute [Authorize]
 
 <AuthorizeView Roles="admin, mod">
@@ -20,6 +24,9 @@
         <ConfirmModal Open="OpenDeletedModal" Title="Delete blog"
                       Message="@_deleteMessage" OnConfirm="OnConfirmDelete" OnDeny="OnDenyDelete"
         ></ConfirmModal>
+        <BanModal Open="IsOpenBanModal"  Reasons="_reason"
+                      Message="@_banMessage" OnConfirm="OnConfirmBan" OnDeny="OnDenyBan"
+        ></BanModal>
         
         <BlogModal Close="Close" Open="IsOpenDetailModal" Blog="Blog"></BlogModal>
         <div class="flex mb-5 flex-row-reverse align-middle space-x-5">
@@ -137,7 +144,7 @@
                                             <li class="text-success"><a>ReActive</a></li>
                                         }
                                         <li class="text-error"><a @onclick="() => { OnDelete(blog); }">Delete</a></li>
-                                        <li class="text-warning"><a>Block</a></li>
+                                        <li class="text-warning"><a  @onclick="() => { OnBan(blog); }" >Block</a></li>
                                     </ul>
                                 </div>
                             </td>
@@ -169,17 +176,16 @@
     [Parameter] public Paging Paging { get; set; } = new Paging(0,0,20,0);
     public bool IsLoading { get; set; } = false;
     public bool OpenDeletedModal { get; set; } = false;
-
     private BlogList? _selectedBlog = null;
+    private IEnumerable<ReasonBlogBlock>? _reason;
+    
     private string _deleteMessage = "";
-
     private void OnDelete(BlogList? blog)
     {
         _selectedBlog = blog;
         _deleteMessage = $"Are you sure to delete \"{blog?.Title}\"";
         OpenDeletedModal = true; 
     }
-
     private async void OnConfirmDelete()
     {
         if (_selectedBlog is null) return;
@@ -196,11 +202,48 @@
 
         await InvokeAsync(StateHasChanged);
     }
+    private string _banMessage = "";
 
     private  void OnDenyDelete()
     {
         OpenDeletedModal = false;
     }
+    
+    public bool IsOpenBanModal { get; set; } = false;
+
+    private void OnBan(BlogList? blog)
+    {
+        _selectedBlog = blog;
+        _banMessage = $"Are you sure to block blog \"{blog?.Title}\"";
+        IsOpenBanModal = true; 
+    }
+    private async void OnConfirmBan(ReasonBlogBlock? reason)
+    {
+        if (_selectedBlog is null) return;
+        if (reason is null ) return;
+        IsLoading = true;
+        var r = await BlogBlockedService.Create(_requester, new BlogBlockedCreate
+        {
+            BlogId = _selectedBlog.Id,
+            ReasonBlogBlockedId = reason.Id,
+        });
+        if (!r.IsOk)
+        {
+            Console.WriteLine(r.Error.Message);
+        }
+        IsLoading = false;
+        IsOpenBanModal = false;
+        var firstOrDefault = BlogList?.FirstOrDefault(b => b.Id == _selectedBlog.Id);
+        if (firstOrDefault != null) firstOrDefault.Status = 2;
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private  void OnDenyBan()
+    {
+        IsOpenBanModal = false;
+    }
+
     
     private void Close()
     {
@@ -217,6 +260,8 @@
         {
             return;
         }
+
+        _reason = (await ReasonBlogBlockService.ListAll()).Value; 
         BlogList = r.Value;
         IsLoading = false;
     }

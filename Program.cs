@@ -5,6 +5,10 @@ using Blazored.Toast;
 using HiHoHuBlog;
 using HiHoHuBlog.Components;
 using HiHoHuBlog.Modules.Admin;
+using HiHoHuBlog.Modules.Admin.Repository.Implementation;
+using HiHoHuBlog.Modules.Admin.Repository.Interface;
+using HiHoHuBlog.Modules.Admin.Service.Implementation;
+using HiHoHuBlog.Modules.Admin.Service.Interface;
 using HiHoHuBlog.Modules.Blog;
 using HiHoHuBlog.Modules.Blog.Repository;
 using HiHoHuBlog.Modules.Blog.Repository.Implementation;
@@ -51,10 +55,14 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddScoped<IUserRepository, EfRepo>();
 builder.Services.AddScoped<IBlogRepository, EfBlogRepo>();
+builder.Services.AddScoped<IBlogBlockedRepository,BlogBlockedRepository>();
+builder.Services.AddScoped<IReasonBlogBlockRepository,ReasonBlogBlockRepository>();
 
 builder.Services.AddScoped<IUserSignUpService, UserSignUpService>();
 builder.Services.AddScoped<IUserLoginService, UserLoginService>();
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
+builder.Services.AddScoped<IBlogBlockedService,BlogBlockedService>();
+builder.Services.AddScoped<IReasonBlogBlockService,ReasonBlogBlockService>();
 
 builder.Services.AddScoped<ICreateBlogService,CreateBlogService>();
 builder.Services.AddScoped<IBlogUpdateService, BlogUpdateService>();

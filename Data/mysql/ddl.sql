@@ -136,17 +136,11 @@ CREATE TABLE `comments` (
                             PRIMARY KEY (`user_id`,`blog_id`)
 )ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
 
-DROP TABLE IF EXISTS `reason_blog_block`;
-CREATE TABLE `reason_blog_blocked` (
-    `id` INT NOT NULL AUTO_INCREMENT,
-    `message` TEXT,
-    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`)
-)ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
+
 
 DROP TABLE IF EXISTS `blog_blocked`;
 CREATE TABLE `blog_blocked` (
-    `id` INT NOT NULL,
+    `id` INT NOT NULL AUTO_INCREMENT,
     `blog_id` INT NOT NULL,
     `reason_blog_blocked_id` INT NOT NULL,
     `status` INT NOT NULL DEFAULT '1',

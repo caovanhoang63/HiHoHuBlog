@@ -1,7 +1,54 @@
 @page "/setting"
 @using HiHoHuBlog.Components.Layout
+@using HiHoHuBlog.Modules.Admin.Entity
+@using HiHoHuBlog.Modules.Admin.Service.Interface
+@using HiHoHuBlog.Utils
 @layout AdminLayout
-<h3>Setting</h3>
+@inject IReasonBlogBlockService Service
+@attribute [Authorize]
+@rendermode InteractiveServer
+
+<AuthorizeView Roles="admin, mod">
+    <Authorized>
+        <div>
+            <h3 class="text-3xl font-bold">Setting</h3>
+            <div class="py-10 space-x-5">
+                <input @bind="Reason" type="text" placeholder="Reason" class="input input-bordered w-80 max-w-xs " />
+                <button @onclick="OnNewReason" class="btn ">
+                    <span>
+                        New block reason
+                    </span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </Authorized>
+</AuthorizeView>
 @code {
+    [CascadingParameter] 
+    Task<AuthenticationState> authenticationStateTask { get; set; }
+    [Parameter] public string Reason { get; set; } = "";
+    private IRequester? _requester = null;
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        _requester = await AuthUtils.GetInfo(authenticationStateTask);
+    }
     
+    public async void OnNewReason()
+    {
+        if (_requester == null) return;
+         var r =  await Service.Create(_requester, new ReasonBlogBlockCreate
+        {
+            Message = Reason
+        });
+
+        if (!r.IsOk)
+        {
+            Console.WriteLine(r.Error.Message);
+            return;
+        }
+    }
 }

@@ -1,0 +1,33 @@
+@using HiHoHuBlog.Modules.Admin.Entity
+<div>
+    <dialog id="my_modal_1" class="modal @(Open ? "modal-open" : " ")">
+        <div class="modal-box ">
+            <h3 class="text-lg font-bold">Ban Blog</h3>
+            <p class="py-4">@Message</p>
+            <select class="select select-bordered w-full max-w-xs">
+                <option disabled selected>Reason</option>
+                @if (Reasons != null)
+                {
+                foreach (var reason in Reasons)
+                    {
+                        <option @onclick='() => _selectedReason = reason'>@reason.Message</option>
+                    }
+                }
+            </select>
+            <div class="modal-action">
+                <button @onclick="() => { OnConfirm.InvokeAsync(_selectedReason); }" class="btn btn-warning">Confirm</button>
+                <button @onclick="OnDeny" class="btn">Close</button>
+            </div>
+        </div>
+    </dialog>    
+</div>
+
+
+@code {
+    [Parameter] public bool Open { get; set; }
+    [Parameter] public string? Message { get; set; }
+    [Parameter] public EventCallback<ReasonBlogBlock> OnConfirm { get; set; }
+    [Parameter] public EventCallback OnDeny { get; set; }
+    [Parameter] public IEnumerable<ReasonBlogBlock>? Reasons { get; set; }
+    private ReasonBlogBlock? _selectedReason = null;
+}

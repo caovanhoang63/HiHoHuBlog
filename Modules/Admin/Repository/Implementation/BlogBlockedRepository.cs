@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HiHoHuBlog.Modules.Admin.Repository.Implementation;
 
-public class BlogBlockedRepository(ApplicationDbContext context, Mapper mapper) : IBlogBlockedRepository
+public class BlogBlockedRepository(ApplicationDbContext context, IMapper mapper) : IBlogBlockedRepository
 {
     private readonly DbSet<BlogBlocked> _dbSet = context.Set<BlogBlocked>();
 
