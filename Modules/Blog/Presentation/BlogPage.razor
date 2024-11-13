@@ -101,7 +101,7 @@
             return;
         }
    
-        var r = await BlogGetService.GetBlog(id);
+        var r = await BlogGetService.GetBlog(null,id);
         if (!r.IsOk || r.Value is null)
         {
             return;

@@ -7,7 +7,7 @@ namespace HiHoHuBlog.Modules.Blog.Service.Implementation;
 
 public class BlogGetService(IBlogRepository blogRepo) : IBlogGetService
 {
-    public async Task<Result<BlogDetail?, Err>> GetBlog(int id)
+    public async Task<Result<BlogDetail?, Err>> GetBlog(IRequester? requester, int id)
     {
        var r = await blogRepo.GetBlogDetail(id);
 
@@ -16,12 +16,28 @@ public class BlogGetService(IBlogRepository blogRepo) : IBlogGetService
            return Result<BlogDetail?, Err>.Err(r.Error);
        }
 
-       if (r.Value is not { Status: (int)Status.Active })
+       if (r.Value is null)
        {
            return Result<BlogDetail?, Err>.Err(UtilErrors.ErrEntityNotFound("blog"));
        }
+
+       // other user can't see deleted and blocked blogs
+       if (r.Value.Status != (int)Status.Active && 
+           (requester is null || (requester.GetId() != r.Value.UserId && requester.GetSystemRole() == "user")))
+       {
+           return Result<BlogDetail?, Err>.Err(UtilErrors.ErrEntityNotFound("blog"));
+       }
+
+       // authors can see their blocked blogs but can't see deleted blogs
+       if (r.Value.Status == (int)Status.Deleted
+           && (requester?.GetId() != r.Value.UserId || requester?.GetSystemRole() == "user"))
+       {
+           Console.WriteLine(123);
+           return Result<BlogDetail?, Err>.Err(UtilErrors.ErrEntityNotFound("blog"));
+       }
        
-       r.Value.Slug = SlugHelper.GenerateSlug(r.Value.Title) + '-' + id ;
+       
+       r.Value.Slug = SlugHelper.GenerateSlug(r.Value.Title) + '-' + id  ;
        
        return r.Value;
     }
