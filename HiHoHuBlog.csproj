@@ -194,7 +194,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Modules\Admin\Entity\" />
         <Folder Include="Modules\Admin\Repository\" />
         <Folder Include="Modules\Admin\Service\" />
         <Folder Include="wwwroot\lib\" />

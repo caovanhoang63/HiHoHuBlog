@@ -117,7 +117,7 @@ CREATE TABLE  `bookmarks` (
                               `blog_id` INT,
                               `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                               PRIMARY KEY (`user_id`,`blog_id`)
-)ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;;
+)ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
 
 DROP TABLE IF EXISTS `user_read_blogs`;
 CREATE TABLE  `user_read_blogs` (
@@ -125,7 +125,7 @@ CREATE TABLE  `user_read_blogs` (
                                     `blog_id` INT,
                                     `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                     PRIMARY KEY (`user_id`,`blog_id`)
-)ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;;
+)ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
 
 DROP TABLE IF EXISTS `comments`;
 CREATE TABLE `comments` (
@@ -134,4 +134,24 @@ CREATE TABLE `comments` (
                             `content` text,
                             `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                             PRIMARY KEY (`user_id`,`blog_id`)
-)ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;;
+)ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
+
+DROP TABLE IF EXISTS `reason_blog_block`;
+CREATE TABLE `reason_blog_blocked` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `message` TEXT,
+    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`)
+)ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
+
+DROP TABLE IF EXISTS `blog_blocked`;
+CREATE TABLE `blog_blocked` (
+    `id` INT NOT NULL,
+    `blog_id` INT NOT NULL,
+    `reason_blog_blocked_id` INT NOT NULL,
+    `status` INT NOT NULL DEFAULT '1',
+    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `status` (`status`) USING BTREE
+)ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;

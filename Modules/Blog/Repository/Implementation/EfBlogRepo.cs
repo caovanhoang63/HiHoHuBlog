@@ -10,6 +10,7 @@ public class EfBlogRepo : IBlogRepository
     private readonly IMapper _mapper;
     private readonly ApplicationDbContext _context;
     private readonly DbSet<Entity.Blog> _dbSet;
+    private IBlogRepository _blogRepositoryImplementation;
 
 
     public EfBlogRepo(IMapper mapper, ApplicationDbContext context)
@@ -71,9 +72,24 @@ public class EfBlogRepo : IBlogRepository
     {
         try
         {
-            await _dbSet.Where(b => b.Id == id).ExecuteUpdateAsync(
-                b => b.SetProperty(u => u.Status, 0));
-            await _context.SaveChangesAsync();
+            await _dbSet.Where(b => b.Id == id)
+                .ExecuteUpdateAsync(
+                    b => b.SetProperty(u => u.Status, 0));
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception ex)
+        {
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(ex));
+        }
+    }
+
+    public async Task<Result<Unit, Err>> BanBlog(int id)
+    {
+        try
+        {
+            await _dbSet.Where(b => b.Id == id)
+                .ExecuteUpdateAsync(
+                    b => b.SetProperty(u => u.Status, 2));
             return Result<Unit, Err>.Ok(new Unit());
         }
         catch (Exception ex)

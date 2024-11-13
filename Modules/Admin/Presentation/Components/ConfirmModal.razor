@@ -1,0 +1,29 @@
+<div>
+    <dialog id="my_modal_1" class="modal @(Open ? "modal-open" : " ")">
+        <div class="modal-box ">
+            <h3 class="text-lg font-bold">@Title</h3>
+            <p class="py-4">@Message</p>
+            <div class="modal-action">
+                    <!-- if there is a button in form, it will close the modal -->
+                <button @onclick="OnConfirm" class="btn btn-warning">Confirm</button>
+                <button @onclick="OnDeny" class="btn">Close</button>
+            </div>
+        </div>
+    </dialog>    
+</div>
+
+
+@code {
+    [Parameter] public bool Open { get; set; }
+    [Parameter] public string? Type { get; set; }
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Message { get; set; }
+    [Parameter] public EventCallback OnConfirm { get; set; }
+    [Parameter] public EventCallback OnDeny { get; set; }
+    private readonly string _typeClass = "";
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+}

@@ -58,6 +58,7 @@ builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 builder.Services.AddScoped<ICreateBlogService,CreateBlogService>();
 builder.Services.AddScoped<IBlogUpdateService, BlogUpdateService>();
 builder.Services.AddScoped<IBlogGetService, BlogGetService>();
+builder.Services.AddScoped<IBlogDeleteService, BlogDeleteService>();
 
 builder.Services.AddAutoMapper(typeof(UserMappingProfile));
 builder.Services.AddAutoMapper(typeof(BlogMappingProfile));
