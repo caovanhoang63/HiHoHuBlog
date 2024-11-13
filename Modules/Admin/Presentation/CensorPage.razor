@@ -14,13 +14,13 @@
     <BlogModal @ref="blogModal" Close="Close" Open="IsOpenDetailModal" Blog="Blog"></BlogModal>
     <div class="flex mb-5 flex-row-reverse align-middle space-x-5">
         <div>
-            <label class="input w-80 ml-5 input-bordered flex items-center gap-2 bg-white">
-                <input type="text" class="grow" placeholder="Search"/>
+            <label class="input w-80 ml-5 input-bordered input-sm flex items-center gap-2 bg-white">
+                <input type="text" class="grow " placeholder="Search"/>
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 16 16"
                     fill="currentColor"
-                    class="h-4 w-4 opacity-70">
+                    class="h-3 w-3 opacity-70">
                     <path
                         fill-rule="evenodd"
                         d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
@@ -29,14 +29,14 @@
             </label>    
         </div>
 
-        <div tabindex="0" role="button" class="btn ">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+        <div tabindex="0" role="button" class="btn btn-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"/>
             </svg>
 
         </div>
-        <div tabindex="0" role="button" class="btn">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+        <div tabindex="0" role="button" class="btn btn-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M12 17.25h8.25"/>
             </svg>
         </div>
@@ -108,11 +108,15 @@
                         </td>
                         <td class="w-20 relative">
                             <div class="dropdown dropdown-hover dropdown-bottom dropdown-end">
-                                <div tabindex="0" role="button" class="btn m-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <a tabindex="0" role="button" >
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                         fill="none" viewBox="0 0 24 24"
+                                         stroke-width="1.5"
+                                         stroke="currentColor" 
+                                         class="size-4">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"/>
                                     </svg>
-                                </div>
+                                </a>
                                 <ul tabindex="0" class="absolute dropdown-content menu bg-base-100 rounded-box z-[1] w-40 p-2 shadow">
                                     <li class="text-warning"><a>Warn</a></li>
                                     <li class="text-error"><a>Delete</a></li>

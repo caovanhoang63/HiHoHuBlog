@@ -174,7 +174,7 @@ public class EfBlogRepo : IBlogRepository
                 // }
             }
 
-            var r = await queryable.Select(b => _mapper.Map<Entity.Blog, BlogList>(b)).ToListAsync();
+            var r = await queryable.OrderByDescending(b=> b.Id).Select(b => _mapper.Map<Entity.Blog, BlogList>(b)).ToListAsync();
             return Result<IEnumerable<BlogList>?, Err>.Ok(r);
         }
         catch (Exception ex)
