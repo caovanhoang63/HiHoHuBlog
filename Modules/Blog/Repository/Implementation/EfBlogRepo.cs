@@ -1,32 +1,22 @@
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using HiHoHuBlog.Modules.Blog.Entity;
 using HiHoHuBlog.Utils;
 using Microsoft.EntityFrameworkCore;
 
 namespace HiHoHuBlog.Modules.Blog.Repository.Implementation;
 
-public class EfBlogRepo : IBlogRepository
+public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRepository
 {
-    private readonly IMapper _mapper;
-    private readonly ApplicationDbContext _context;
-    private readonly DbSet<Entity.Blog> _dbSet;
-    private IBlogRepository _blogRepositoryImplementation;
-
-
-    public EfBlogRepo(IMapper mapper, ApplicationDbContext context)
-    {
-        _mapper = mapper;
-        _context = context;
-        _dbSet = context.Set<Entity.Blog>();
-    }
+    private readonly DbSet<Entity.Blog> _dbSet = context.Set<Entity.Blog>();
 
     public async Task<Result<Unit, Err>> Create(BlogCreate blog)
     {
         try
         {
-            var entity = _mapper.Map<Entity.Blog>(blog);
+            var entity = mapper.Map<Entity.Blog>(blog);
             await _dbSet.AddAsync(entity);
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
             
             blog.Id = entity.Id;
             return Result<Unit, Err>.Ok(new Unit());
@@ -41,7 +31,6 @@ public class EfBlogRepo : IBlogRepository
     {
         try
         {
-            Console.WriteLine(blog.Id);
             var result  = _dbSet.SingleOrDefault(b => b.Id == blog.Id);
             if (result != null)
             {
@@ -57,7 +46,7 @@ public class EfBlogRepo : IBlogRepository
                     }
                 }
                 
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
                 
                 return Result<Unit, Err>.Ok(new Unit());
             }
@@ -118,7 +107,7 @@ public class EfBlogRepo : IBlogRepository
         {
             var entity = await _dbSet.SingleOrDefaultAsync(b => b.Id == id);
             
-            return Result<BlogDetail?, Err>.Ok(_mapper.Map<Entity.Blog?,BlogDetail>(entity));
+            return Result<BlogDetail?, Err>.Ok(mapper.Map<Entity.Blog?,BlogDetail>(entity));
         }
         catch (Exception e)
         {
@@ -190,7 +179,9 @@ public class EfBlogRepo : IBlogRepository
                 // }
             }
 
-            var r = await queryable.OrderByDescending(b=> b.Id).Select(b => _mapper.Map<Entity.Blog, BlogList>(b)).ToListAsync();
+            var r = await queryable.OrderByDescending(b=> b.Id)
+                .Include(b => b.User)
+                .Select(b => mapper.Map<Entity.Blog, BlogList>(b)).ToListAsync();
             return Result<IEnumerable<BlogList>?, Err>.Ok(r);
         }
         catch (Exception ex)

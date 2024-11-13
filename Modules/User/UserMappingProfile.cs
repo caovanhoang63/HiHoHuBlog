@@ -1,4 +1,5 @@
 using AutoMapper;
+using HiHoHuBlog.Modules.Blog.Entity;
 using HiHoHuBlog.Modules.User.Entity;
 
 namespace HiHoHuBlog.Modules.User;

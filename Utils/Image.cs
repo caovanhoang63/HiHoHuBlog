@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 
 namespace HiHoHuBlog.Utils;
 public class Image
@@ -9,6 +8,4 @@ public class Image
     public string Height;
     public string CloudName;
     public string Extension;
-
-
 }

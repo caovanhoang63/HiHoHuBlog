@@ -21,11 +21,19 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Ignore<JsonDocument>();
         modelBuilder.Entity<User>().ToTable("users");
         modelBuilder.Entity<Blog>().ToTable("blogs");
+        
         modelBuilder.Entity<Blog>()
             .Property(b => b.Thumbnail)
             .HasConversion<string>(
-                v => JsonConvert.SerializeObject(v),       // Convert Image? to string for storage
-                v => JsonConvert.DeserializeObject<Image?>(v)  // Convert string to Image? when reading
+                v => JsonConvert.SerializeObject(v),       
+                v => JsonConvert.DeserializeObject<Image?>(v) 
+            );
+        
+        modelBuilder.Entity<User>()
+            .Property(b => b.Avatar)
+            .HasConversion<string>(
+                v => JsonConvert.SerializeObject(v),       
+                v => JsonConvert.DeserializeObject<Image?>(v) 
             );
         
         foreach (var entity in modelBuilder.Model.GetEntityTypes())

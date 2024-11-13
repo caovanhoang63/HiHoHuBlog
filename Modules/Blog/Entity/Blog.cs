@@ -11,6 +11,8 @@ public class Blog : BaseEntity
     public int Id { get; set; }
     public int UserId { get; set; }
     public Image? Thumbnail  {get; set; }
+    
+    public virtual User.Entity.User? User { get; set; }
     public string? Title { get; set; }
     public string? Content { get; set; }
     public bool IsPublished { get; set; }
@@ -24,3 +26,4 @@ public class Blog : BaseEntity
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }
+

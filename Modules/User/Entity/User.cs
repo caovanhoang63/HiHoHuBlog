@@ -19,7 +19,7 @@ public class User : BaseEntity
     public string FirstName { get; set; }
     public string? Phone { get; set; }
     public string Role { get; set; } = "user";  // Enum type in MySQL can be represented as string in C#
-    public JsonDocument? Avatar { get; set; }   // JSON type mapped to JsonDocument in C#
+    public Image? Avatar { get; set; }   // JSON type mapped to JsonDocument in C#
     public int Status { get; set; } = 1;
     public int TotalFollower { get; set; } = 0;
     public int TotalFollowing { get; set; } = 0;

@@ -6,7 +6,7 @@ public class BlogDetail
     public int UserId { get; set; }
     public string Title { get; set; }
     public string Content { get; set; }
-    public User User { get; set; }
+    public UserDto? User { get; set; }
     public string Slug { get; set; }
     public bool IsPublished { get; set; }
     public int TotalView { get; set; } = 0;
