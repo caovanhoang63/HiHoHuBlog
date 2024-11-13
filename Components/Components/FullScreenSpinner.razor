@@ -1,0 +1,9 @@
+<div  
+    class="@(IsLoading ? " " : "hidden" ) fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-[999999]"
+>
+    <span class="loading loading-spinner loading-lg"></span>
+</div>
+
+@code {
+    [Parameter] public bool IsLoading { get; set; }
+}

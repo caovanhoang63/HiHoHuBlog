@@ -4,6 +4,7 @@
 @using HiHoHuBlog.Modules.Blog.Service.Interface
 @using HiHoHuBlog.Utils
 @using HiHoHuBlog.Modules.Admin.Presentation.Components
+@using HiHoHuBlog.Components.Components
 @layout AdminLayout
 @inject IBlogGetService BlogGetService
 @inject IToastService ToastService
@@ -11,6 +12,7 @@
 @inject NavigationManager NavigationManager
 
 <div class="h-full  ">
+    <FullScreenSpinner IsLoading="IsLoading"></FullScreenSpinner>
     <BlogModal @ref="blogModal" Close="Close" Open="IsOpenDetailModal" Blog="Blog"></BlogModal>
     <div class="flex mb-5 flex-row-reverse align-middle space-x-5">
         <div>
@@ -26,7 +28,7 @@
                         d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
                         clip-rule="evenodd"/>
                 </svg>
-            </label>    
+            </label>
         </div>
 
         <div tabindex="0" role="button" class="btn btn-sm">
@@ -52,7 +54,7 @@
                 <th >Created At</th>
                 <th>Publish At</th>
                 <th >Is Publish</th>
-                
+
                 <th>Status</th>
                 <th></th>
                 <th></th>
@@ -108,11 +110,11 @@
                         </td>
                         <td class="w-20 relative">
                             <div class="dropdown dropdown-hover dropdown-bottom dropdown-end">
-                                <a tabindex="0" role="button" >
+                                <a tabindex="0" role="button">
                                     <svg xmlns="http://www.w3.org/2000/svg"
                                          fill="none" viewBox="0 0 24 24"
                                          stroke-width="1.5"
-                                         stroke="currentColor" 
+                                         stroke="currentColor"
                                          class="size-4">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"/>
                                     </svg>
@@ -137,7 +139,7 @@
             <button class="join-item btn">100</button>
         </div>
     </div>
-    
+
 </div>
 
 @code {
@@ -145,6 +147,7 @@
     [Parameter] public BlogDetail? Blog { get; set; }
     [Parameter] public bool IsOpenDetailModal { get; set; } = false;
     [Parameter] public Paging Paging { get; set; } = new Paging(0,0,20,0);
+    [Parameter] public bool IsLoading { get; set; } = false;
     private BlogModal? blogModal;
 
     private void Close()
@@ -155,12 +158,14 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        IsLoading = true;
         var r = await BlogGetService.GetBlogs(null, Paging);
         if (!r.IsOk)
         {
             return;
         }
         BlogList = r.Value;
+        IsLoading = false;
     }
 
     private async Task OnRowClick(int id)
