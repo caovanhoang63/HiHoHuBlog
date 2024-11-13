@@ -1,4 +1,5 @@
 @page "/new-blog"
+@page "/p/{BlogId}/edit"
 @using System.Reactive.Linq
 @using System.Reactive.Subjects
 @using System.Security.Claims
@@ -16,6 +17,7 @@
 @inject NavigationManager NavigationManager
 @inject ICreateBlogService CreateBlogService
 @inject IBlogUpdateService BlogUpdateService
+@inject IBlogGetService BlogGetService
 @inject IToastService ToastService
 
 
@@ -25,10 +27,10 @@
 <div class="h-screen ">
     <Container ContainerClass="pb-80">
         <div class="flex flex-row-reverse pt-2">
-            <button @onclick="OnPublish" class="btn btn-success @(_blog.Id == 0 ? "btn-disabled" : " ") text-base-200 btn-sm ">Publish</button>
+            <button  @onclick="OnPublish" class="btn btn-success @(_blog.Id == 0 ? "btn-disabled" : " ") text-base-200 btn-sm ">Publish</button>
         </div>
         <div class="flex justify-between pt-5 ">
-            <input @oninput="OnSearchQueryInput" placeholder="title" class="text-4xl w-full input focus:ring-0 border-transparent focus:border-transparent px-0 !outline-none"/>
+            <input value="@_blog.Title" @oninput="OnSearchQueryInput" placeholder="title" class="text-4xl w-full input focus:ring-0 border-transparent focus:border-transparent px-0 !outline-none"/>
         </div>
         @if (_firstChange)
         {
@@ -49,8 +51,8 @@
             </div>
         }
         <div class="h-full">
-            <TextEditor ImageUploadFunc="OnUpload" OnChange="OnChange" Toolbar="new Toolbar { ShowFullToolbar = true }" EditorContainerId="TestId" @ref="@TextEditor"
-                        Placeholder="Write your own words...">
+            <TextEditor ImageUploadFunc="OnUpload" OnChange="OnChange" Toolbar="new Toolbar { ShowFullToolbar = true }" EditorContainerId="TestId"
+                        Placeholder="Write your own words..." @ref="TextEditor">
             </TextEditor>
         </div>
 
@@ -61,16 +63,19 @@
 </AuthorizeView>
 
 @code {
-    TextEditor TextEditor;
     [CascadingParameter] 
     Task<AuthenticationState> authenticationStateTask { get; set; }
 
-    private IDisposable? _titleSubscription;
-    private readonly Subject<string?> _titleSubject = new();
+    TextEditor? TextEditor;
     
+    [Parameter] public string? BlogId { get; set; }
+    
+    private IDisposable? _titleSubscription;
     private IDisposable? _contentSubscription;
+    private readonly Subject<string?> _titleSubject = new();
     private readonly Subject<string?> _contentSubject = new();
-    private bool _firstImage = false;    
+    private bool _isSaving = false;
+    private bool _firstChange = false;
     private  void OnChange(string args)
     {
         _isSaving = true;
@@ -78,7 +83,7 @@
         _contentSubject.OnNext(content);
         _isSaving = false;
     }
-
+    
     private async Task<Result<string, Err>> OnUpload(string name, string type, string array)
     {
          
@@ -107,23 +112,10 @@
         {
             return Result<string, Err>.Err(uR.Error);
         }
-        
-        // Return the URL path
-        if (!_firstImage)
-        {
-            _firstImage = true;
-        }
-        
         return Result<string,Err>.Ok(uR.Value.Url);
     } 
-    
-    private bool _isSaving = false;
     private readonly BlogCreate _blog = new BlogCreate();
-
-    
     private IRequester _requester;
-    private bool _firstChange = false;
-
     
     private  void OnSearchQueryInput(ChangeEventArgs args)
     {
@@ -136,12 +128,35 @@
     protected override async Task OnInitializedAsync()
     {
         _requester = await AuthUtils.GetInfo(authenticationStateTask); 
-    }
 
-    protected override void OnInitialized()
+    }
+    
+    protected override async  void OnInitialized()
     {
         base.OnInitialized();
 
+        if (BlogId is not null)
+        {
+            _firstChange = true;
+            if (!Int32.TryParse(BlogId, out var id))
+            {
+                NavigationManager.NavigateTo("/error");
+                return;
+            }
+            var r =  await BlogGetService.GetBlog(_requester,id);
+            if (!r.IsOk || r.Value is null || r.Value.UserId != _requester.GetId() )
+            {
+                NavigationManager.NavigateTo("/error");
+                return;
+            }
+            
+            _blog.Id = r.Value.Id;
+            _blog.Title = r.Value.Title;
+            _blog.UserId = r.Value.UserId;
+            _blog.Content = r.Value.Content;
+            await TextEditor.LoadHTMLContent(_blog.Content);
+            StateHasChanged();
+        }
         _contentSubscription = _contentSubject
             .Throttle(TimeSpan.FromMilliseconds(1500))
             .Subscribe(async content =>
@@ -155,6 +170,7 @@
                     {
                         _firstChange = true;
                         await CreateBlogService.CreateNewBlog(_requester, _blog);
+                        ChangeUrl($"p/{_blog.Id.ToString()}/edit");
                     }
                     else
                     {
@@ -178,6 +194,7 @@
                     {
                         _firstChange = true;
                         await CreateBlogService.CreateNewBlog(_requester, _blog);
+                        ChangeUrl($"p/{_blog.Id.ToString()}/edit");
                     }
                     else
                     {
@@ -190,7 +207,7 @@
             });
     }
 
-    public async void OnPublish()
+    private async void OnPublish()
     {
         var r = await BlogUpdateService.Publish(_requester, _blog.Id, _blog.Content);
         if (!r.IsOk)
@@ -201,16 +218,20 @@
         ToastService.ShowSuccess("Publish success!");
     }
     
-    
     public void Dispose()
     {
         _titleSubscription?.Dispose();
         _contentSubscription?.Dispose();
     }
-
-    private async void Callback(ChangeEventArgs obj)
-    {
-        Console.WriteLine(await TextEditor.GetHTML());
+    void ChangeUrl(string url){
+        // You can also change it to any url you want
+        JSRuntime.InvokeVoidAsync("ChangeUrl", url);
     }
-
+ 
+    
 }
+<script>
+    window.ChangeUrl = function(url){
+        history.pushState(null, '', url);
+    } 
+</script>

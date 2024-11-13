@@ -85,14 +85,9 @@
     [Parameter]
     public string Slug { get; set; }
 
-
-    // TextEditor TextEditor;
-    
-    
     public BlogDetail blog { get; set; }
     protected override async Task OnInitializedAsync()
     {
-        Console.WriteLine(Slug);
         var request = Slug.Split('-'); 
         string idString = request[^1];
         int id;
@@ -100,7 +95,6 @@
         {
             return;
         }
-   
         var r = await BlogGetService.GetBlog(null,id);
         if (!r.IsOk || r.Value is null)
         {
@@ -114,8 +108,19 @@
        
         if (Slug != r.Value.Slug)
         {
-            NavigationManager.NavigateTo($"blog/{r.Value.Slug}",forceLoad: false);
+            ChangeUrl($"blog/{r.Value.Slug}");
         }
     }
     
+    void ChangeUrl(string url){
+        // You can also change it to any url you want
+        JSRuntime.InvokeVoidAsync("ChangeUrl", url);
+    }
+    
 }
+
+<script>
+    window.ChangeUrl = function(url){
+        history.pushState(null, '', url);
+    } 
+</script>
