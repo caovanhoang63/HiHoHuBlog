@@ -4,6 +4,7 @@ using Amazon.S3;
 using Blazored.Toast;
 using HiHoHuBlog;
 using HiHoHuBlog.Components;
+using HiHoHuBlog.Modules.Admin;
 using HiHoHuBlog.Modules.Blog;
 using HiHoHuBlog.Modules.Blog.Repository;
 using HiHoHuBlog.Modules.Blog.Repository.Implementation;
@@ -62,6 +63,7 @@ builder.Services.AddScoped<IBlogDeleteService, BlogDeleteService>();
 
 builder.Services.AddAutoMapper(typeof(UserMappingProfile));
 builder.Services.AddAutoMapper(typeof(BlogMappingProfile));
+builder.Services.AddAutoMapper(typeof(AdminMappingProfile));
 
 
 builder.Services.AddSignalR(e => {

@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using HiHoHuBlog.Modules.Admin.Entity;
 using HiHoHuBlog.Modules.Blog.Entity;
 using HiHoHuBlog.Modules.User.Entity;
 using HiHoHuBlog.Utils;
@@ -16,11 +17,14 @@ public class ApplicationDbContext : DbContext
     
     public DbSet<User> Users { get; set; }
     public DbSet<Blog> Blogs { get; set; }
+    public DbSet<BlogBlocked> BlogBlocked { get; set; }
+    public DbSet<ReasonBlogBlock> ReasonBlogBlock { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Ignore<JsonDocument>();
         modelBuilder.Entity<User>().ToTable("users");
         modelBuilder.Entity<Blog>().ToTable("blogs");
+        modelBuilder.Entity<BlogBlocked>().ToTable("blog_blocked");
+        modelBuilder.Entity<ReasonBlogBlock>().ToTable("reason_blog_block");
         
         modelBuilder.Entity<Blog>()
             .Property(b => b.Thumbnail)

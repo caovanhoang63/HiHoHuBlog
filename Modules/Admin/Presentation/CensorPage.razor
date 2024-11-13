@@ -15,7 +15,7 @@
 
 <AuthorizeView Roles="admin, mod">
     <Authorized>
-    <div class="h-full ">
+    <div class="h-full">
         <FullScreenSpinner IsLoading="IsLoading"></FullScreenSpinner>
         <ConfirmModal Open="OpenDeletedModal" Title="Delete blog"
                       Message="@_deleteMessage" OnConfirm="OnConfirmDelete" OnDeny="OnDenyDelete"
@@ -132,8 +132,12 @@
                                         </svg>
                                     </a>
                                     <ul tabindex="0" class="absolute dropdown-content menu bg-base-100 rounded-box z-[1] w-40 p-2 shadow">
+                                        @if (blog.Status != (int)Status.Active)
+                                        {
+                                            <li class="text-success"><a>ReActive</a></li>
+                                        }
                                         <li class="text-error"><a @onclick="() => { OnDelete(blog); }">Delete</a></li>
-                                        <li class="text-warning-content"><a>Block</a></li>
+                                        <li class="text-warning"><a>Block</a></li>
                                     </ul>
                                 </div>
                             </td>
