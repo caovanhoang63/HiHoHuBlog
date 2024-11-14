@@ -28,7 +28,7 @@
                       Message="@_banMessage" OnConfirm="OnConfirmBan" OnDeny="OnDenyBan">
             </BanModal>
             <BlogModal Close="Close" Open="IsOpenDetailModal" Blog="Blog"></BlogModal>
-
+            <BlogFilterModal Filter="Filter" Open="IsOpenFilterModal" OnConfirm="OnConfirmFilter" OnDeny="OnDenyFilter" ></BlogFilterModal>
             @* content *@
             <div class="flex flex-col max-h-full">
                 @* Search bar *@
@@ -49,12 +49,19 @@
                         </label>
                     </div>
 
-                    <div tabindex="0" role="button" class="btn btn-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+
+                    <div @onclick="OnFilter" tabindex="0" role="button" class="btn btn-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke-width="1.5"
+                             stroke="currentColor"
+                             class="size-4">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"/>
                         </svg>
-
                     </div>
+                        
+
                     <div tabindex="0" role="button" class="btn btn-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M12 17.25h8.25"/>
@@ -100,18 +107,18 @@
                             <td class="w-20">
                                 @switch (blog.Status)
                                 {
-                                case 0:
-                                <span class="text-error">Deleted</span>
-                                break;
-                                case 1:
-                                <span class="text-success">Active</span>
-                                break;
-                                case 2:
-                                <span class="text-warning">Banned</span>
-                                break;
-                                default:
-                                <span class="text-warning">Unknown</span>
-                                break;
+                                    case 0:
+                                        <span class="text-error">Deleted</span>
+                                        break;
+                                    case 1:
+                                        <span class="text-success">Active</span>
+                                        break;
+                                    case 2:
+                                        <span class="text-warning">Banned</span>
+                                        break;
+                                    default:
+                                        <span class="text-warning">Unknown</span>
+                                        break;
                                 }
                             </td>
                             <td class="w-10">
@@ -138,7 +145,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"/>
                                         </svg>
                                     </a>
-                                    <ul tabindex="0" class="absolute dropdown-content menu bg-base-100 rounded-box z-[1] w-40 p-2 shadow">
+                                    <ul tabindex="0" class="absolute dropdown-content menu bg-base-100 rounded-box z-50 w-40 p-2 shadow">
                                         @if (blog.Status != (int)Status.Active)
                                         {
                                         <li class="text-success">
@@ -161,12 +168,14 @@
                     </table>
                 </div>
                 @* Paging *@
-                <div class="join mt-10  flex-1 flex justify-end">
-                    <button class="join-item btn">1</button>
-                    <button class="join-item btn">2</button>
-                    <button class="join-item btn btn-disabled">...</button>
-                    <button class="join-item btn">99</button>
-                    <button class="join-item btn">100</button>
+                <div class="join mt-5 flex justify-end">
+                    <button @onclick="OnPrevious" class="join-item btn btn-ghost btn-sm">«</button>
+                    <button class="join-item btn btn-ghost btn-sm">1</button>
+                    <button class="join-item btn btn-ghost btn-sm">2</button>
+                    <button class="join-item btn btn-ghost btn-disabled btn-sm">...</button>
+                    <button class="join-item btn btn-ghost btn-sm">99</button>
+                    <button class="join-item btn btn-ghost btn-sm">100</button>
+                    <button @onclick="OnNext" class="join-item btn btn-ghost btn-sm">»</button>
                 </div>
             </div>
         </div>
@@ -179,8 +188,35 @@
     private IRequester _requester;
     [Parameter] public IEnumerable<BlogList>? BlogList { get; set; } = null;
     [Parameter] public BlogDetail? Blog { get; set; }
-    public bool IsOpenDetailModal { get; set; } = false;
-    [Parameter] public Paging Paging { get; set; } = new Paging(0, 0, 20, 0);
+    private bool IsOpenDetailModal { get; set; } = false;
+    private bool IsOpenFilterModal { get; set; } = false;
+
+    public async void OnFilter()
+    {
+        IsOpenFilterModal = true;
+    }
+    
+    public async void OnConfirmFilter()
+    {
+        await GetBlogs();
+        IsOpenFilterModal = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public async void OnDenyFilter()
+    {
+        IsOpenFilterModal = false;
+    }
+    
+    private Paging Paging { get; set; } = new Paging(0, 20);
+    private Filter Filter { get; set; } = new Filter
+    {
+        Status = [1],
+        CategoryId = null,
+        CreatedAt = null,
+        IsPublished = null,
+        UserId = null
+    };
     public bool IsLoading { get; set; } = false;
     public bool OpenDeletedModal { get; set; } = false;
     private BlogList? _selectedBlog = null;
@@ -194,7 +230,7 @@
         _deleteMessage = $"Are you sure to delete \"{blog?.Title}\"";
         OpenDeletedModal = true;
     }
-
+    
     private async void OnConfirmDelete()
     {
         if (_selectedBlog is null) return;
@@ -263,20 +299,40 @@
         IsOpenDetailModal = false;
     }
 
-    protected override async Task OnInitializedAsync()
+    private async void OnNext()
     {
-        await base.OnInitializedAsync();
-        _requester = await AuthUtils.GetInfo(authenticationStateTask);
+        if (Paging.IsLastPage()) return;
+        Paging.Page++;
+        await GetBlogs();
+    }
+
+    private async void OnPrevious()
+    {
+        if (Paging.Page == 1) return;
+        Paging.Page--;
+        await GetBlogs();
+    }
+
+    private async Task GetBlogs()
+    {
         IsLoading = true;
-        var r = await BlogGetService.GetBlogs(null, Paging);
+        var r = await BlogGetService.GetBlogs(Filter, Paging);
         if (!r.IsOk)
         {
             return;
         }
 
-        _reason = (await ReasonBlogBlockService.ListAll()).Value;
         BlogList = r.Value;
         IsLoading = false;
+        StateHasChanged();
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        _requester = await AuthUtils.GetInfo(authenticationStateTask);
+        _reason = (await ReasonBlogBlockService.ListAll()).Value;
+        await GetBlogs();
     }
 
     private async Task OnRowClick(int id)
@@ -307,8 +363,11 @@
         }
         catch (Exception ex)
         {
+            ToastService.ShowError(ex.Message);
         }
     }
+    
+    
 
 
 }

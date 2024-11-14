@@ -2,16 +2,39 @@ namespace HiHoHuBlog.Utils;
 
 public class Paging
 {
-    public Paging(int cursor, int nextCursor, int pageSize, int total)
+    public Paging(int page,int pageSize)
     {
-        Cursor = cursor;
-        NextCursor = nextCursor;
         PageSize = pageSize;
-        Total = total;
+        Page = page;
+        InitDefault();
     }
 
-    public int Cursor { get; set; }
-    public int NextCursor { get; set; }
+    public int Page { get; set; }
+    public int? Cursor { get; set; }
+    public int? NextCursor { get; set; }
     public int PageSize { get; set; }
     public int Total { get; set;  }
+
+    public int GetOffSet()
+    {
+        return PageSize * (Page - 1);
+    }
+
+    public bool IsLastPage()
+    {
+        return Page  == (Total / PageSize) + 1;
+    }
+    
+    public void InitDefault()
+    {
+        if (Page <= 0)
+        {
+            Page = 1;
+        }
+
+        if (PageSize <= 0)
+        {
+            PageSize = 20;
+        }
+    }
 }

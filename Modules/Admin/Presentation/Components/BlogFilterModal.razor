@@ -1,0 +1,73 @@
+@using HiHoHuBlog.Modules.Blog.Entity
+@using HiHoHuBlog.Utils
+<div>
+    <dialog id="my_modal_1" class="modal @(Open ? "modal-open" : " ")">
+        <div class="modal-box ">
+            <h3 class="text-lg font-bold">Filter</h3>
+            <div>
+                <div class="flex w-full">
+                    <label class="label">
+                        <span class="label-text">Status:</span>
+                    </label>
+                    <label class="label cursor-pointer space-x-2">
+                        <input @onclick="() =>OnCheck(1)" type="checkbox" checked="@(Status!.Contains(1))"  class="checkbox checkbox-sm"/>
+                        <span class="label-text text-success">Active</span>
+                    </label>
+                    <label class="label cursor-pointer space-x-2">
+                        <input @onclick="() => OnCheck(0)" type="checkbox" value="0" checked="@(Status!.Contains(0))" class="checkbox checkbox-sm"/>
+                        <span class="label-text text-error">Deleted</span>
+                    </label>
+                    <label class="label cursor-pointer space-x-2">
+                        <input @onclick="() => OnCheck(2)" type="checkbox"  value="2" checked="@(Status!.Contains(2))" class="checkbox checkbox-sm"/>
+                        <span class="label-text text-warning-content">Banned</span>
+                    </label>
+                </div>
+                <div class="flex w-full">
+                    <label class="label">
+                        <span class="label-text">User:</span>
+                    </label>
+                    <input type="text" placeholder="Type here" class="input input-sm input-bordered w-full"/>
+                </div>
+            </div>
+            
+            <div class="modal-action">
+                <button @onclick="OnConfirmClick" class="btn btn-warning">Confirm</button>
+                <button @onclick="OnDeny" class="btn">Close</button>
+            </div>
+        </div>
+    </dialog>
+</div>
+
+
+@code {
+    [Parameter] public bool Open { get; set; }
+    [Parameter] public EventCallback OnConfirm { get; set; }
+    [Parameter] public EventCallback OnDeny { get; set; }
+    [Parameter] public Filter Filter { get; set; }
+    private int[] Status { get; set; }
+
+    private async void OnConfirmClick()
+    {
+        Filter.Status = Status;
+        await OnConfirm.InvokeAsync();
+    }
+    protected override void OnInitialized()
+    {
+
+        base.OnInitialized();
+        Status = Filter.Status;
+        
+    }
+
+    private void OnCheck(int status)
+    {
+        if (Status.Contains(status))
+        {
+            Status = Status.Where(val => val != status).ToArray();
+        }
+        else
+        {
+            Status =  Status.Append(status).ToArray();
+        }
+    }
+}

@@ -160,7 +160,7 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
 
                 if (filter.Status is not null)
                 {
-                    queryable = queryable.Where(b => b.Status == filter.Status);
+                    queryable = queryable.Where(b => filter.Status.Contains(b.Status));
                 }
 
                 if (filter.IsPublished is not null)
@@ -178,10 +178,32 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
                 //     queryable = queryable.Where(b =>)
                 // }
             }
+            
+            var totalCount = await queryable.CountAsync();
+            paging.Total = totalCount;
 
-            var r = await queryable.OrderByDescending(b=> b.Id)
+            if (paging.Cursor != null)
+            {
+                queryable =  queryable.OrderByDescending(b=> b.Id).Where(b => b.Id < paging.Cursor);
+            }
+            else
+            {
+                queryable = queryable.OrderByDescending(b=> b.Id).Skip(paging.GetOffSet());
+            }
+            
+            var r = await queryable.Take(paging.PageSize)
                 .Include(b => b.User)
                 .Select(b => mapper.Map<Entity.Blog, BlogList>(b)).ToListAsync();
+
+            if (r.Count > 0)
+            {
+                paging.NextCursor = r[^1].Id - 1;
+            }
+            else
+            {
+                paging.NextCursor = null;
+            }
+            
             return Result<IEnumerable<BlogList>?, Err>.Ok(r);
         }
         catch (Exception ex)
