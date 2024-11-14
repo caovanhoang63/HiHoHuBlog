@@ -19,67 +19,70 @@
 
 <AuthorizeView Roles="admin, mod">
     <Authorized>
-    <div class="h-full">
-        <FullScreenSpinner IsLoading="IsLoading"></FullScreenSpinner>
-        <ConfirmModal Open="OpenDeletedModal" Title="Delete blog"
-                      Message="@_deleteMessage" OnConfirm="OnConfirmDelete" OnDeny="OnDenyDelete"
-        ></ConfirmModal>
-        <BanModal Open="IsOpenBanModal"  Reasons="_reason"
-                      Message="@_banMessage" OnConfirm="OnConfirmBan" OnDeny="OnDenyBan"
-        ></BanModal>
-        
-        <BlogModal Close="Close" Open="IsOpenDetailModal" Blog="Blog"></BlogModal>
-        <div class="flex mb-5 flex-row-reverse align-middle space-x-5">
-            <div>
-                <label class="input w-80 ml-5 input-bordered input-sm flex items-center gap-2 bg-white">
-                    <input type="text" class="grow " placeholder="Search"/>
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 16 16"
-                        fill="currentColor"
-                        class="h-3 w-3 opacity-70">
-                        <path
-                            fill-rule="evenodd"
-                            d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
-                            clip-rule="evenodd"/>
-                    </svg>
-                </label>
-            </div>
+        <div class="flex flex-col h-full overflow-y-hidden p-5">
+            <FullScreenSpinner IsLoading="IsLoading"></FullScreenSpinner>
+            <ConfirmModal Open="OpenDeletedModal" Title="Delete blog"
+                          Message="@_deleteMessage" OnConfirm="OnConfirmDelete" OnDeny="OnDenyDelete">
+            </ConfirmModal>
+            <BanModal Open="IsOpenBanModal" Reasons="_reason"
+                      Message="@_banMessage" OnConfirm="OnConfirmBan" OnDeny="OnDenyBan">
+            </BanModal>
+            <BlogModal Close="Close" Open="IsOpenDetailModal" Blog="Blog"></BlogModal>
 
-            <div tabindex="0" role="button" class="btn btn-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"/>
-                </svg>
+            @* content *@
+            <div class="flex flex-col max-h-full">
+                @* Search bar *@
+                <div class="flex mb-5 flex-row-reverse align-middle space-x-5">
+                    <div>
+                        <label class="input w-80 ml-5 input-bordered input-sm flex items-center gap-2 bg-white">
+                            <input type="text" class="grow " placeholder="Search"/>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 16 16"
+                                fill="currentColor"
+                                class="h-3 w-3 opacity-70">
+                                <path
+                                    fill-rule="evenodd"
+                                    d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+                                    clip-rule="evenodd"/>
+                            </svg>
+                        </label>
+                    </div>
 
-            </div>
-            <div tabindex="0" role="button" class="btn btn-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M12 17.25h8.25"/>
-                </svg>
-            </div>
-        </div>
-        <div class="overflow-x-auto  h-full flex flex-col">
-            <table class="table table-xs text-center">
-                <thead >
-                <tr class="font-bold">
-                    <th>Id</th>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>Last Modified</th>
-                    <th>Created At</th>
-                    <th>Publish At</th>
-                    <th>Is Publish</th>
+                    <div tabindex="0" role="button" class="btn btn-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"/>
+                        </svg>
 
-                    <th>Status</th>
-                    <th></th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                @if (BlogList is not null)
-                {
-                    @foreach (var blog in BlogList)
-                    {
+                    </div>
+                    <div tabindex="0" role="button" class="btn btn-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M12 17.25h8.25"/>
+                        </svg>
+                    </div>
+                </div>
+                @* Table *@
+                <div class="overflow-y-scroll">
+                    <table class="table table-xs text-center">
+                        <thead class="sticky top-0 z-50 bg-white">
+                        <tr class="font-bold">
+                            <th>Id</th>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Last Modified</th>
+                            <th>Created At</th>
+                            <th>Publish At</th>
+                            <th>Is Publish</th>
+                            <th>Status</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody class="">
+                        @if (BlogList is not null)
+                        {
+                        @foreach (var blog in BlogList)
+                        {
                         <tr class="hover:bg-base-200 hover:cursor-pointer" @onclick="async () => await OnRowClick(blog.Id)">
                             <th>@blog.Id</th>
                             <td>
@@ -95,28 +98,25 @@
                                 </label>
                             </td>
                             <td class="w-20">
-                                @switch (@blog.Status)
+                                @switch (blog.Status)
                                 {
-                                    case 0:
-                                        <span class="text-error">Deleted</span>
-                                        break;
-                                    case 1:
-                                        <span class="text-success">Active</span>
-                                        break;
-                                    case 2:
-                                        <span class="text-warning">Banned</span>
-                                        break;
-                                    default:
-                                        <span class="text-warning">Unknown</span>
-                                        break;
+                                case 0:
+                                <span class="text-error">Deleted</span>
+                                break;
+                                case 1:
+                                <span class="text-success">Active</span>
+                                break;
+                                case 2:
+                                <span class="text-warning">Banned</span>
+                                break;
+                                default:
+                                <span class="text-warning">Unknown</span>
+                                break;
                                 }
                             </td>
                             <td class="w-10">
-                                <a @onclick:stopPropagation="true" @onclick:preventDefault="true" 
-                                       @onclick='e => {
-                                           if (blog.Status != 1) return;
-                                            NavigationManager.NavigateTo($"blog/{blog.Id}"); 
-                                       }'>
+                                <a @onclick:stopPropagation="true" @onclick:preventDefault="true"
+                                   @onclick='e => { if (blog.Status != 1) return; NavigationManager.NavigateTo($"blog/{blog.Id}"); }'>
                                     <svg xmlns="http://www.w3.org/2000/svg"
                                          fill="none"
                                          viewBox="0 0 24 24"
@@ -128,7 +128,7 @@
                                 </a>
                             </td>
                             <td class="w-20 relative">
-                                <div  @onclick:stopPropagation="true"  class="dropdown dropdown-hover dropdown-bottom dropdown-end">
+                                <div @onclick:stopPropagation="true" class="dropdown dropdown-hover dropdown-bottom dropdown-end">
                                     <a tabindex="0" role="button">
                                         <svg xmlns="http://www.w3.org/2000/svg"
                                              fill="none" viewBox="0 0 24 24"
@@ -141,51 +141,60 @@
                                     <ul tabindex="0" class="absolute dropdown-content menu bg-base-100 rounded-box z-[1] w-40 p-2 shadow">
                                         @if (blog.Status != (int)Status.Active)
                                         {
-                                            <li class="text-success"><a>ReActive</a></li>
+                                        <li class="text-success">
+                                            <a>ReActive</a>
+                                        </li>
                                         }
-                                        <li class="text-error"><a @onclick="() => { OnDelete(blog); }">Delete</a></li>
-                                        <li class="text-warning"><a  @onclick="() => { OnBan(blog); }" >Block</a></li>
+                                        <li class="text-error">
+                                            <a @onclick="() => { OnDelete(blog); }">Delete</a>
+                                        </li>
+                                        <li class="text-warning">
+                                            <a @onclick="() => { OnBan(blog); }">Block</a>
+                                        </li>
                                     </ul>
                                 </div>
                             </td>
                         </tr>
-                    }
-                }
-                </tbody>
-            </table>
-            <div class="join mt-10 place-self-end">
-                <button class="join-item btn">1</button>
-                <button class="join-item btn">2</button>
-                <button class="join-item btn btn-disabled">...</button>
-                <button class="join-item btn">99</button>
-                <button class="join-item btn">100</button>
+                        }
+                        }
+                        </tbody>
+                    </table>
+                </div>
+                @* Paging *@
+                <div class="join mt-10  flex-1 flex justify-end">
+                    <button class="join-item btn">1</button>
+                    <button class="join-item btn">2</button>
+                    <button class="join-item btn btn-disabled">...</button>
+                    <button class="join-item btn">99</button>
+                    <button class="join-item btn">100</button>
+                </div>
             </div>
         </div>
-
-    </div>
     </Authorized>
 </AuthorizeView>
+
 @code {
-    [CascadingParameter] 
-    Task<AuthenticationState> authenticationStateTask { get; set; }
+    [CascadingParameter] Task<AuthenticationState> authenticationStateTask { get; set; }
 
     private IRequester _requester;
     [Parameter] public IEnumerable<BlogList>? BlogList { get; set; } = null;
     [Parameter] public BlogDetail? Blog { get; set; }
     public bool IsOpenDetailModal { get; set; } = false;
-    [Parameter] public Paging Paging { get; set; } = new Paging(0,0,20,0);
+    [Parameter] public Paging Paging { get; set; } = new Paging(0, 0, 20, 0);
     public bool IsLoading { get; set; } = false;
     public bool OpenDeletedModal { get; set; } = false;
     private BlogList? _selectedBlog = null;
     private IEnumerable<ReasonBlogBlock>? _reason;
-    
+
     private string _deleteMessage = "";
+
     private void OnDelete(BlogList? blog)
     {
         _selectedBlog = blog;
         _deleteMessage = $"Are you sure to delete \"{blog?.Title}\"";
-        OpenDeletedModal = true; 
+        OpenDeletedModal = true;
     }
+
     private async void OnConfirmDelete()
     {
         if (_selectedBlog is null) return;
@@ -195,6 +204,7 @@
         {
             Console.WriteLine(r.Error.Message);
         }
+
         IsLoading = false;
         OpenDeletedModal = false;
         var firstOrDefault = BlogList?.FirstOrDefault(b => b.Id == _selectedBlog.Id);
@@ -202,25 +212,27 @@
 
         await InvokeAsync(StateHasChanged);
     }
+
     private string _banMessage = "";
 
-    private  void OnDenyDelete()
+    private void OnDenyDelete()
     {
         OpenDeletedModal = false;
     }
-    
+
     public bool IsOpenBanModal { get; set; } = false;
 
     private void OnBan(BlogList? blog)
     {
         _selectedBlog = blog;
         _banMessage = $"Are you sure to block blog \"{blog?.Title}\"";
-        IsOpenBanModal = true; 
+        IsOpenBanModal = true;
     }
+
     private async void OnConfirmBan(ReasonBlogBlock? reason)
     {
         if (_selectedBlog is null) return;
-        if (reason is null ) return;
+        if (reason is null) return;
         IsLoading = true;
         var r = await BlogBlockedService.Create(_requester, new BlogBlockedCreate
         {
@@ -231,6 +243,7 @@
         {
             Console.WriteLine(r.Error.Message);
         }
+
         IsLoading = false;
         IsOpenBanModal = false;
         var firstOrDefault = BlogList?.FirstOrDefault(b => b.Id == _selectedBlog.Id);
@@ -239,12 +252,12 @@
         await InvokeAsync(StateHasChanged);
     }
 
-    private  void OnDenyBan()
+    private void OnDenyBan()
     {
         IsOpenBanModal = false;
     }
 
-    
+
     private void Close()
     {
         IsOpenDetailModal = false;
@@ -261,7 +274,7 @@
             return;
         }
 
-        _reason = (await ReasonBlogBlockService.ListAll()).Value; 
+        _reason = (await ReasonBlogBlockService.ListAll()).Value;
         BlogList = r.Value;
         IsLoading = false;
     }
@@ -270,20 +283,20 @@
     {
         try
         {
-            var r = await BlogGetService.GetBlog(_requester,id);
-        
+            var r = await BlogGetService.GetBlog(_requester, id);
+
             if (!r.IsOk)
             {
                 Console.WriteLine(r.Error.Message);
                 return;
             }
-        
+
             if (r.Value != null)
             {
                 Console.WriteLine(r.Value.Id);
-                
+
                 Blog = r.Value;
-                await InvokeAsync(StateHasChanged); 
+                await InvokeAsync(StateHasChanged);
 
                 IsOpenDetailModal = true;
             }
@@ -291,13 +304,11 @@
             {
                 ToastService.ShowError("Not found");
             }
-        }catch (Exception ex)
+        }
+        catch (Exception ex)
         {
-         
         }
     }
 
 
-
 }
-

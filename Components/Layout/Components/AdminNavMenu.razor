@@ -1,9 +1,8 @@
 @rendermode InteractiveServer
 @inject NavigationManager NavigationManager
-<div class="navbar border-b-[1px]">
+<div class="navbar h-10 border-b-[1px] sticky bg-white z-50 top-0">
     <div class="flex-1">
-        <a @onclick='() => { NavigationManager.NavigateTo("/"); }' class="btn btn-ghost  text-xl">Hihohu</a>
-
+        <a @onclick='() => { NavigationManager.NavigateTo("/"); }' class="btn  btn-ghost text-xl">Hihohu</a>
     </div>
     <div class="flex-none gap-2">
         <div class="dropdown dropdown-end">

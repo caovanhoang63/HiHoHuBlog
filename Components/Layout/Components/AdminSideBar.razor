@@ -1,6 +1,6 @@
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
-<ul class="menu w-40">
+<ul class="menu w-40 p-2 sticky top-0">
     <li>
         <a class="@(ActivePage == "/dashboard" ? "active" : "")" @onclick='() => Nav("/dashboard")'>
             <svg

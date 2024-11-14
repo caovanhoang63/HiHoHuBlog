@@ -2,11 +2,11 @@
 @inherits LayoutComponentBase
 
 
-<div class="min-h-screen  flex flex-col">
+<div class="h-screen relative flex flex-col">
     <AdminNavMenu></AdminNavMenu>
-    <div class="flex flex-grow ">
+    <div class="flex flex-grow overflow-y-auto">
         <AdminSideBar></AdminSideBar>
-        <div class=" mx-10 my-5  flex-grow">
+        <div class="w-full">
             @Body
         </div>
     </div>
