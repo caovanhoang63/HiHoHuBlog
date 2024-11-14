@@ -11,6 +11,7 @@ public class UserProfile
     public string LastName { get; set; }
     public string FirstName { get; set; }
     public Image? Avatar { get; set; }   // JSON type mapped to JsonDocument in C#
+    public string Slug { get; set; }
     public int TotalFollower { get; set; } = 0;
     public int TotalFollowing { get; set; } = 0;
     public int TotalMark { get; set; } = 0;

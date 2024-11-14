@@ -41,4 +41,20 @@ public class EfRepo  : IUserRepository
 
         return Result<Entity.User?, Err>.Ok(user);
     }
+
+    public async Task<Result<UserProfile?, Err>> GetProfile(string email)
+    {
+        try
+        {
+            var user = await _dbSet.Where(u => u.Email == email).FirstOrDefaultAsync();
+            var userProfile = _mapper.Map<UserProfile>(user);
+            return Result<UserProfile?, Err>.Ok(userProfile);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return Result<UserProfile?, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+        
+    }
 }
