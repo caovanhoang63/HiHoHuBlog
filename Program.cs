@@ -24,6 +24,8 @@ using HiHoHuBlog.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Nest;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,6 +41,11 @@ builder.Services.AddSingleton<IAmazonS3>(sp =>
     return new AmazonS3Client(awsAccessKeyId, awsSecretAccessKey);
 });
 
+builder.Services.AddSingleton<EsClient>(sp =>
+{
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    return new EsClient(configuration);
+});
 
 
 builder.Services.AddScoped<IUploadProvider, S3UploadProvider>();
