@@ -5,6 +5,7 @@ using HiHoHuBlog.Modules.Search.Entity;
 using HiHoHuBlog.Modules.Search.Repository.Implementation;
 using HiHoHuBlog.Modules.Search.Service.Interface;
 using HiHoHuBlog.Utils;
+using HtmlAgilityPack;
 
 namespace HiHoHuBlog.Modules.Search.Service.Implementation;
 
@@ -33,11 +34,23 @@ public class MigrateBlogDataService(IBlogRepository sourceRepository, ISearchBlo
         {
             return Result<Unit, Err>.Err(r.Error);
         }
-
+        
+        
+        
         if (r.Value is null || !r.Value.Any())
         {
             Console.WriteLine("No need to migrate blog data");
             return Result<Unit, Err>.Ok(new Unit());
+        }
+
+        foreach (var blog in r.Value)
+        {
+            var doc = new HtmlDocument();
+            if (blog.Content is not null)
+            {
+                doc.LoadHtml(blog.Content);
+                blog.Content = doc.DocumentNode.InnerText;
+            }
         }
         
         var result = await _targetRepository.AddBulkAsync(_mapper.Map<IEnumerable<BlogSearchDoc>>(r.Value),now);
