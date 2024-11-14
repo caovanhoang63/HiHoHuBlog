@@ -4,11 +4,8 @@
 @using HiHoHuBlog.Modules.User.Entity
 @using HiHoHuBlog.Modules.User.Service.Interface
 @using Microsoft.AspNetCore.Authentication
-@*
-@rendermode InteractiveServer
-*@
-@layout NonLayout
-@inject NavigationManager NavigationManager
+@layout StaticSsrLayout
+@inject NavigationManager NavigationManager 
 @inject IUserLoginService UserLoginService
 @inject IToastService ToastService
 @inject IAuthenticateService AuthenticateService
@@ -48,14 +45,12 @@
         <a href="/signup" class="link text-center">Do not an account?</a>
     </EditForm>
 
-
 </div>
 
 @code {
     private EditContext? _editContext;
 
-    [CascadingParameter] 
-    public HttpContext? Context { get; set; }
+    [CascadingParameter] public HttpContext? Context { get; set; } = default!;
 
     [SupplyParameterFromForm(FormName = "LoginForm")]
     private UserLogin? User { get; set; } = new UserLogin();

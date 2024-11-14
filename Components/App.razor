@@ -16,7 +16,7 @@
 </head>
 
 <body>
-<Routes />
+<Routes @rendermode="RenderModeForPage"/>
 <script src="_framework/blazor.web.js"></script>
 
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
@@ -26,3 +26,21 @@
 </body>
 
 </html>
+@code {
+    [CascadingParameter] private HttpContext HttpContext { get; set; } = default!;
+
+    private IComponentRenderMode? RenderModeForPage
+    {
+        get
+        {
+            if (HttpContext.Request.Path.StartsWithSegments("/login")||
+                HttpContext.Request.Path.StartsWithSegments("/logout"))
+            {
+                return null;
+            }
+            return InteractiveServer;
+        }
+    }
+        
+        
+}
