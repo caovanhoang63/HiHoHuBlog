@@ -1,3 +1,4 @@
+using HiHoHuBlog.Modules.Search.Entity;
 using Nest;
 
 namespace HiHoHuBlog;
@@ -10,11 +11,13 @@ public class EsClient
         var userName  = configuration["ElasticSearch:UserName"];
         var password = configuration["ElasticSearch:Password"];
         var url = configuration["ElasticSearch:Uri"];
-        
+
         var settings = new ConnectionSettings(new Uri(url))
             .ServerCertificateValidationCallback((sender, cert, chain, errors) => true)
-            .BasicAuthentication(userName,password);
-
+            .BasicAuthentication(userName, password)
+            .DefaultMappingFor<BlogSearchDoc>(m => m.IndexName("blog_search"))
+            .DefaultMappingFor<MigrationTimestamp>(m => m.IndexName("migration_time"));
+        
         _client = new ElasticClient(settings);
 
         var pingResult =  _client.Ping();

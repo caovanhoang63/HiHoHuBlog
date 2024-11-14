@@ -1,4 +1,5 @@
 @page "/censor"
+@using AutoMapper
 @using HiHoHuBlog.Components.Layout
 @using HiHoHuBlog.Modules.Blog.Entity
 @using HiHoHuBlog.Modules.Blog.Service.Interface
@@ -7,14 +8,19 @@
 @using HiHoHuBlog.Components.Components
 @using HiHoHuBlog.Modules.Admin.Entity
 @using HiHoHuBlog.Modules.Admin.Service.Interface
+@using HiHoHuBlog.Modules.Search.Entity
+@using HiHoHuBlog.Modules.Search.Repository.Implementation
+@using HiHoHuBlog.Modules.Search.Service.Interface
 @layout AdminLayout
+@rendermode InteractiveServer
 @inject IBlogGetService BlogGetService
 @inject IToastService ToastService
 @inject IBlogDeleteService BlogDeleteService
-@rendermode InteractiveServer
 @inject NavigationManager NavigationManager
 @inject IReasonBlogBlockService ReasonBlogBlockService
 @inject IBlogBlockedService BlogBlockedService
+@inject ISearchBlogRepository SearchBlogRepo
+@inject IMigrateBlogDataService MigrateService
 @attribute [Authorize]
 
 <AuthorizeView Roles="admin, mod">
@@ -28,11 +34,12 @@
                       Message="@_banMessage" OnConfirm="OnConfirmBan" OnDeny="OnDenyBan">
             </BanModal>
             <BlogModal Close="Close" Open="IsOpenDetailModal" Blog="Blog"></BlogModal>
-            <BlogFilterModal Filter="Filter" Open="IsOpenFilterModal" OnConfirm="OnConfirmFilter" OnDeny="OnDenyFilter" ></BlogFilterModal>
+            <BlogFilterModal BlogFilter="BlogFilter" Open="IsOpenFilterModal" OnConfirm="OnConfirmFilter" OnDeny="OnDenyFilter" ></BlogFilterModal>
             @* content *@
             <div class="flex flex-col max-h-full">
                 @* Search bar *@
                 <div class="flex mb-5 flex-row-reverse align-middle space-x-5">
+
                     <div>
                         <label class="input w-80 ml-5 input-bordered input-sm flex items-center gap-2 bg-white">
                             <input type="text" class="grow " placeholder="Search"/>
@@ -60,13 +67,18 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"/>
                         </svg>
                     </div>
-                        
+
 
                     <div tabindex="0" role="button" class="btn btn-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M12 17.25h8.25"/>
                         </svg>
                     </div>
+
+                    <button class="btn btn-primary " @onclick='OnTest'>
+                        Test
+                    </button>
+                    
                 </div>
                 @* Table *@
                 <div class="overflow-y-scroll">
@@ -209,11 +221,11 @@
     }
     
     private Paging Paging { get; set; } = new Paging(0, 20);
-    private Filter Filter { get; set; } = new Filter
+    private BlogFilter BlogFilter { get; set; } = new BlogFilter
     {
         Status = [1],
         CategoryId = null,
-        CreatedAt = null,
+        LtCreatedAt = null,
         IsPublished = null,
         UserId = null
     };
@@ -316,7 +328,7 @@
     private async Task GetBlogs()
     {
         IsLoading = true;
-        var r = await BlogGetService.GetBlogs(Filter, Paging);
+        var r = await BlogGetService.GetBlogs(BlogFilter, Paging);
         if (!r.IsOk)
         {
             return;
@@ -366,8 +378,18 @@
             ToastService.ShowError(ex.Message);
         }
     }
-    
-    
 
+    private async void OnTest()
+    {
+        var r = await MigrateService.MigrateBlogDataAsync();
+        if (!r.IsOk)
+        {
+            Console.WriteLine(r.Error);
+            // ToastService.ShowError(r.Error.ToString());
+            return;
+        }
+        Console.WriteLine("Success");
+        // ToastService.ShowSuccess("Success");
+    }
 
 }
