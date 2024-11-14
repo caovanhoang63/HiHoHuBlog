@@ -16,9 +16,8 @@ public class MigrateBlogDataService(IBlogRepository sourceRepository, ISearchBlo
     private readonly IMapper _mapper = mapper;
     public async Task<Result<Unit, Err>> MigrateBlogDataAsync()
     {
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         var lastResult = await _targetRepository.GetLastMigrateTime();
-        
         
         var r = await _sourceRepository.ListBlogs(new BlogFilter
         {
@@ -33,6 +32,12 @@ public class MigrateBlogDataService(IBlogRepository sourceRepository, ISearchBlo
         if (!r.IsOk)
         {
             return Result<Unit, Err>.Err(r.Error);
+        }
+
+        if (r.Value is null || !r.Value.Any())
+        {
+            Console.WriteLine("No need to migrate blog data");
+            return Result<Unit, Err>.Ok(new Unit());
         }
         
         var result = await _targetRepository.AddBulkAsync(_mapper.Map<IEnumerable<BlogSearchDoc>>(r.Value),now);

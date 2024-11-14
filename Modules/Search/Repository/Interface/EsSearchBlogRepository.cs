@@ -12,7 +12,7 @@ public class EsSearchBlogRepository(EsClient client) : ISearchBlogRepository
 
     public async Task<Result<Unit, Err>> AddBulkAsync(IEnumerable<Entity.BlogSearchDoc> blogs, DateTime? date)
     {
-        var r = await client.Client.BulkAsync(b => b.Index<BlogSearchDoc>().CreateMany(blogs));
+        var r = await client.Client.BulkAsync(b => b.Index<BlogSearchDoc>().IndexMany(blogs));
 
         if (!r.IsValid)
         {
@@ -44,12 +44,11 @@ public class EsSearchBlogRepository(EsClient client) : ISearchBlogRepository
             .Index<MigrationTimestamp>()
             .Query(q => q
                 .Term(t => t
-                    .Field(f => f.Index)
-                    .Value("blog")
+                    .Field(f => f.Index ).Value("blog_search")
                 )
             )
             .Sort(sort => sort
-                    .Descending("_id") 
+                    .Descending(p => p.Timestamp) 
             )
             .Size(1)
         );
