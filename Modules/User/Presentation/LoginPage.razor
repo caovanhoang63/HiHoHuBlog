@@ -4,6 +4,7 @@
 @using HiHoHuBlog.Modules.User.Entity
 @using HiHoHuBlog.Modules.User.Service.Interface
 @using Microsoft.AspNetCore.Authentication
+@using HiHoHuBlog.Components.Components
 @layout StaticSsrLayout
 @inject NavigationManager NavigationManager 
 @inject IUserLoginService UserLoginService
@@ -44,7 +45,6 @@
         <input type="submit" class="btn" value="Login"/>
         <a href="/signup" class="link text-center">Do not an account?</a>
     </EditForm>
-
 </div>
 
 @code {
