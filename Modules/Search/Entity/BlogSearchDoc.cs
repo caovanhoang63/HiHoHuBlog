@@ -11,6 +11,7 @@ public class BlogSearchDoc
     public UserDto?  User{ get; set; }
     public string? Title { get; set; }
     public string? Content { get; set; }
+    public string? ShortContent { get; set; }
     public bool IsPublished { get; set; }
     public DateTime? PublishedAt { get; set; }
     public int MinToRead { get; set; }

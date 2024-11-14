@@ -43,17 +43,24 @@ public class MigrateBlogDataService(IBlogRepository sourceRepository, ISearchBlo
             return Result<Unit, Err>.Ok(new Unit());
         }
 
-        foreach (var blog in r.Value)
+        var blogs = _mapper.Map<IEnumerable<BlogSearchDoc>>(r.Value);
+        var blogSearchDocs = blogs as BlogSearchDoc[] ?? blogs.ToArray();
+        foreach (var blog in blogSearchDocs)
         {
             var doc = new HtmlDocument();
             if (blog.Content is not null)
             {
                 doc.LoadHtml(blog.Content);
                 blog.Content = doc.DocumentNode.InnerText;
+                var firstTextElement = doc.DocumentNode.SelectSingleNode("//h1|//h2|//h3|//p");
+                if (firstTextElement != null)
+                {
+                    blog.ShortContent = firstTextElement.InnerText;
+                }
             }
         }
         
-        var result = await _targetRepository.AddBulkAsync(_mapper.Map<IEnumerable<BlogSearchDoc>>(r.Value),now);
+        var result = await _targetRepository.AddBulkAsync(blogSearchDocs,now);
         
         if (!result.IsOk)
         {

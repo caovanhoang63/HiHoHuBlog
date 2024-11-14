@@ -7,4 +7,5 @@ public interface ISearchBlogRepository
 {
     Task<Result<Unit,Err>> AddBulkAsync(IEnumerable<Entity.BlogSearchDoc> blogs, DateTime? date);
     Task<Result<MigrationTimestamp?,Err>> GetLastMigrateTime();
+    Task<Result<IEnumerable<BlogSearchDoc>?,Err>> SearchBlog(string agrs, Paging paging);
 }

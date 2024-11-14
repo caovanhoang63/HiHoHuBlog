@@ -63,4 +63,54 @@ public class EsSearchBlogRepository(EsClient client) : ISearchBlogRepository
     
         return Result<MigrationTimestamp?, Err>.Err(new Err("No documents found or an error occurred"));
     }
+
+    public async Task<Result<IEnumerable<BlogSearchDoc>?, Err>> SearchBlog(string arg , Paging paging)
+    {
+        var searchResponse = await client.Client.SearchAsync<BlogSearchDoc>(s => s
+            .From(paging.GetOffSet())  
+            .Size(paging.PageSize)    
+            .Query(q => q
+                .Bool(b => b
+                    .Should(sh => sh
+                            .MultiMatch(mm => mm
+                                .Query(arg)
+                                .Fields(f => f
+                                    .Field("title")
+                                    .Field("content")
+                                )
+                                .Fuzziness(Fuzziness.Auto)
+                                .Type(TextQueryType.BestFields)
+                                .Boost(1.0)
+                            ),
+                        sh => sh
+                            .MultiMatch(mm => mm
+                                .Query(arg)  // Fixed query here
+                                .Fields(f => f
+                                    .Field("title^2")
+                                    .Field("content")
+                                )
+                                .Operator(Operator.Or)
+                                .Type(TextQueryType.PhrasePrefix)
+                                .Boost(2.0)
+                            )
+                    )
+                    .Filter(f => f
+                            .Term(t => t.Field("isPublished").Value(true)),
+                        f => f
+                            .Term(t => t.Field("status").Value(1))
+                    )
+                )
+            )
+        );
+
+        if (searchResponse.IsValid && searchResponse.Documents.Any())
+        {
+            paging.Total = (int)searchResponse.Total;
+
+            return Result<IEnumerable<BlogSearchDoc>?, Err>.Ok(searchResponse.Documents);
+        }
+    
+        return Result<IEnumerable<BlogSearchDoc>?, Err>.Err(UtilErrors.InternalServerError(searchResponse.OriginalException));
+    }
+
 }
