@@ -1,5 +1,5 @@
 using HiHoHuBlog.Modules.Search.Entity;
-using HiHoHuBlog.Modules.Search.Repository.Implementation;
+using HiHoHuBlog.Modules.Search.Repository.Interface;
 using HiHoHuBlog.Modules.Search.Service.Interface;
 using HiHoHuBlog.Utils;
 using Quartz.Util;
@@ -26,5 +26,10 @@ public class SearchBlogService(ISearchBlogRepository searchBlogRepository) : ISe
         }
 
         return r;
+    }
+
+    public Task<Result<IEnumerable<BlogSearchDoc>?, Err>> AdminSearchBlog(string searchTerm, Paging paging)
+    {
+        throw new NotImplementedException();
     }
 }

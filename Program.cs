@@ -15,7 +15,6 @@ using HiHoHuBlog.Modules.Blog.Repository.Implementation;
 using HiHoHuBlog.Modules.Blog.Service.Implementation;
 using HiHoHuBlog.Modules.Blog.Service.Interface;
 using HiHoHuBlog.Modules.Search;
-using HiHoHuBlog.Modules.Search.Repository.Implementation;
 using HiHoHuBlog.Modules.Search.Repository.Interface;
 using HiHoHuBlog.Modules.Search.Service.Implementation;
 using HiHoHuBlog.Modules.Search.Service.Interface;

@@ -2,7 +2,7 @@ using AutoMapper;
 using HiHoHuBlog.Modules.Blog.Entity;
 using HiHoHuBlog.Modules.Blog.Repository;
 using HiHoHuBlog.Modules.Search.Entity;
-using HiHoHuBlog.Modules.Search.Repository.Implementation;
+using HiHoHuBlog.Modules.Search.Repository.Interface;
 using HiHoHuBlog.Modules.Search.Service.Interface;
 using HiHoHuBlog.Utils;
 using HtmlAgilityPack;
