@@ -50,11 +50,11 @@ public class EfRepo  : IUserRepository
         return Result<Entity.User?, Err>.Ok(user);
     }
 
-    public async Task<Result<UserProfile?, Err>> GetProfile(string email)
+    public async Task<Result<UserProfile?, Err>> GetProfile(string userName)
     {
         try
         {
-            var user = await _dbSet.Where(u => u.Email == email).FirstOrDefaultAsync();
+            var user = await _dbSet.Where(u => u.UserName == userName).FirstOrDefaultAsync();
             var userProfile = _mapper.Map<UserProfile>(user);
             return Result<UserProfile?, Err>.Ok(userProfile);
         }

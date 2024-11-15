@@ -12,7 +12,8 @@ public static class AuthUtils
         
         var userIdClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         var roleClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-        Requester requester = new Requester(userIdClaim, roleClaim);
+        var userEmailClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        Requester requester = new Requester(userIdClaim, roleClaim,userEmailClaim);
         
         return requester;
     }

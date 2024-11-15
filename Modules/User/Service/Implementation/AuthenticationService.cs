@@ -13,7 +13,7 @@ public class AuthenticateService : IAuthenticateService
     {
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.NameIdentifier, u.Id.ToString()),
+            new Claim(ClaimTypes.NameIdentifier, u.Username),
             new Claim(ClaimTypes.Email, u.Email),
             new Claim(ClaimTypes.Role, u.Role),
         };
