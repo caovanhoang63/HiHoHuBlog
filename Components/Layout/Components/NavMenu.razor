@@ -3,8 +3,12 @@
 <div class="navbar border-b-[1px]">
     <div class="flex-1">
         <a @onclick='() => { NavigationManager.NavigateTo("/"); }' class="btn btn-ghost  text-xl">Hihohu</a>
-        <label class="input input-bordered flex items-center gap-2 bg-white">
-            <input type="text" class="grow" placeholder="Search"/>
+
+        <label class="input input-bordered flex items-center gap-2 bg-white relative">
+            <input type="text" class="grow" placeholder="Search" 
+                   @bind="_searchQuery"
+                   @onfocus="OpenDropdown"
+                   @onblur="CloseDropdown"/>
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 16 16"
@@ -15,7 +19,32 @@
                     d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
                     clip-rule="evenodd"/>
             </svg>
+            <!-- Dropdown kết quả -->
+            @if (_isDropdownOpen)
+            {
+            <ul class="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded shadow-lg mt-2 z-10">
+                @foreach (var item in _searchHistory)
+                {
+                @if (item.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase))
+                {
+                <li class="flex items-center justify-between px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                    <span>@item</span>
+                    <!-- Nút X để xóa -->
+                    <button
+                        class=" hover:text-gray-500 ml-2"
+                        @onclick="() => RemoveItem(item)">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </li>
+                }
+                }
+            </ul>
+            }
+
         </label>
+        
     </div>
     <div class="flex-none gap-2">
         <button @onclick="OnWrite" class="btn btn-ghost sm">
@@ -64,11 +93,36 @@
     </div>
 </div>
 
+
 @code {
     private async  Task OnWrite()
     {
         Console.Write("Ok");
         NavigationManager.NavigateTo("/new-blog");
     }
+    private string _searchQuery = string.Empty;
+    private bool _isDropdownOpen = false;
+    private void OpenDropdown()
+    {
+        _isDropdownOpen = true;
+    }
 
+    // Phương thức để đóng dropdown
+    private void CloseDropdown()
+    {
+        _isDropdownOpen = false;
+    }
+    private void RemoveItem(string item)
+    {
+        _searchHistory.Remove(item);
+    }
+    // Giả lập dữ liệu lịch sử tìm kiếm
+    private List<string> _searchHistory = new List<string>
+    {
+        "Twitch livestream",
+        "Flutter mobile development",
+        "ASP.NET Core tutorial",
+        "Clean Architecture pattern",
+        "Human-Computer Interaction"
+    };
 }
