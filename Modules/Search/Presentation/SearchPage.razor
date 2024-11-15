@@ -11,7 +11,7 @@
         <p>@SearchTerm</p>
         <div class="text-3xl font-bold ">
             <span class="text-gray-400">Result for </span>
-            <span>Live</span>
+            <span>@SearchTerm</span>
         </div>
         @*<span class="text-2xl font-bold">Results for asdasd</span>*@
         <div role="tablist" class="tabs mt-10 tabs-bordered">
@@ -72,7 +72,7 @@
     </div>
     <div class="border-l-[1px] grow p-10 max-w-sm">
         <div class="flex flex-col space-y-2">
-            <span class="text-gray-600 mb-6">Topics matching live</span>
+            <span class="text-gray-600 mb-6">Topics matching @SearchTerm</span>
             <div class="flex flex-wrap ">
                 <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live</div>
                 <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live Streaming</div>
@@ -81,14 +81,14 @@
                 <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Livestream</div>
                 <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live Casino</div>
             </div>
-            <a  class="text-green-500 hover:underline mb-2"  @onclick="() => ChangeTab(2)">See all Topics</a>
+            <a  class="text-green-500 hover:underline mb-2"  @onclick="() => ChangeTab(2)">See all</a>
             <div class="divider mt-9 mb-0"></div>
-            <span class="text-gray-600 mb-6">Topics matching live</span>
+            <span class="text-gray-600 mb-6">Topics matching @SearchTerm</span>
             <div >
                 <MatchingPeopleSmallCard></MatchingPeopleSmallCard>
                 <MatchingPeopleSmallCard></MatchingPeopleSmallCard>
             </div>
-            <a class="text-green-500 hover:underline mb-2 " @onclick="() => ChangeTab(1)">See all People</a>
+            <a class="text-green-500 hover:underline mb-2 " @onclick="() => ChangeTab(1)">See all</a>
 
         </div>
     </div>
