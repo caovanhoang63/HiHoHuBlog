@@ -109,13 +109,13 @@
             SearchTerm = "";
         }
         var result = await SearchBlogService.SearchBlog(SearchTerm, Paging);
-        Console.WriteLine(result.IsOk);
-        Console.WriteLine(SearchTerm);
-        _searchDocs = result.Value;
-        foreach (var val in result.Value)
+        if (!result.IsOk)
         {
-            Console.WriteLine(val.Title);
+            Console.WriteLine(result.Error);
+            return;
         }
+
+        _searchDocs = result.Value;
     }
 
     private void ChangeTab(int tabIndex)
