@@ -77,12 +77,13 @@ builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 builder.Services.AddScoped<IBlogBlockedService,BlogBlockedService>();
 builder.Services.AddScoped<IReasonBlogBlockService,ReasonBlogBlockService>();
 
+
 builder.Services.AddScoped<ICreateBlogService,CreateBlogService>();
 builder.Services.AddScoped<IBlogUpdateService, BlogUpdateService>();
 builder.Services.AddScoped<IBlogGetService, BlogGetService>();
 builder.Services.AddScoped<IBlogDeleteService, BlogDeleteService>();
 builder.Services.AddScoped<IMigrateBlogDataService,MigrateBlogDataService>();
-
+builder.Services.AddScoped<ISearchBlogService, SearchBlogService>();
 builder.Services.AddAutoMapper(typeof(BlogMappingProfile));
 builder.Services.AddAutoMapper(typeof(AdminMappingProfile));
 builder.Services.AddAutoMapper(typeof(SearchMappingProfile));

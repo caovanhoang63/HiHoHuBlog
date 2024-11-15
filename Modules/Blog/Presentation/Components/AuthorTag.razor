@@ -1,34 +1,43 @@
-<div class="h-6 flex justify-start items-center avatar-container ">
-    <a class="w-fit h-5 mr-3 relative group" href="/profile/name">
-        <div class="hidden absolute card bg-white w-80 shadow-xl bottom-8 z-50 hover:block group-hover:block after:absolute after:w-1/2 after:h-[1rem] after:bg-transparent">
-            <div class="card-body p-3 ">
-                <div class="h-fit flex justify-between">
-                    <div>
-                        <div class="h-12 avatar aspect-square">
-                            <div class="rounded-full">
-                                <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" alt="author-avatar"/>
+@using HiHoHuBlog.Modules.Search.Entity
+@if (Blog is null)
+{
+    <div></div>
+}
+else
+{
+    <div class="h-6 flex justify-start items-center avatar-container ">
+        <a class="w-fit h-5 mr-3 relative group" href="/profile/name">
+            <div class="hidden absolute card bg-white w-80 shadow-xl bottom-8 z-50 hover:block group-hover:block after:absolute after:w-1/2 after:h-[1rem] after:bg-transparent">
+                <div class="card-body p-3 ">
+                    <div class="h-fit flex justify-between">
+                        <div>
+                            <div class="h-12 avatar aspect-square">
+                                <div class="rounded-full">
+                                
+                                    <img src="@(Blog?.Thumbnail?.Url is null ? "https://placehold.co/600x400?text=Hihohublog" :Blog.Thumbnail.Url   )" alt="author-avatar"/>
+                                </div>
                             </div>
+                            <h2 class="card-title">@Blog?.User?.UserName</h2>
                         </div>
-                        <h2 class="card-title">Name</h2>
+                        <button class="btn btn-sm my-auto rounded-2xl">Follow</button>
                     </div>
-                    <button class="btn btn-sm my-auto rounded-2xl">Follow</button>
+                    <p class="text-sm line-clamp-1">@Blog?.User?.Email</p>
                 </div>
-                <p class="text-sm line-clamp-1">If a dog chews shoes whose shoes does he choose?</p>
             </div>
-        </div>
-        <div class="avatar h-full aspect-square">
-            <div class="rounded-full">
-                <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" alt="author-avatar"/>
+            <div class="avatar h-full aspect-square">
+                <div class="rounded-full">
+                    <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" alt="author-avatar"/>
+                </div>
             </div>
+        </a>
+        <div class="text-xs">
+            <span><a class="text-black hover:underline" href="/profile/name">Name</a></span>
+            <span class="text-gray-900">in</span>
+            <span><a class="text-black hover:underline" href="/profile/name">UIT</a></span>
         </div>
-    </a>
-    <div class="text-xs">
-        <span><a class="text-black hover:underline" href="/profile/name">Name</a></span>
-        <span class="text-gray-900">in</span>
-        <span><a class="text-black hover:underline" href="/profile/name">UIT</a></span>
     </div>
-</div>
+}
 
 @code {
-    
+    [Parameter] public BlogSearchDoc? Blog { get; set; }
 }
