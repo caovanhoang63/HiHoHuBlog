@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 using HiHoHuBlog.Modules.Blog.Entity;
 using HiHoHuBlog.Utils;
 using Microsoft.EntityFrameworkCore;
+using Nest;
 
 namespace HiHoHuBlog.Modules.Blog.Repository.Implementation;
 
@@ -146,7 +147,19 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
         }
     }
 
-    public  async Task<Result<IEnumerable<BlogList>?, Err>> GetBlogList(Filter? filter, Paging paging)
+    
+    
+    public  async Task<Result<IEnumerable<BlogList>?, Err>> GetBlogList(BlogFilter? filter, Paging paging)
+    {
+        var r =  await ListBlogs(filter, paging);
+        if (!r.IsOk)
+        {
+            return Result<IEnumerable<BlogList>?, Err>.Err(r.Error);
+        }
+        return Result<IEnumerable<BlogList>?, Err>.Ok(mapper.Map<IEnumerable<BlogList>>(r.Value));
+    }
+
+    public async Task<Result<IEnumerable<Entity.Blog>?, Err>> ListBlogs(BlogFilter? filter, Paging? paging)
     {
         try
         {
@@ -168,15 +181,40 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
                     queryable = queryable.Where(b => b.IsPublished == filter.IsPublished);
                 }
 
-                if (filter.CreatedAt is not null)
+                if (filter.LtCreatedAt is not null)
                 {
-                    queryable = queryable.Where(b => b.CreatedAt >= filter.CreatedAt);
+                    queryable = queryable.Where(b => b.CreatedAt <= filter.LtCreatedAt);
                 }
+                if (filter.GtCreatedAt is not null)
+                {
+                    queryable = queryable.Where(b => b.CreatedAt >= filter.GtCreatedAt);
+                }
+                
+                if (filter.LtUpdatedAt is not null)
+                {
+                    queryable = queryable.Where(b => b.UpdatedAt <= filter.LtUpdatedAt);
+                }
+                if (filter.GtUpdatedAt is not null)
+                {
+                    queryable = queryable.Where(b => b.UpdatedAt >= filter.GtUpdatedAt);
+                }
+
 
                 // if (filter.CategoryId is not null)
                 // {
                 //     queryable = queryable.Where(b =>)
                 // }
+            }
+
+            if (paging is null)
+            {
+                
+                var result = await queryable
+                    .Include(b => b.User)
+                    .Select(b => b).ToListAsync();
+                
+                
+                return Result<IEnumerable<Entity.Blog>?, Err>.Ok(result);
             }
             
             var totalCount = await queryable.CountAsync();
@@ -193,7 +231,7 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
             
             var r = await queryable.Take(paging.PageSize)
                 .Include(b => b.User)
-                .Select(b => mapper.Map<Entity.Blog, BlogList>(b)).ToListAsync();
+                .Select(b => b).ToListAsync();
 
             if (r.Count > 0)
             {
@@ -204,11 +242,11 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
                 paging.NextCursor = null;
             }
             
-            return Result<IEnumerable<BlogList>?, Err>.Ok(r);
+            return Result<IEnumerable<Entity.Blog>?, Err>.Ok(r);
         }
         catch (Exception ex)
         {
-            return Result<IEnumerable<BlogList>?, Err>.Err(UtilErrors.InternalServerError(ex));
+            return Result<IEnumerable<Entity.Blog>?, Err>.Err(UtilErrors.InternalServerError(ex));
         }
     }
 

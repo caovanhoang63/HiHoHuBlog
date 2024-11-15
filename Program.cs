@@ -14,6 +14,10 @@ using HiHoHuBlog.Modules.Blog.Repository;
 using HiHoHuBlog.Modules.Blog.Repository.Implementation;
 using HiHoHuBlog.Modules.Blog.Service.Implementation;
 using HiHoHuBlog.Modules.Blog.Service.Interface;
+using HiHoHuBlog.Modules.Search;
+using HiHoHuBlog.Modules.Search.Repository.Interface;
+using HiHoHuBlog.Modules.Search.Service.Implementation;
+using HiHoHuBlog.Modules.Search.Service.Interface;
 using HiHoHuBlog.Modules.User;
 using HiHoHuBlog.Modules.User.Service;
 using HiHoHuBlog.Modules.User.Repository;
@@ -24,6 +28,8 @@ using HiHoHuBlog.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Nest;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,6 +45,11 @@ builder.Services.AddSingleton<IAmazonS3>(sp =>
     return new AmazonS3Client(awsAccessKeyId, awsSecretAccessKey);
 });
 
+builder.Services.AddSingleton<EsClient>(sp =>
+{
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    return new EsClient(configuration);
+});
 
 
 builder.Services.AddScoped<IUploadProvider, S3UploadProvider>();
@@ -57,6 +68,8 @@ builder.Services.AddScoped<IUserRepository, EfRepo>();
 builder.Services.AddScoped<IBlogRepository, EfBlogRepo>();
 builder.Services.AddScoped<IBlogBlockedRepository,BlogBlockedRepository>();
 builder.Services.AddScoped<IReasonBlogBlockRepository,ReasonBlogBlockRepository>();
+builder.Services.AddScoped<ISearchBlogRepository,EsSearchBlogRepository>();
+
 
 builder.Services.AddScoped<IUserSignUpService, UserSignUpService>();
 builder.Services.AddScoped<IUserLoginService, UserLoginService>();
@@ -68,10 +81,11 @@ builder.Services.AddScoped<ICreateBlogService,CreateBlogService>();
 builder.Services.AddScoped<IBlogUpdateService, BlogUpdateService>();
 builder.Services.AddScoped<IBlogGetService, BlogGetService>();
 builder.Services.AddScoped<IBlogDeleteService, BlogDeleteService>();
+builder.Services.AddScoped<IMigrateBlogDataService,MigrateBlogDataService>();
 
-builder.Services.AddAutoMapper(typeof(UserMappingProfile));
 builder.Services.AddAutoMapper(typeof(BlogMappingProfile));
 builder.Services.AddAutoMapper(typeof(AdminMappingProfile));
+builder.Services.AddAutoMapper(typeof(SearchMappingProfile));
 
 
 builder.Services.AddSignalR(e => {
@@ -84,9 +98,10 @@ Console.WriteLine(builder.Configuration.GetConnectionString("DefaultConnection")
 builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
             new MySqlServerVersion("8.0.35"))
-    .LogTo(Console.WriteLine, LogLevel.Information)
-    .EnableSensitiveDataLogging()
-    .EnableDetailedErrors());
+    // .LogTo(Console.WriteLine, LogLevel.Information)
+    // .EnableSensitiveDataLogging()
+    // .EnableDetailedErrors()
+    );
 
 builder.Services.AddBlazoredToast();
 

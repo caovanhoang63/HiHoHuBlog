@@ -43,19 +43,19 @@
     [Parameter] public bool Open { get; set; }
     [Parameter] public EventCallback OnConfirm { get; set; }
     [Parameter] public EventCallback OnDeny { get; set; }
-    [Parameter] public Filter Filter { get; set; }
+    [Parameter] public BlogFilter BlogFilter { get; set; }
     private int[] Status { get; set; }
 
     private async void OnConfirmClick()
     {
-        Filter.Status = Status;
+        BlogFilter.Status = Status;
         await OnConfirm.InvokeAsync();
     }
     protected override void OnInitialized()
     {
 
         base.OnInitialized();
-        Status = Filter.Status;
+        Status = BlogFilter.Status;
         
     }
 

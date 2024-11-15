@@ -194,10 +194,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="CronJobs\" />
-        <Folder Include="Modules\Search\Entity\" />
-        <Folder Include="Modules\Search\Repository\" />
-        <Folder Include="Modules\Search\Service\" />
+        <Folder Include="Modules\Search\CronJobs\" />
         <Folder Include="wwwroot\lib\" />
     </ItemGroup>
 
@@ -212,6 +209,7 @@
       <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="8.0.10" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="8.0.10" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.10" />
+      <PackageReference Include="NEST" Version="7.10.0" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
       <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2" />
       <PackageReference Include="Pomelo.EntityFrameworkCore.MySql.Design" Version="1.1.2" />
