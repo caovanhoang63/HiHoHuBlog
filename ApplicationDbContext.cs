@@ -28,6 +28,8 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<Blog>().ToTable("blogs");
         modelBuilder.Entity<Tag>().ToTable("tags");
         modelBuilder.Entity<BlogTag>().ToTable("blog_tag");
+        modelBuilder.Entity<BlogTag>().HasKey(b => b.TagId);
+        modelBuilder.Entity<BlogTag>().HasKey(b => b.BlogId);
         modelBuilder.Entity<BlogBlocked>().ToTable("blog_blocked");
         modelBuilder.Entity<ReasonBlogBlock>().ToTable("reason_blog_block");
         

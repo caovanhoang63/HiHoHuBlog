@@ -18,6 +18,10 @@ using HiHoHuBlog.Modules.Search;
 using HiHoHuBlog.Modules.Search.Repository.Interface;
 using HiHoHuBlog.Modules.Search.Service.Implementation;
 using HiHoHuBlog.Modules.Search.Service.Interface;
+using HiHoHuBlog.Modules.Tag.Repository.Implementation;
+using HiHoHuBlog.Modules.Tag.Repository.Interface;
+using HiHoHuBlog.Modules.Tag.Service.Implementation;
+using HiHoHuBlog.Modules.Tag.Service.Interface;
 using HiHoHuBlog.Modules.User;
 using HiHoHuBlog.Modules.User.Service;
 using HiHoHuBlog.Modules.User.Repository;
@@ -69,6 +73,8 @@ builder.Services.AddScoped<IBlogRepository, EfBlogRepo>();
 builder.Services.AddScoped<IBlogBlockedRepository,BlogBlockedRepository>();
 builder.Services.AddScoped<IReasonBlogBlockRepository,ReasonBlogBlockRepository>();
 builder.Services.AddScoped<ISearchBlogRepository,EsSearchBlogRepository>();
+builder.Services.AddScoped<ITagRepository, EfTagRepository>();
+builder.Services.AddScoped<IBlogTagRepository, EfBlogTagRepo>();
 
 
 builder.Services.AddScoped<IUserSignUpService, UserSignUpService>();
@@ -76,7 +82,7 @@ builder.Services.AddScoped<IUserLoginService, UserLoginService>();
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 builder.Services.AddScoped<IBlogBlockedService,BlogBlockedService>();
 builder.Services.AddScoped<IReasonBlogBlockService,ReasonBlogBlockService>();
-
+builder.Services.AddScoped<ITagService, TagService>();
 
 builder.Services.AddScoped<ICreateBlogService,CreateBlogService>();
 builder.Services.AddScoped<IBlogUpdateService, BlogUpdateService>();

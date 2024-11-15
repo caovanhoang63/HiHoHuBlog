@@ -23,9 +23,11 @@ public class EfTagRepository : ITagRepository
     public async Task<Result<Unit, Err>> Create(TagCreate tag)
     {
         try
-        { 
-            await _dbSet.AddAsync(_mapper.Map<Entity.Tag>(tag));
+        {
+            var entity = _mapper.Map<Entity.Tag>(tag);
+            await _dbSet.AddAsync(_mapper.Map<Entity.Tag>(entity));
             await _context.SaveChangesAsync();
+            tag.Id = entity.Id;
             return Result<Unit, Err>.Ok(new Unit());
         }
         catch (Exception ex)

@@ -150,7 +150,7 @@ CREATE TABLE `blog_blocked` (
 )ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
 
 DROP TABLE IF EXISTS `tags`;
-CREATE TABLE `tag` (
+CREATE TABLE `tags` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(255) NOT NULL,
     `status` INT NOT NULL DEFAULT '1',
