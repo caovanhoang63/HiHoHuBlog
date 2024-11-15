@@ -20,23 +20,25 @@ public class UserSignUpService(IUserRepository userRepo) : IUserSignUpService
         {
             return Result<Unit,Err>.Err(vR.Error);
         }
-        
-        var old = await userRepo.FindByEmail(u.Email);
+        u.UserName = u.Email.Split('@')[0];
+
+        var old = await userRepo.FindByEmailAndUserName(u.Email,u.UserName);
 
         if (!old.IsOk)
         {
             return Result<Unit, Err>.Err(old.Error);
         }
         
-        if (old.Value != null)
+        if (old.Value != null && old.Value.Email == u.Email)
         {
             return Result<Unit, Err>.Err(UserErrors.ErrUserAlreadyExists(old.Value.Email));
         }
         
         if (u.Password != u.ConfirmPassword)
             return Result<Unit, Err>.Err(UserErrors.PasswordDoNotMatch());
-        
-        u.UserName = u.Email.Split('@')[0];
+
+        u.UserName = u.Email.Split('@')[0] + RandomString.RandomString5(); // TODO: Random 
+
         
         u.Salt = Guid.NewGuid().ToString();
         byte[] buffer = Encoding.UTF8.GetBytes(u.Password + u.Salt);
@@ -48,5 +50,9 @@ public class UserSignUpService(IUserRepository userRepo) : IUserSignUpService
             return Result<Unit, Err>.Err(i.Error);
         }
         return Result<Unit, Err>.Ok(new Unit());
+        
+        
+        // s = abcde...... 48
+        // random 5 => result = s[random]
     }
 }
