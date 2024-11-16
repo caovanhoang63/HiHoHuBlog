@@ -38,7 +38,7 @@ public class TagService(ITagRepository tagRepo) : ITagService
 
     public async Task<Result<IEnumerable<Entity.Tag>?, Err>> List(IRequester requester, TagFilter? tagFilter, Paging paging)
     {
-        var r = await _tagRepo.List(tagFilter, paging);
+        var r = await _tagRepo.ListWithPaging(tagFilter, paging);
         
         if (!r.IsOk) return Result<IEnumerable<Entity.Tag>?, Err>.Err(r.Error);
         

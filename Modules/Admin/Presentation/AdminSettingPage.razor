@@ -8,7 +8,7 @@
 @inject IReasonBlogBlockService Service
 @attribute [Authorize]
 @rendermode InteractiveServer
-@inject IMigrateBlogDataService MigrateService
+@inject IMigrationSearchDataService MigrateService
 @inject IToastService ToastService
 
 <AuthorizeView Roles="admin, mod">
@@ -34,7 +34,7 @@
                 <button class="btn btn-primary " @onclick='OnMigrateBlogData'>
                     Migrate blog data
                 </button>
-                <button class="btn btn-primary " @onclick='OnMigrateBlogData'>
+                <button class="btn btn-primary " @onclick='OnMigrateTagData'>
                     Migrate tag data
                 </button>
                 <button class="btn btn-primary " @onclick='OnMigrateBlogData'>
@@ -54,8 +54,8 @@
         await base.OnInitializedAsync();
         _requester = await AuthUtils.GetInfo(authenticationStateTask);
     }
-    
-    public async void OnNewReason()
+
+    private async void OnNewReason()
     {
         if (_requester == null) return;
          var r =  await Service.Create(_requester, new ReasonBlogBlockCreate
@@ -71,9 +71,23 @@
         }
         ToastService.ShowSuccess("Success");
     }
+    
     private async void OnMigrateBlogData()
     {
         var r = await MigrateService.MigrateBlogDataAsync();
+        if (!r.IsOk)
+        {
+            Console.WriteLine(r.Error);
+            ToastService.ShowError(r.Error.ToString());
+            return;
+        }
+        Console.WriteLine("Success");
+        ToastService.ShowSuccess("Success");
+    }
+
+    private  async Task OnMigrateTagData()
+    {
+        var r = await MigrateService.MigrateTagDataAsync();
         if (!r.IsOk)
         {
             Console.WriteLine(r.Error);

@@ -8,8 +8,6 @@ namespace HiHoHuBlog.Modules.Search.Repository.Interface;
 
 public class EsSearchBlogRepository(EsClient client) : ISearchBlogRepository
 {
-    private ISearchBlogRepository _searchBlogRepositoryImplementation;
-
     public async Task<Result<Unit, Err>> AddBulkAsync(IEnumerable<Entity.BlogSearchDoc> blogs, DateTime? date)
     {
         var r = await client.Client.BulkAsync(b => b.Index<BlogSearchDoc>().IndexMany(blogs));
@@ -35,33 +33,6 @@ public class EsSearchBlogRepository(EsClient client) : ISearchBlogRepository
         }
     
         return Result<Unit, Err>.Ok(new Unit());
-    }
-
-
-    public async Task<Result<MigrationTimestamp?, Err>> GetLastMigrateTime()
-    {
-        var searchResponse = await client.Client.SearchAsync<MigrationTimestamp>(s => s
-            .Index<MigrationTimestamp>()
-            .Query(q => q
-                .Term(t => t
-                    .Field(f => f.Index ).Value("blog_search")
-                )
-            )
-            .Sort(sort => sort
-                    .Descending(p => p.Timestamp) 
-            )
-            .Size(1)
-        );
-
-        
-        if (searchResponse.IsValid && searchResponse.Documents.Any())
-        {
-            var lastDocument = searchResponse.Documents.First();
-
-            return Result<MigrationTimestamp?, Err>.Ok(lastDocument);
-        }
-    
-        return Result<MigrationTimestamp?, Err>.Err(new Err("No documents found or an error occurred"));
     }
 
     public async Task<Result<IEnumerable<BlogSearchDoc>?, Err>> SearchBlog(string arg , Paging paging)

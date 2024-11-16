@@ -8,5 +8,6 @@ public interface ITagRepository
 {
     Task<Result<Unit,Err>> Create(TagCreate tag);
     Task<Result<Unit, Err>> Delete(int id);
-    Task<Result<IEnumerable<Entity.Tag>?,Err>> List(TagFilter? tagFilter,Paging paging);
+    Task<Result<IEnumerable<Entity.Tag>?,Err>> ListWithPaging(TagFilter? tagFilter,Paging paging);
+    Task<Result<IEnumerable<Entity.Tag>?, Err>> FindWithFilter(TagFilter? tagFilter);
 }

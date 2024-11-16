@@ -10,5 +10,7 @@ public class SearchMappingProfile : Profile
     {
         CreateMap<BlogList, BlogSearchDoc>();
         CreateMap<Blog.Entity.Blog, BlogSearchDoc>();
+        CreateMap<Tag.Entity.Tag, TagSearchDoc>();
+        CreateMap<User.Entity.User, UserSearchDoc>();
     }
 }

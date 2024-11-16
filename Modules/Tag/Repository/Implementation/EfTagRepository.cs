@@ -51,8 +51,51 @@ public class EfTagRepository : ITagRepository
         }
     }
 
+    public async Task<Result<IEnumerable<Entity.Tag>?, Err>> FindWithFilter(TagFilter? tagFilter)
+    {
+        try
+        { 
+            var queryable = _dbSet.AsQueryable();
+            
+            if (tagFilter is not null)
+            {
+                if (tagFilter.Status is not null)
+                {
+                    queryable = queryable.Where(t => tagFilter.Status.Contains(t.Status));
+                }
+                
+                if (tagFilter.LtCreatedAt is not null)
+                {
+                    queryable = queryable.Where(b => b.CreatedAt <= tagFilter.LtCreatedAt);
+                }
+                if (tagFilter.GtCreatedAt is not null)
+                {
+                    queryable = queryable.Where(b => b.CreatedAt >= tagFilter.GtCreatedAt);
+                }
+                
+                if (tagFilter.LtUpdatedAt is not null)
+                {
+                    queryable = queryable.Where(b => b.UpdatedAt <= tagFilter.LtUpdatedAt);
+                }
+                if (tagFilter.GtUpdatedAt is not null)
+                {
+                    queryable = queryable.Where(b => b.UpdatedAt >= tagFilter.GtUpdatedAt);
+                }
+            }
+            
+            
+            var r = await queryable
+                .Select(b => b).ToListAsync();
+            
+            return Result<IEnumerable<Entity.Tag>?, Err>.Ok(r);
+        }
+        catch (Exception ex)
+        {
+            return Result<IEnumerable<Entity.Tag>?, Err>.Err(UtilErrors.InternalServerError(ex));
+        }
+    }
 
-    public async Task<Result<IEnumerable<Entity.Tag>?, Err>> List(TagFilter? tagFilter, Paging paging)
+    public async Task<Result<IEnumerable<Entity.Tag>?, Err>> ListWithPaging(TagFilter? tagFilter, Paging paging)
     {
         try
         { 

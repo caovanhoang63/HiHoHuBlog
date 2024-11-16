@@ -1,6 +1,8 @@
+using HiHoHuBlog.Utils;
+
 namespace HiHoHuBlog.Modules.Tag.Entity;
 
-public class TagFilter
+public class TagFilter : Filter
 {
     public int[]? Status;
 }
