@@ -26,7 +26,7 @@ public class TagService(ITagRepository tagRepo) : ITagService
 
     public async Task<Result<Unit, Err>> Delete(IRequester requester, int id)
     {
-        if (requester.GetSystemRole() != "admin" || requester.GetSystemRole() != "mod")
+        if (requester.GetSystemRole() != "admin" && requester.GetSystemRole() != "mod")
             return Result<Unit, Err>.Err(UtilErrors.ErrNoPermission());
         
         var r =  await _tagRepo.Delete(id);
