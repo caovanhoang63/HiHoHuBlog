@@ -6,17 +6,18 @@
 @using HiHoHuBlog.Modules.Search.Service.Interface
 @using HiHoHuBlog.Utils
 @inject ISearchBlogService SearchBlogService
+@inject NavigationManager NavigationManager
+
 <Container ContainerClass="flex justify-between space-x-10 max-w-7xl">
     <div class="grow max-w-4xl py-10">
-        <p>@SearchTerm</p>
         <div class="text-3xl font-bold ">
             <span class="text-gray-400">Result for </span>
             <span>@SearchTerm</span>
         </div>
         @*<span class="text-2xl font-bold">Results for asdasd</span>*@
         <div role="tablist" class="tabs mt-10 tabs-bordered">
-            <input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="Stories" checked="@isActiveTab(0)"
-                   @onchange="@(() => ChangeTab(0))"/>
+            <input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="Blogs" checked="@isActiveTab(0)"
+                   @onchange="@(() => ChangeTab(0,"blogs"))"/>
             <div role="tabpanel" class="tab-content">
                 @if (_searchDocs is not null)
                 {
@@ -34,7 +35,7 @@
                 class="tab"
                 aria-label="People"
                 checked="@isActiveTab(1)"
-                @onchange="@(() => ChangeTab(1))"/>
+                @onchange="@(() => ChangeTab(1,"people"))"/>
             <div role="tabpanel" class="tab-content">
                 @*Row Children*@
                 <MatchingPeopleCard/>
@@ -44,7 +45,7 @@
             </div>
 
             <input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="Topics" checked="@isActiveTab(2)"
-                   @onchange="@(() => ChangeTab(2))"/>
+                   @onchange="@(() => ChangeTab(2,"topics"))"/>
             <div role="tabpanel" class="tab-content mt-10">
                 <div class="flex flex-wrap gap-2">
                     <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live</div>
@@ -81,14 +82,18 @@
                 <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Livestream</div>
                 <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live Casino</div>
             </div>
-            <a  class="text-green-500 hover:underline mb-2"  @onclick="() => ChangeTab(2)">See all</a>
+            @*
+            <a  class="text-green-500 hover:underline mb-2"  @onclick="() => ChangeTab(2,'people')">See all</a>
+            *@
             <div class="divider mt-9 mb-0"></div>
             <span class="text-gray-600 mb-6">Topics matching @SearchTerm</span>
             <div >
                 <MatchingPeopleSmallCard></MatchingPeopleSmallCard>
                 <MatchingPeopleSmallCard></MatchingPeopleSmallCard>
             </div>
+            @*
             <a class="text-green-500 hover:underline mb-2 " @onclick="() => ChangeTab(1)">See all</a>
+            *@
 
         </div>
     </div>
@@ -97,6 +102,8 @@
 
 @code {
     [SupplyParameterFromQuery(Name = "q")] string? SearchTerm { get; set; }
+    
+    [SupplyParameterFromQuery(Name = "type")] string? Type { get; set; } 
     private int activeTab = 0;
     private Paging Paging = new Paging(1, 10);
     private IEnumerable<BlogSearchDoc>? _searchDocs = new List<BlogSearchDoc>();
@@ -108,7 +115,17 @@
         {
             SearchTerm = "";
         }
-
+    // Cập nhật tab dựa trên query string "tab"
+        if (!string.IsNullOrEmpty(Type))
+        {
+            activeTab = Type switch
+            {
+                "blogs" => 0,
+                "people" => 1,
+                "topics" => 2,
+                _ => 0
+            };
+        }
         // Gọi API tìm kiếm
         var result = await SearchBlogService.SearchBlog(SearchTerm, Paging);
         if (result.IsOk)
@@ -127,9 +144,10 @@
         }
     }
 
-    private void ChangeTab(int tabIndex)
+    private void ChangeTab(int tabIndex, string tabName)
     {
         activeTab = tabIndex;
+        NavigationManager.NavigateTo($"/search?q={SearchTerm}&type={tabName}", forceLoad: false);
     }
 
     private bool isActiveTab(int tabIndex)
