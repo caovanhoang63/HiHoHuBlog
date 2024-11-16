@@ -101,21 +101,30 @@
     private Paging Paging = new Paging(1, 10);
     private IEnumerable<BlogSearchDoc>? _searchDocs = new List<BlogSearchDoc>();
 
-    protected override async Task OnInitializedAsync()
+    // Chuyển từ OnInitializedAsync sang OnParametersSetAsync
+    protected override async Task OnParametersSetAsync()
     {
-        await base.OnInitializedAsync();
-        if (SearchTerm == null)
+        if (string.IsNullOrEmpty(SearchTerm))
         {
             SearchTerm = "";
         }
+
+        // Gọi API tìm kiếm
         var result = await SearchBlogService.SearchBlog(SearchTerm, Paging);
-        if (!result.IsOk)
+        if (result.IsOk)
+        {
+            Console.WriteLine("Search result");
+            foreach (var val in result.Value)
+            {
+                Console.WriteLine(val.Title);
+            }
+            _searchDocs = result.Value;
+        }
+        else
         {
             Console.WriteLine(result.Error);
-            return;
+            _searchDocs = new List<BlogSearchDoc>();
         }
-
-        _searchDocs = result.Value;
     }
 
     private void ChangeTab(int tabIndex)
