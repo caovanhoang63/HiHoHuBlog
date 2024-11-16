@@ -1,10 +1,10 @@
 using HiHoHuBlog.Modules.Blog.Entity;
 using HiHoHuBlog.Modules.Search.Entity;
+using HiHoHuBlog.Modules.Search.Repository.Interface;
 using HiHoHuBlog.Utils;
 using Nest;
-using Index = System.Index;
 
-namespace HiHoHuBlog.Modules.Search.Repository.Interface;
+namespace HiHoHuBlog.Modules.Search.Repository.Implementation;
 
 public class EsSearchBlogRepository(EsClient client) : ISearchBlogRepository
 {
