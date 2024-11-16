@@ -20,7 +20,6 @@
 @inject IReasonBlogBlockService ReasonBlogBlockService
 @inject IBlogBlockedService BlogBlockedService
 @inject ISearchBlogRepository SearchBlogRepo
-@inject IMigrateBlogDataService MigrateService
 @attribute [Authorize]
 
 <AuthorizeView Roles="admin, mod">
@@ -75,9 +74,7 @@
                         </svg>
                     </div>
 
-                    <button class="btn btn-primary " @onclick='OnTest'>
-                        Test
-                    </button>
+
                     
                 </div>
                 @* Table *@
@@ -379,17 +376,6 @@
         }
     }
 
-    private async void OnTest()
-    {
-        var r = await MigrateService.MigrateBlogDataAsync();
-        if (!r.IsOk)
-        {
-            Console.WriteLine(r.Error);
-            // ToastService.ShowError(r.Error.ToString());
-            return;
-        }
-        Console.WriteLine("Success");
-        // ToastService.ShowSuccess("Success");
-    }
+
 
 }
