@@ -23,7 +23,7 @@
                 {
                     foreach (var blog in _searchDocs)
                     {
-                        <BlogCard BlogSearchDoc="@blog"/>
+                        <BlogCard BlogSearchDoc="@blog" OnCardClickCallback="HandleCardClick"/>
                     }
                 }
                 @* Paging *@
@@ -129,7 +129,13 @@
     private int activeTab = 0;
     private Paging Paging = new Paging(1, 3);
     private IEnumerable<BlogSearchDoc>? _searchDocs = new List<BlogSearchDoc>();
-
+    private async Task HandleCardClick(BlogSearchDoc clickedDoc)
+    {
+        Console.WriteLine($"Clicked on: {clickedDoc.Title}");
+        // Điều hướng hoặc xử lý khác
+        NavigationManager.NavigateTo($"/blog/{clickedDoc.Id}");
+    }
+    
     // Chuyển từ OnInitializedAsync sang OnParametersSetAsync
     protected override async Task OnParametersSetAsync()
     {

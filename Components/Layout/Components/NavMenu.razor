@@ -9,7 +9,7 @@
                 <input type="text" class="grow "  placeholder="Search"
                        @bind="_searchQuery"
                        @onfocus="OpenDropdown"
-                       @onblur="CloseDropdown"
+                       @onblur="OnInputBlur"
                        
                 />
                 <svg
@@ -30,12 +30,14 @@
                     {
                     @if (item.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase))
                     {
-                    <li class="flex items-center justify-between px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                    <li class="flex items-center justify-between px-4 py-2 hover:bg-gray-100 cursor-pointer" @onclick="()=>OnClickBlogPage(@item)">
                         <span>@item</span>
                         <!-- Nút X để xóa -->
                         <button
+                            type="button"
                             class=" hover:text-gray-500 ml-2"
-                            @onclick="() => RemoveItem(item)">
+                            @onclick:stopPropagation
+                            @onclick="async () => await RemoveItemAndKeepDropdown(item)">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                             </svg>
@@ -102,6 +104,13 @@
     private string _searchQuery = string.Empty;
     private bool _isDropdownOpen = false;
     private List<string> _searchHistory = new();
+    private bool _isRemovingItem = false;
+
+    
+    public void OnClickBlogPage(string id)
+    {
+        NavigationManager.NavigateTo("/blog/" + id);
+    }
     
     private async Task OnSubmitSearch()
     {
@@ -161,7 +170,21 @@
     {
         _isDropdownOpen = false;
     }
-
+    private async Task OnInputBlur()
+    {
+        // Thêm delay nhỏ để đảm bảo RemoveItem được xử lý trước
+        await Task.Delay(200);
+        if (!_isRemovingItem)
+        {
+            CloseDropdown();
+        }
+    }
+    private async Task RemoveItemAndKeepDropdown(string item)
+    {
+        _isRemovingItem = true;
+        await RemoveItem(item);
+        _isRemovingItem = false;
+    }
     private async Task RemoveItem(string item)
     {
         // Lấy lịch sử hiện tại

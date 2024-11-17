@@ -1,6 +1,6 @@
 @using HiHoHuBlog.Modules.Search.Entity
 
-<a class="" href="">
+<a class="" @onclick="OnCardClick">
     <div class="card card-side  w-full border-b-[1px]">
         <div class="card-body p-0 pb-8 ">
             <AuthorTag Blog="@BlogSearchDoc"/>
@@ -41,4 +41,13 @@
 
 @code { 
     [Parameter] public BlogSearchDoc? BlogSearchDoc { get; set; }
+    [Parameter] public EventCallback<BlogSearchDoc> OnCardClickCallback { get; set; }
+
+    private async Task OnCardClick()
+    {
+        if (BlogSearchDoc is not null)
+        {
+            await OnCardClickCallback.InvokeAsync(BlogSearchDoc);
+        }
+    }
  }
