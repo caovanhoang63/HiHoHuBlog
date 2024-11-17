@@ -23,7 +23,7 @@
                         clip-rule="evenodd"/>
                 </svg>
                 <!-- Dropdown kết quả -->
-                @if (_isDropdownOpen)
+                @if (_isDropdownOpen && _searchHistory.Count > 0)
                 {
                 <ul class="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded shadow-lg mt-2 z-[999999]">
                     @foreach (var item in _searchHistory)
@@ -98,45 +98,96 @@
     </div>
 </div>
 
-
 @code {
-    
-    private void OnSubmitSearch()
-    {
-        // Lưu `_searchQuery` vào localStorage
-        JsRuntime.InvokeVoidAsync("localStorage.setItem", "searchQuery", _searchQuery);
-        
-        // Chuyển hướng tới trang search với query
-        NavigationManager.NavigateTo($"/search?q={_searchQuery}");
-    }
-    private async Task OnWrite()
-    {
-        Console.Write("Ok");
-        NavigationManager.NavigateTo("/new-blog");
-    }
     private string _searchQuery = string.Empty;
     private bool _isDropdownOpen = false;
-    private void OpenDropdown()
+    private List<string> _searchHistory = new();
+    
+    private async Task OnSubmitSearch()
     {
-        _isDropdownOpen = true;
+        if (!string.IsNullOrWhiteSpace(_searchQuery))
+        {
+            // Thêm query mới vào lịch sử tìm kiếm
+            await AddToSearchHistory(_searchQuery);
+
+            // Chuyển hướng tới trang tìm kiếm
+            NavigationManager.NavigateTo($"/search?q={_searchQuery}");
+        }
     }
 
-    // Phương thức để đóng dropdown
+    // Thêm một query mới vào lịch sử tìm kiếm
+    private async Task AddToSearchHistory(string query)
+    {
+        // Lấy lịch sử hiện tại từ localStorage
+        var json = await JsRuntime.InvokeAsync<string>("localStorage.getItem", "searchHistory");
+        var currentHistory = new List<string>();
+        
+        // Nếu có dữ liệu cũ, deserialize nó
+        if (!string.IsNullOrEmpty(json))
+        {
+            currentHistory = System.Text.Json.JsonSerializer.Deserialize<List<string>>(json) ?? new List<string>();
+        }
+
+        // Nếu query đã tồn tại, xóa nó từ vị trí cũ
+        currentHistory.RemoveAll(x => x.Equals(query, StringComparison.OrdinalIgnoreCase));
+        
+        // Thêm query vào đầu danh sách
+        currentHistory.Insert(0, query);
+            
+        // Giới hạn số lượng lịch sử (tùy chọn, ví dụ giữ 10 item)
+        if (currentHistory.Count > 10)
+        {
+            currentHistory = currentHistory.Take(10).ToList();
+        }
+
+        // Cập nhật lại localStorage và state
+        var newJson = System.Text.Json.JsonSerializer.Serialize(currentHistory);
+        await JsRuntime.InvokeVoidAsync("localStorage.setItem", "searchHistory", newJson);
+        _searchHistory = currentHistory;
+    }
+
+    private async Task OnWrite()
+    {
+        NavigationManager.NavigateTo("/new-blog");
+    }
+
+    private async Task OpenDropdown()
+    {
+        _isDropdownOpen = true;
+        await LoadSearchHistory();
+    }
+
     private void CloseDropdown()
     {
         _isDropdownOpen = false;
     }
-    private void RemoveItem(string item)
+
+    private async Task RemoveItem(string item)
     {
-        _searchHistory.Remove(item);
+        // Lấy lịch sử hiện tại
+        var json = await JsRuntime.InvokeAsync<string>("localStorage.getItem", "searchHistory");
+        var currentHistory = new List<string>();
+        
+        if (!string.IsNullOrEmpty(json))
+        {
+            currentHistory = System.Text.Json.JsonSerializer.Deserialize<List<string>>(json) ?? new List<string>();
+        }
+
+        // Xóa item
+        currentHistory.RemoveAll(x => x.Equals(item, StringComparison.OrdinalIgnoreCase));
+        
+        // Cập nhật lại localStorage và state
+        var newJson = System.Text.Json.JsonSerializer.Serialize(currentHistory);
+        await JsRuntime.InvokeAsync<string>("localStorage.setItem", "searchHistory", newJson);
+        _searchHistory = currentHistory;
     }
-    // Giả lập dữ liệu lịch sử tìm kiếm
-    private List<string> _searchHistory = new List<string>
+
+    private async Task LoadSearchHistory()
     {
-        "Twitch livestream",
-        "Flutter mobile development",
-        "ASP.NET Core tutorial",
-        "Clean Architecture pattern",
-        "Human-Computer Interaction"
-    };
+        var json = await JsRuntime.InvokeAsync<string>("localStorage.getItem", "searchHistory");
+        if (!string.IsNullOrEmpty(json))
+        {
+            _searchHistory = System.Text.Json.JsonSerializer.Deserialize<List<string>>(json) ?? new List<string>();
+        }
+    }
 }
