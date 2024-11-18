@@ -1,3 +1,4 @@
+using Amazon;
 using Amazon.Internal;
 using Amazon.Runtime;
 using Amazon.S3;
@@ -36,7 +37,8 @@ builder.Services.AddSingleton<IAmazonS3>(sp =>
     var configuration = sp.GetRequiredService<IConfiguration>();
     var awsAccessKeyId = configuration["AWS:AccessKeyId"];
     var awsSecretAccessKey = configuration["AWS:SecretAccessKey"];
-    return new AmazonS3Client(awsAccessKeyId, awsSecretAccessKey);
+    var region = RegionEndpoint.GetBySystemName(configuration["AWS:Region"]);
+    return new AmazonS3Client(awsAccessKeyId, awsSecretAccessKey,region);
 });
 
 
