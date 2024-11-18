@@ -20,8 +20,7 @@ public class UserProfileService(IUserRepository userRepository) : IUserProfileSe
         {
             return Result<UserProfile?, Err>.Err(UtilErrors.ErrEntityNotFound("user"));
         }
-
-        r.Value.UserName = r.Value.Email.Split('@')[0];
+        
         return Result<UserProfile?, Err>.Ok(r.Value);
     }
 }
