@@ -1,12 +1,17 @@
 @page "/profile/{Username}"
 @using HiHoHuBlog.Components.Layout
 @using HiHoHuBlog.Components.Components
+@using HiHoHuBlog.Modules.Blog.Entity
 @using HiHoHuBlog.Modules.Blog.Presentation.Components
+@using HiHoHuBlog.Modules.Blog.Service.Implementation
+@using HiHoHuBlog.Modules.Blog.Service.Interface
 @using HiHoHuBlog.Modules.User.Entity
 @using HiHoHuBlog.Modules.User.Service.Implementation
 @using HiHoHuBlog.Modules.User.Service.Interface
+@using HiHoHuBlog.Utils
 @layout MainLayout
 @inject IUserProfileService UserProfileService
+@inject IBlogGetService BlogGetService
 <Container ContainerClass="flex justify-between space-x-10 max-w-7xl">
     <div class="max-w-4xl py-10 w-full">
         <div class="flex flex-col justify-between space-y-10 px-8 mt-3 mb-4">
@@ -27,11 +32,18 @@
             <div role="tablist" class="tabs tabs-bordered">
                 <input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="Home" checked="checked" />
                 <div class="grow max-w-4xl tab-content" role="tabpanel">
+                    @*<BlogCard/>
                     <BlogCard/>
                     <BlogCard/>
                     <BlogCard/>
+                    <BlogCard/>*@
+                    @if (BlogList is not null)
+                    {
+                    @foreach (var blog in BlogList)
+                    {
                     <BlogCard/>
-                    <BlogCard/>
+                    }
+                    }
                 </div>
                 <input
                     type="radio"
@@ -47,11 +59,12 @@
         </div>
             
         <div class="grow max-w-4xl tab-content" role="tabpanel">
+            @*<BlogCard/>
             <BlogCard/>
             <BlogCard/>
             <BlogCard/>
-            <BlogCard/>
-            <BlogCard/>
+            <BlogCard/>*@
+            
         </div>
     </div>
     <div class="border-l-[1px] grow p-10 max-w-sm">
@@ -116,9 +129,13 @@
     public string Username { get; set; }
     public string Name { get; set; }
     public UserProfile UserProfile { get; set; }
+    private Paging Paging { get; set; } = new Paging(0, 20);
+    private Filter Filter { get; set; } 
+    [Parameter] public IEnumerable<BlogList>? BlogList { get; set; } = null;
 
     protected override async Task OnInitializedAsync()
-    {        
+    {
+        await base.OnInitializedAsync();
         Console.WriteLine("hellllllo1");
         //var userEmail = Username + "@gmail.com";
         var r = await UserProfileService.GetUserProfile(Username);
@@ -129,7 +146,23 @@
         }
 
         UserProfile = r.Value;
+        Filter = new Filter
+        {
+            Status = [1],
+            CategoryId = null,
+            CreatedAt = null,
+            IsPublished = null,
+            UserId = UserProfile.Id,
+        };
         Name = UserProfile.FirstName +" "+  UserProfile.LastName;
+        var i = await BlogGetService.GetBlogs(Filter, Paging);
+        if (!r.IsOk)
+        {
+            return;
+        }
+        BlogList = i.Value;
+        Console.WriteLine(BlogList.Count().ToString());
     }
+    
 
 }

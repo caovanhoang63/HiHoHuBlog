@@ -13,9 +13,10 @@ public class AuthenticateService : IAuthenticateService
     {
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.NameIdentifier, u.Username),
+            new Claim(ClaimTypes.NameIdentifier, u.Id.ToString()),
             new Claim(ClaimTypes.Email, u.Email),
             new Claim(ClaimTypes.Role, u.Role),
+            new Claim(ClaimTypes.Name, u.Username),
         };
         
         var identity = new ClaimsIdentity(claims, AuthConstant.Scheme);
