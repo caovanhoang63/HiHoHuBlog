@@ -1,0 +1,127 @@
+﻿@page "/me/settings"
+@using HiHoHuBlog.Components.Layout
+@using HiHoHuBlog.Components.Components
+@using HiHoHuBlog.Modules.Blog.Entity
+@using HiHoHuBlog.Modules.Blog.Presentation.Components
+@using HiHoHuBlog.Modules.Blog.Service.Implementation
+@using HiHoHuBlog.Modules.Blog.Service.Interface
+@using HiHoHuBlog.Modules.User.Entity
+@using HiHoHuBlog.Modules.User.Service.Implementation
+@using HiHoHuBlog.Modules.User.Service.Interface
+@using HiHoHuBlog.Utils
+@using HiHoHuBlog.Modules.Admin.Presentation.Components
+@layout MainLayout
+@inject IUserProfileService UserProfileService
+@inject IBlogGetService BlogGetService
+<Container ContainerClass="flex justify-between space-x-10 max-w-7xl">
+    
+    <div class="max-w-4xl py-10 w-full">
+        <div class="flex flex-col justify-between space-y-10 px-8 mt-3 mb-4">
+            <div class="flex justify-between">
+                <span class="font-medium font-sans text-5xl">Settings</span>
+                <button class="btn bg-white border-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
+                    </svg>
+                </button>
+            </div>
+            @*<div role="tablist" class="tabs tabs-bordered max-w-9">
+                <a role="tab" class="tab tab-active">Home</a>
+                <a role="tab" class="tab ">About</a>
+            </div>*@
+        </div>
+        <div class="flex flex-col justify-between space-y-10 px-8 mt-3 mb-4">
+            <div role="tablist" class="tabs tabs-bordered">
+                <input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="Account" checked="checked"/>
+                <div class="grow max-w-4xl tab-content" role="tabpanel">
+                    <div class="w-full flex flex-col py-10 justify-between space-y-8 ">
+                        <div class="max-w-full flex justify-between items-center hover:cursor-pointer">
+                            <span class=" font-sans text-sm">Email address</span>
+                            <span class=" font-sans text-sm">@UserProfile?.Email</span>
+                        </div>
+                        <div class="max-w-full flex justify-between items-center hover:cursor-pointer">
+                            <span class=" font-sans text-sm">Username and subdomain</span>
+                            <span class=" font-sans text-sm">@UserProfile?.UserName</span>
+                        </div>
+                        <div class="max-w-full flex justify-between items-center hover:cursor-pointer">
+                            <span class=" font-sans text-sm">Profile infomation</span>
+                            <span class=" font-sans text-sm">@Name</span>
+                        </div>
+                        <div class="max-w-full flex justify-between items-center hover:cursor-pointer">
+                            <span class=" font-sans text-sm text-red-700">Deactivate account</span>
+                            <span class=" font-sans text-sm"></span>
+                        </div>
+                        <div class="max-w-full flex justify-between items-center hover:cursor-pointer">
+                            <span class=" font-sans text-sm text-red-700">Delete account</span>
+                            <span class=" font-sans text-sm"></span>
+                        </div>
+                    </div>
+                </div>
+                <input
+                    type="radio"
+                    name="my_tabs_1"
+                    role="tab"
+                    class="tab"
+                    aria-label="Security and apps"/>
+                <div role="tabpanel" class="tab-content p-10 w-full">
+                    <span class="font-medium font-sans text-sm"> Member since November 2024</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grow max-w-4xl tab-content" role="tabpanel">
+            @*<BlogCard/>
+            <BlogCard/>
+            <BlogCard/>
+            <BlogCard/>
+            <BlogCard/>*@
+
+        </div>
+    </div>
+    <div class="border-l-[1px] grow p-10 max-w-sm">
+        <div class="flex flex-col sticky top-20">
+            <div class="avatar">
+                <div class="w-24 rounded-full">
+                    <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                         alt="Tailwind CSS Navbar component"/>
+                </div>
+            </div>
+            <div class="mt-4">
+                <span class="font-medium font-sans text-base">@Name</span>
+            </div>
+            <div class="mt-2">
+                <span class="font-medium font-sans text-base text-gray-500"> @UserProfile?.TotalFollower Followers</span>
+            </div>
+            <div class="mt-2">
+                <span class="font-medium font-sans text-sm text-gray-500">I'm Tiset, a CS/Physics student at Brown
+                    University. I write about science and technology here and on my blog harysdalvi.com</span>
+            </div>
+
+        </div>
+    </div>
+
+</Container>
+@code {
+    [Parameter]
+    public string Username { get; set; }
+    public string Name { get; set; }
+    public UserProfile UserProfile { get; set; }
+    [CascadingParameter] 
+    Task<AuthenticationState> authenticationStateTask { get; set; }
+    public IRequester requester;
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        requester = await AuthUtils.GetInfo(authenticationStateTask);
+        var r = await UserProfileService.GetUserProfile(requester.GetUsername());
+        if (!r.IsOk || r.Value is null)
+        {
+            Console.WriteLine(r.Error.Message);
+            return;
+        }
+        UserProfile = r.Value;
+        Name = UserProfile.FirstName +" "+  UserProfile.LastName;
+    }
+    
+
+}
