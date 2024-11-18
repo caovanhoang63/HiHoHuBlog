@@ -1,9 +1,11 @@
-﻿@inherits LayoutComponentBase
+﻿@using HiHoHuBlog.Components.Components
+@inherits LayoutComponentBase
 @inject NavigationManager Navigation
 
 @if (HttpContext is null)
 {
-    <p>Loading...</p>
+    //<p>Loading...</p>
+    //<FullScreenSpinner IsLoading="true"></FullScreenSpinner>
 }
 else
 {
