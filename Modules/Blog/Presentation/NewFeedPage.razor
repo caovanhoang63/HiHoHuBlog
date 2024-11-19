@@ -12,7 +12,7 @@
         <div role="tablist" class="tabs tabs-bordered">
             <button class="tab">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
                 </svg>
             </button>
             <a role="tab" class="tab">Tab 1</a>
@@ -25,7 +25,7 @@
             @foreach (var blog in _blogs)
             {
                 <BlogCard BlogSearchDoc="blog"/>
-                
+
             }
         }
     </div>
@@ -36,13 +36,13 @@
             <TinyBlogCard/>
             <TinyBlogCard/>
         </div>
-    </div>  
+    </div>
 </Container>
 
 @code {
 
     private IRequester? _requester;
-    private readonly Paging _paging = new Paging(1, 10);
+    private readonly Paging _paging = new Paging(1, 5);
     private int seed = 0;
     private IEnumerable<BlogSearchDoc>? _blogs;
     protected override async Task OnInitializedAsync()
