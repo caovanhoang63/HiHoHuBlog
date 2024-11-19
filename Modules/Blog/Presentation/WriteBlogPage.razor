@@ -24,52 +24,53 @@
 @attribute [Authorize]
 <AuthorizeView Roles="admin, user, mod">
     <Authorized>
-<div class="h-screen ">
-    <Container ContainerClass="pb-80">
-        <div class="flex flex-row-reverse pt-2">
-            <button  @onclick="OnPublish" class="btn btn-success @(_blog.Id == 0 ? "btn-disabled" : " ") text-base-200 btn-sm ">Publish</button>
-        </div>
-        <div class="flex justify-between pt-5 ">
-            <input value="@_blog.Title" @oninput="OnSearchQueryInput" placeholder="title" class="text-4xl w-full input focus:ring-0 border-transparent focus:border-transparent px-0 !outline-none"/>
-        </div>
-        @if (_firstChange)
-        {
-            <div class="py-2">
-                @if (_isSaving)
+        <div class="h-screen ">
+            <Container ContainerClass="pb-80">
+                <FullScreenSpinner IsLoading="_isLoading"></FullScreenSpinner>
+                <div class="flex flex-row-reverse pt-2">
+                    <button @onclick="OnPublish" class="btn btn-success @(_blog.Id == 0 ? "btn-disabled" : " ") text-base-200 btn-sm ">Publish</button>
+                </div>
+                <div class="flex justify-between pt-5 ">
+                    <input value="@_blog.Title" @oninput="OnSearchQueryInput" placeholder="title" class="text-4xl w-full input focus:ring-0 border-transparent focus:border-transparent px-0 !outline-none"/>
+                </div>
+                @if (_firstChange)
                 {
-                    <div class="flex align-middle text-gray-500 space-x-2">
-                        <span class="loading loading-spinner loading-md"></span>
-                        <span class="">saving...</span>
+                    <div class="py-2">
+                        @if (_isSaving)
+                        {
+                            <div class="flex align-middle text-gray-500 space-x-2">
+                                <span class="loading loading-spinner loading-md"></span>
+                                <span class="">saving...</span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="flex align-middle text-gray-500 space-x-2">
+                                <span class="">Saved</span>
+                            </div>
+                        }
                     </div>
                 }
-                else
-                {
-                    <div class="flex align-middle text-gray-500 space-x-2">
-                        <span class="">Saved</span>
-                    </div>
-                }
-            </div>
-        }
-        <div class="h-full">
-            <TextEditor ImageUploadFunc="OnUpload" OnChange="OnChange" Toolbar="new Toolbar { ShowFullToolbar = true }" EditorContainerId="TestId"
-                        Placeholder="Write your own words..." @ref="TextEditor">
-            </TextEditor>
+                <div class="h-full">
+                    <TextEditor ImageUploadFunc="OnUpload" OnChange="OnChange" Toolbar="new Toolbar { ShowFullToolbar = true }" EditorContainerId="TestId"
+                                Placeholder="Write your own words..." @ref="_textEditor">
+                    </TextEditor>
+                </div>
+
+
+            </Container>
         </div>
-
-
-    </Container>
-</div>
     </Authorized>
 </AuthorizeView>
 
 @code {
     [CascadingParameter] 
     Task<AuthenticationState> authenticationStateTask { get; set; }
-
-    TextEditor? TextEditor;
-    
     [Parameter] public string? BlogId { get; set; }
+
+    TextEditor? _textEditor;
     
+    private bool _isLoading = false;
     private IDisposable? _titleSubscription;
     private IDisposable? _contentSubscription;
     private readonly Subject<string?> _titleSubject = new();
@@ -131,12 +132,11 @@
 
     }
     
-    protected override async  void OnInitialized()
+    protected  override async Task OnParametersSetAsync()
     {
-        base.OnInitialized();
-
         if (BlogId is not null)
         {
+            _isLoading = true;
             _firstChange = true;
             if (!Int32.TryParse(BlogId, out var id))
             {
@@ -154,7 +154,13 @@
             _blog.Title = r.Value.Title;
             _blog.UserId = r.Value.UserId;
             _blog.Content = r.Value.Content;
-            await TextEditor.LoadHTMLContent(_blog.Content);
+            if (_textEditor is null)
+            {
+                NavigationManager.NavigateTo("error");
+                return;
+            }
+            await _textEditor.LoadHTMLContent(_blog.Content);
+            _isLoading = false;
             StateHasChanged();
         }
         _contentSubscription = _contentSubject
@@ -181,7 +187,7 @@
                 });
             });
         
-        _titleSubscription = _titleSubject
+            _titleSubscription = _titleSubject
             .Throttle(TimeSpan.FromMilliseconds(300))
             .Subscribe(async title =>
             {

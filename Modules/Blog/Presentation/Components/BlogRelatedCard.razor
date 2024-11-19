@@ -1,6 +1,12 @@
 ﻿@using HiHoHuBlog.Modules.Search.Entity
 @inject NavigationManager NavigationManager
-<a class="hover:cursor-pointer"  @onclick='() => NavigationManager.NavigateTo($"/blog/{Blog?.Id}")'>
+@if (Blog is null)
+{
+    <div></div>
+}
+else
+{
+    <a class="hover:cursor-pointer"  @onclick='() => NavigationManager.NavigateTo($"/blog/{Blog?.Id}")'>
     <div class="card ">
         <figure class="h-48 overflow-hidden">
             <img src="@Blog?.Thumbnail?.Url" alt="Strangler Fig Pattern" class="w-full h-full object-cover" />
@@ -45,6 +51,9 @@
         </div>
     </div>
 </a>
+}
+
+
 
 @code
 {
