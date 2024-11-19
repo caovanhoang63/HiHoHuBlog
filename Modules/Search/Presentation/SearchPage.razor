@@ -6,27 +6,50 @@
 @using HiHoHuBlog.Modules.Search.Service.Interface
 @using HiHoHuBlog.Utils
 @inject ISearchBlogService SearchBlogService
+@inject NavigationManager NavigationManager
+
 <Container ContainerClass="flex justify-between space-x-10 max-w-7xl">
     <div class="grow max-w-4xl py-10">
-        <p>@SearchTerm</p>
         <div class="text-3xl font-bold ">
             <span class="text-gray-400">Result for </span>
-            <span>Live</span>
+            <span>@SearchTerm</span>
         </div>
         @*<span class="text-2xl font-bold">Results for asdasd</span>*@
         <div role="tablist" class="tabs mt-10 tabs-bordered">
-            <input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="Stories" checked="@isActiveTab(0)"
-                   @onchange="@(() => ChangeTab(0))"/>
+            <input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="Blogs" checked="@isActiveTab(0)"
+                   @onchange="@(() => ChangeTab(0,"blogs"))"/>
             <div role="tabpanel" class="tab-content">
                 @if (_searchDocs is not null)
                 {
                     foreach (var blog in _searchDocs)
                     {
-                        <BlogCard BlogSearchDoc="@blog"/>
+                        <BlogCard BlogSearchDoc="@blog" OnCardClickCallback="HandleCardClick"/>
                     }
                 }
-            </div>
+                @* Paging *@
+                <div class="join mt-5 flex justify-center">
+                    <button @onclick="OnPrevious" class="join-item btn btn-ghost btn-sm" disabled="@(Paging.Page == 1)">«</button>
 
+                    @for (int i = 1; i <= Paging.TotalPages; i++)
+                    {
+                    if (ShouldDisplayPage(i))
+                    {
+                    var i1 = i;
+                    <button @onclick="() => OnPageClick(i1)"
+                            class="join-item btn btn-sm @(Paging.Page == i ? "btn-active" : "btn-ghost")">
+                        @i
+                    </button>
+                    }
+                    else if (i == 2 || i == Paging.TotalPages - 1)
+                    {
+                    <button class="join-item btn btn-ghost btn-disabled">...</button>
+                    }
+                    }
+
+                    <button @onclick="OnNext" class="join-item btn btn-ghost btn-sm" disabled="@(Paging.Page == Paging.TotalPages)">»</button>
+                </div>
+            </div>
+           
             <input
                 type="radio"
                 name="my_tabs_1"
@@ -34,7 +57,7 @@
                 class="tab"
                 aria-label="People"
                 checked="@isActiveTab(1)"
-                @onchange="@(() => ChangeTab(1))"/>
+                @onchange="@(() => ChangeTab(1,"people"))"/>
             <div role="tabpanel" class="tab-content">
                 @*Row Children*@
                 <MatchingPeopleCard/>
@@ -44,7 +67,7 @@
             </div>
 
             <input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="Topics" checked="@isActiveTab(2)"
-                   @onchange="@(() => ChangeTab(2))"/>
+                   @onchange="@(() => ChangeTab(2,"topics"))"/>
             <div role="tabpanel" class="tab-content mt-10">
                 <div class="flex flex-wrap gap-2">
                     <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live</div>
@@ -72,7 +95,7 @@
     </div>
     <div class="border-l-[1px] grow p-10 max-w-sm">
         <div class="flex flex-col space-y-2">
-            <span class="text-gray-600 mb-6">Topics matching live</span>
+            <span class="text-gray-600 mb-6">Topics matching @SearchTerm</span>
             <div class="flex flex-wrap ">
                 <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live</div>
                 <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live Streaming</div>
@@ -81,14 +104,18 @@
                 <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Livestream</div>
                 <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live Casino</div>
             </div>
-            <a  class="text-green-500 hover:underline mb-2"  @onclick="() => ChangeTab(2)">See all Topics</a>
+            @*
+            <a  class="text-green-500 hover:underline mb-2"  @onclick="() => ChangeTab(2,'people')">See all</a>
+            *@
             <div class="divider mt-9 mb-0"></div>
-            <span class="text-gray-600 mb-6">Topics matching live</span>
+            <span class="text-gray-600 mb-6">Topics matching @SearchTerm</span>
             <div >
                 <MatchingPeopleSmallCard></MatchingPeopleSmallCard>
                 <MatchingPeopleSmallCard></MatchingPeopleSmallCard>
             </div>
-            <a class="text-green-500 hover:underline mb-2 " @onclick="() => ChangeTab(1)">See all People</a>
+            @*
+            <a class="text-green-500 hover:underline mb-2 " @onclick="() => ChangeTab(1)">See all</a>
+            *@
 
         </div>
     </div>
@@ -97,30 +124,98 @@
 
 @code {
     [SupplyParameterFromQuery(Name = "q")] string? SearchTerm { get; set; }
+    
+    [SupplyParameterFromQuery(Name = "type")] string? Type { get; set; } 
     private int activeTab = 0;
-    private Paging Paging = new Paging(1, 10);
+    private Paging Paging = new Paging(1, 3);
     private IEnumerable<BlogSearchDoc>? _searchDocs = new List<BlogSearchDoc>();
-
-    protected override async Task OnInitializedAsync()
+    private async Task HandleCardClick(BlogSearchDoc clickedDoc)
     {
-        await base.OnInitializedAsync();
-        if (SearchTerm == null)
+        Console.WriteLine($"Clicked on: {clickedDoc.Title}");
+        // Điều hướng hoặc xử lý khác
+        NavigationManager.NavigateTo($"/blog/{clickedDoc.Id}");
+    }
+    
+    // Chuyển từ OnInitializedAsync sang OnParametersSetAsync
+    protected override async Task OnParametersSetAsync()
+    {
+        await GetBlogs();
+    }
+    private bool ShouldDisplayPage(int page)
+    {
+        // Hiển thị trang đầu, cuối, trang hiện tại, và các trang xung quanh
+        return page == 1 || page == Paging.TotalPages || 
+               Math.Abs(page - Paging.Page) <= 2;
+    }
+
+    private async void OnPageClick(int page)
+    {
+        if (page != Paging.Page)
+        {
+            Paging.Page = page;
+            await GetBlogs();
+        }
+        StateHasChanged();
+
+    }
+
+    private async void OnPrevious()
+    {
+        if (Paging.Page > 1)
+        {
+            Paging.Page--;
+            await GetBlogs();
+        }
+    }
+
+    private async void OnNext()
+    {
+        if (Paging.Page < Paging.TotalPages)
+        {
+            Paging.Page++;
+            await GetBlogs();
+        }
+    }
+    private async Task GetBlogs()
+    {if (string.IsNullOrEmpty(SearchTerm))
         {
             SearchTerm = "";
         }
+        // Cập nhật tab dựa trên query string "tab"
+        if (!string.IsNullOrEmpty(Type))
+        {
+            activeTab = Type switch
+            {
+                "blogs" => 0,
+                "people" => 1,
+                "topics" => 2,
+                _ => 0
+            };
+        }
+        // Gọi API tìm kiếm
         var result = await SearchBlogService.SearchBlog(SearchTerm, Paging);
-        if (!result.IsOk)
+        if (result.IsOk)
+        {
+            Console.WriteLine("Search result");
+            foreach (var val in result.Value)
+            {
+                Console.WriteLine(val.Title);
+            }
+
+            var totalResult = result.Value.Count();
+            _searchDocs = result.Value;
+        }
+        else
         {
             Console.WriteLine(result.Error);
-            return;
+            _searchDocs = new List<BlogSearchDoc>();
         }
-
-        _searchDocs = result.Value;
     }
 
-    private void ChangeTab(int tabIndex)
+    private void ChangeTab(int tabIndex, string tabName)
     {
         activeTab = tabIndex;
+        NavigationManager.NavigateTo($"/search?q={SearchTerm}&type={tabName}", forceLoad: false);
     }
 
     private bool isActiveTab(int tabIndex)
