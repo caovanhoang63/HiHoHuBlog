@@ -233,11 +233,5 @@
         // You can also change it to any url you want
         JSRuntime.InvokeVoidAsync("ChangeUrl", url);
     }
- 
     
 }
-<script>
-    window.ChangeUrl = function(url){
-        history.pushState(null, '', url);
-    } 
-</script>
