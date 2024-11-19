@@ -30,8 +30,8 @@
                     {
                     @if (item.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase))
                     {
-                    <li class="flex items-center justify-between px-4 py-2 hover:bg-gray-100 cursor-pointer" @onclick="()=>OnClickBlogPage(@item)">
-                        <span>@item</span>
+                    <li class="flex items-center justify-between px-4 py-2 hover:bg-gray-100 cursor-pointer" @onclick='()=>NavigateToSearchItem(item)'>
+                        <p class=" line-clamp-1 overflow-ellipsis">@item</p>
                         <!-- Nút X để xóa -->
                         <button
                             type="button"
@@ -107,10 +107,6 @@
     private bool _isRemovingItem = false;
 
     
-    public void OnClickBlogPage(string id)
-    {
-        NavigationManager.NavigateTo("/blog/" + id);
-    }
     
     private async Task OnSubmitSearch()
     {
@@ -153,6 +149,10 @@
         var newJson = System.Text.Json.JsonSerializer.Serialize(currentHistory);
         await JsRuntime.InvokeVoidAsync("localStorage.setItem", "searchHistory", newJson);
         _searchHistory = currentHistory;
+    }
+    private void NavigateToSearchItem(string item)
+    {
+        NavigationManager.NavigateTo($"/search?q={item}");
     }
 
     private async Task OnWrite()
