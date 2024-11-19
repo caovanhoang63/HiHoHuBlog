@@ -5,21 +5,21 @@
 <div>
     <dialog id="my_modal_1" class="modal @(Open ? "modal-open" : " ")">
         <div class="modal-box ">
-           
+            <InputFile id="hiddenFileInput" class="hidden" OnChange="HandleSelectedFiles"  />
             <h3 class="text-lg font-bold text-center">@Title</h3>
             <div class="flex flex-col w-full space-y-5">
                 <div class="flex flex-col justify-between space-y-2">
                     <p class="text-sm font-medium">Photo</p>
                     <div class="flex w-full justify-between space-x-5">
-                        <label class="avatar cursor-pointer" >
+                        <label class="avatar cursor-pointer" for="hiddenFileInput">
                             <div class="w-20 rounded-full">
-                                <img src=" @("https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp")"
+                                <img src=" @(newImage is not null ? newImage : "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp")"
                                      alt="Tailwind CSS Navbar component"/>
                             </div>
                         </label>
                         <div class="flex flex-col w-full">
                             <div class="flex space-x-4">
-                                <label class="cursor-pointer text-green-600" >Update</label>
+                                <label class="cursor-pointer text-green-600" for="hiddenFileInput">Update</label>
                                 <p class="cursor-pointer text-red-600">Remove</p>
                             </div>
                             <p class="text-sm font-normal">Recommended: Square JPG, PNG, or GIF, at least 1,000 pixels
@@ -56,5 +56,42 @@
     [Parameter] public EventCallback OnConfirm { get; set; }
     [Parameter] public EventCallback OnDeny { get; set; }
     
+    public Image newImage { get; set; }
     
+    private InputFile? fileInputElement;
+    private IBrowserFile? selectedFile;
+    private IEnumerable<IBrowserFile>? selectedFiles;
+
+    private async Task<Result<Image, Err>> HandleSelectedFiles(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        var allowedFormats = new[] { "image/jpeg", "image/png", "image/gif", "image/bmp", "image/tiff" };
+        if (!allowedFormats.Contains(file.ContentType))
+        {
+            Console.WriteLine("Only image files (JPEG, PNG, GIF, BMP, TIFF) are allowed.");
+            return Result<Image, Err>.Err(new Err("Only image files are allowed"));
+            
+        }
+
+        var resizedImageFile = await file.RequestImageFileAsync(file.ContentType, 800, 600);
+        using var stream = resizedImageFile.OpenReadStream(resizedImageFile.Size);
+        using var memoryStream = new MemoryStream();
+        await stream.CopyToAsync(memoryStream);
+        var base64String = Convert.ToBase64String(memoryStream.ToArray());
+        // Convert base64 to bytes
+        byte[] fileData = Convert.FromBase64String(base64String);
+
+        // Generate unique filename with original extension
+        string extension = Path.GetExtension(file.Name);
+        string newFileName = $"{Guid.NewGuid()}{extension}";
+        var result = await UploadProvider.UploadImage(fileData, newFileName);
+        if (!result.IsOk)
+        {
+            return Result<Image, Err>.Err(result.Error);
+        }
+
+        newImage = result.Value;
+        Console.WriteLine(newImage.ToString());
+        return Result<Image,Err>.Ok(result.Value);
+    }
 }
