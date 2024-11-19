@@ -195,6 +195,7 @@
 
     <ItemGroup>
         <Folder Include="Modules\Search\CronJobs\" />
+        <Folder Include="Modules\Tag\Presentation\" />
         <Folder Include="wwwroot\lib\" />
     </ItemGroup>
 

@@ -2,25 +2,43 @@
 @using HiHoHuBlog.Components.Layout
 @using HiHoHuBlog.Modules.Admin.Entity
 @using HiHoHuBlog.Modules.Admin.Service.Interface
+@using HiHoHuBlog.Modules.Search.Service.Interface
 @using HiHoHuBlog.Utils
 @layout AdminLayout
 @inject IReasonBlogBlockService Service
 @attribute [Authorize]
 @rendermode InteractiveServer
+@inject IMigrationSearchDataService MigrateService
+@inject IToastService ToastService
 
 <AuthorizeView Roles="admin, mod">
     <Authorized>
-        <div>
-            <h3 class="text-3xl font-bold">Setting</h3>
-            <div class="py-10 space-x-5">
-                <input @bind="Reason" type="text" placeholder="Reason" class="input input-bordered w-80 max-w-xs " />
-                <button @onclick="OnNewReason" class="btn ">
+        <div class="p-5">
+            <div>
+                <h3 class="text-3xl font-bold">Setting</h3>
+                <div class="py-10 space-x-5">
+                    <input @bind="Reason" type="text" placeholder="Reason" class="input input-bordered w-80 max-w-xs "/>
+                    <button @onclick="OnNewReason" class="btn ">
                     <span>
                         New block reason
                     </span>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-                    </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <h3 class="text-2xl font-bold my-5 ">Search Migration</h3>
+            <div>
+                <button class="btn btn-primary " @onclick='OnMigrateBlogData'>
+                    Migrate blog data
+                </button>
+                <button class="btn btn-primary " @onclick='OnMigrateTagData'>
+                    Migrate tag data
+                </button>
+                <button class="btn btn-primary " @onclick='OnMigrateBlogData'>
+                    Migrate user data
                 </button>
             </div>
         </div>
@@ -36,8 +54,8 @@
         await base.OnInitializedAsync();
         _requester = await AuthUtils.GetInfo(authenticationStateTask);
     }
-    
-    public async void OnNewReason()
+
+    private async void OnNewReason()
     {
         if (_requester == null) return;
          var r =  await Service.Create(_requester, new ReasonBlogBlockCreate
@@ -47,8 +65,36 @@
 
         if (!r.IsOk)
         {
-            Console.WriteLine(r.Error.Message);
+            Console.WriteLine(r.Error);
+            ToastService.ShowError(r.Error.Message);
             return;
         }
+        ToastService.ShowSuccess("Success");
+    }
+    
+    private async void OnMigrateBlogData()
+    {
+        var r = await MigrateService.MigrateBlogDataAsync();
+        if (!r.IsOk)
+        {
+            Console.WriteLine(r.Error);
+            ToastService.ShowError(r.Error.ToString());
+            return;
+        }
+        Console.WriteLine("Success");
+        ToastService.ShowSuccess("Success");
+    }
+
+    private  async Task OnMigrateTagData()
+    {
+        var r = await MigrateService.MigrateTagDataAsync();
+        if (!r.IsOk)
+        {
+            Console.WriteLine(r.Error);
+            ToastService.ShowError(r.Error.ToString());
+            return;
+        }
+        Console.WriteLine("Success");
+        ToastService.ShowSuccess("Success");
     }
 }

@@ -16,8 +16,9 @@ public class EsClient
             .ServerCertificateValidationCallback((sender, cert, chain, errors) => true)
             .BasicAuthentication(userName, password)
             .DefaultMappingFor<BlogSearchDoc>(m => m.IndexName("blog_search"))
+            .DefaultMappingFor<TagSearchDoc>(m => m.IndexName("tag_search"))
+            .DefaultMappingFor<UserSearchDoc>(m => m.IndexName("user_search"))
             .DefaultMappingFor<MigrationTimestamp>(m => m.IndexName("migration_time"));
-        
         _client = new ElasticClient(settings);
 
         var pingResult =  _client.Ping();

@@ -15,9 +15,14 @@ using HiHoHuBlog.Modules.Blog.Repository.Implementation;
 using HiHoHuBlog.Modules.Blog.Service.Implementation;
 using HiHoHuBlog.Modules.Blog.Service.Interface;
 using HiHoHuBlog.Modules.Search;
+using HiHoHuBlog.Modules.Search.Repository.Implementation;
 using HiHoHuBlog.Modules.Search.Repository.Interface;
 using HiHoHuBlog.Modules.Search.Service.Implementation;
 using HiHoHuBlog.Modules.Search.Service.Interface;
+using HiHoHuBlog.Modules.Tag.Repository.Implementation;
+using HiHoHuBlog.Modules.Tag.Repository.Interface;
+using HiHoHuBlog.Modules.Tag.Service.Implementation;
+using HiHoHuBlog.Modules.Tag.Service.Interface;
 using HiHoHuBlog.Modules.User;
 using HiHoHuBlog.Modules.User.Service;
 using HiHoHuBlog.Modules.User.Repository;
@@ -69,21 +74,24 @@ builder.Services.AddScoped<IBlogRepository, EfBlogRepo>();
 builder.Services.AddScoped<IBlogBlockedRepository,BlogBlockedRepository>();
 builder.Services.AddScoped<IReasonBlogBlockRepository,ReasonBlogBlockRepository>();
 builder.Services.AddScoped<ISearchBlogRepository,EsSearchBlogRepository>();
-
+builder.Services.AddScoped<ITagRepository, EfTagRepository>();
+builder.Services.AddScoped<IBlogTagRepository, EfBlogTagRepo>();
+builder.Services.AddScoped<IMigrationRepository, EsMigrationRepository>();
 
 builder.Services.AddScoped<IUserSignUpService, UserSignUpService>();
 builder.Services.AddScoped<IUserLoginService, UserLoginService>();
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 builder.Services.AddScoped<IBlogBlockedService,BlogBlockedService>();
 builder.Services.AddScoped<IReasonBlogBlockService,ReasonBlogBlockService>();
-
-
+builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<ICreateBlogService,CreateBlogService>();
 builder.Services.AddScoped<IBlogUpdateService, BlogUpdateService>();
 builder.Services.AddScoped<IBlogGetService, BlogGetService>();
 builder.Services.AddScoped<IBlogDeleteService, BlogDeleteService>();
-builder.Services.AddScoped<IMigrateBlogDataService,MigrateBlogDataService>();
+builder.Services.AddScoped<IMigrationSearchDataService,MigrationSearchDataService>();
 builder.Services.AddScoped<ISearchBlogService, SearchBlogService>();
+
+
 builder.Services.AddAutoMapper(typeof(BlogMappingProfile));
 builder.Services.AddAutoMapper(typeof(AdminMappingProfile));
 builder.Services.AddAutoMapper(typeof(SearchMappingProfile));
