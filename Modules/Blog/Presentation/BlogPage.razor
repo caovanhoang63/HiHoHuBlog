@@ -1,14 +1,13 @@
 @page "/blog/{Slug}"
-@rendermode InteractiveServer
 @using HiHoHuBlog.Components.Components
 @using HiHoHuBlog.Modules.Blog.Entity
+@using HiHoHuBlog.Modules.Blog.Presentation.Components
 @using HiHoHuBlog.Modules.Blog.Presentation.Components.TextEditor
 @using HiHoHuBlog.Modules.Blog.Service.Interface
-@using User = HiHoHuBlog.Modules.User.Entity.User
-@using HiHoHuBlog.Modules.Blog.Presentation.Components
 @using HiHoHuBlog.Modules.Search.Entity
 @using HiHoHuBlog.Modules.Search.Service.Interface
 @using HiHoHuBlog.Utils
+@rendermode InteractiveServer
 @inject IBlogGetService BlogGetService
 @inject NavigationManager NavigationManager
 @inject ISearchBlogService SearchBlogService

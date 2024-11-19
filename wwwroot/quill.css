@@ -24,6 +24,10 @@
     text-decoration: none!important;
 }
 
+.ql-editor img {
+    margin: auto!important;
+}
+
 .ql-size-large {
     font-size: 1.8rem!important;
 }
