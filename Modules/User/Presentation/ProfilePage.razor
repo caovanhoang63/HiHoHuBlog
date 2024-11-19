@@ -125,7 +125,7 @@
     public string Name { get; set; }
     public UserProfile UserProfile { get; set; }
     private Paging Paging { get; set; } = new Paging(0, 20);
-    private Filter Filter { get; set; } 
+    private BlogFilter Filter { get; set; } 
     [Parameter] public IEnumerable<BlogList>? BlogList { get; set; } = null;
 
     protected override async Task OnInitializedAsync()
@@ -139,14 +139,15 @@
         }
 
         UserProfile = r.Value;
-        Filter = new Filter
+        Filter = new BlogFilter()
         {
             Status = [1],
             CategoryId = null,
-            CreatedAt = null,
             IsPublished = null,
             UserId = UserProfile.Id,
         };
+        
+        
         Name = UserProfile.FirstName +" "+  UserProfile.LastName;
         var i = await BlogGetService.GetBlogs(Filter, Paging);
         if (!r.IsOk)
