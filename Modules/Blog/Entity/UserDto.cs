@@ -12,5 +12,5 @@ public class UserDto
     public string LastName { get; set; }
     public string FirstName { get; set; }
     public string Role { get; set; } = "user";  
-    // public Image? Avatar { get; set; } 
+    public Image? Avatar { get; set; } 
 }

@@ -10,6 +10,7 @@ public class EsMigrationRepository(EsClient client) : IMigrationRepository
     {
         var r = await client.Client.BulkAsync(b => b.Index<BlogSearchDoc>().IndexMany(blogs));
 
+        
         if (!r.IsValid)
         {
             return Result<Unit, Err>.Err(UtilErrors.InternalServerError(r.OriginalException));
