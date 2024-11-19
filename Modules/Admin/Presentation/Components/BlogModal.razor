@@ -9,13 +9,7 @@
                 <div>
                     <h2 class="text-4xl font-bold">@Blog?.Title</h2>
                     <div class="mt-[-1.8rem]">
-                        <TextEditor ReadOnly="true">
-                            <EditorContent>
-                                @if (Blog?.Content != null)
-                                {
-                                @((MarkupString)Blog.Content)
-                                }
-                            </EditorContent>
+                        <TextEditor @ref="_textEditor"  ReadOnly="true">
                         </TextEditor>    
                     </div>
                 </div>
@@ -29,7 +23,15 @@
 
 @code {
     [Parameter] public bool Open { get; set; }
-    [Parameter] public BlogDetail Blog { get; set; } 
+    [Parameter] public BlogDetail? Blog { get; set; } 
     [Parameter] public EventCallback Close { get; set; }
+    private TextEditor _textEditor;
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Blog is not null)
+        {
+            await _textEditor.LoadHTMLContent(Blog.Content);
+        }
+    }
 
 }

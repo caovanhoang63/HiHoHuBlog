@@ -247,7 +247,8 @@
         var r = await BlogDeleteService.Delete(_requester, _selectedBlog.Id);
         if (!r.IsOk)
         {
-            Console.WriteLine(r.Error.Message);
+            ToastService.ShowError(r.Error.Message);
+            Console.WriteLine(r.Error);
         }
 
         IsLoading = false;
@@ -358,11 +359,8 @@
 
             if (r.Value != null)
             {
-                Console.WriteLine(r.Value.Id);
-
                 Blog = r.Value;
                 await InvokeAsync(StateHasChanged);
-
                 IsOpenDetailModal = true;
             }
             else
