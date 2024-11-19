@@ -158,7 +158,7 @@ public class EsSearchBlogRepository(EsClient client) : ISearchBlogRepository
         throw new NotImplementedException();
     }
 
-    public async Task<Result<IEnumerable<BlogSearchDoc>?, Err>> RecommendSearchBlogByBlog(IRequester? requester, BlogSearchDoc searchDoc, Paging paging)
+    public async Task<Result<IEnumerable<BlogSearchDoc>?, Err>> RecommendSearchBlogByBlog(IRequester? requester, int id , Paging paging)
     {
         var docs = await client.Client.SearchAsync<BlogSearchDoc>(s => s
             .Size(paging.PageSize)
@@ -168,7 +168,7 @@ public class EsSearchBlogRepository(EsClient client) : ISearchBlogRepository
                     .Fields(f => f.Field("title").Field("content"))
                     .Like(l => l
                         .Document(d => d
-                        .Id(searchDoc.Id)))
+                        .Id(id)))
                     .MinTermFrequency(1)
                     .MinDocumentFrequency(1)
                     .MaxQueryTerms(25))

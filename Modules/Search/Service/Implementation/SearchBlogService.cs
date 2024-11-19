@@ -34,9 +34,9 @@ public class SearchBlogService(ISearchBlogRepository searchBlogRepository) : ISe
     }
 
 
-    public async Task<Result<IEnumerable<BlogSearchDoc>?, Err>> RecommendSearchBlogByBlog(IRequester? requester,BlogSearchDoc searchDoc, Paging paging)
+    public async Task<Result<IEnumerable<BlogSearchDoc>?, Err>> RecommendSearchBlogByBlog(IRequester? requester,int id, Paging paging)
     {
-        var r= await  _searchBlogRepository.RecommendSearchBlogByBlog(requester,searchDoc, paging);
+        var r= await  _searchBlogRepository.RecommendSearchBlogByBlog(requester,id, paging);
         if (!r.IsOk)
         {
             return Result<IEnumerable<BlogSearchDoc>?, Err>.Err(r.Error);
