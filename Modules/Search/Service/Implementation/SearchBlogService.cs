@@ -32,4 +32,42 @@ public class SearchBlogService(ISearchBlogRepository searchBlogRepository) : ISe
     {
         throw new NotImplementedException();
     }
+
+
+    public async Task<Result<IEnumerable<BlogSearchDoc>?, Err>> RecommendSearchBlogByBlog(IRequester? requester,BlogSearchDoc searchDoc, Paging paging)
+    {
+        var r= await  _searchBlogRepository.RecommendSearchBlogByBlog(requester,searchDoc, paging);
+        if (!r.IsOk)
+        {
+            return Result<IEnumerable<BlogSearchDoc>?, Err>.Err(r.Error);
+            
+        }
+        return r;
+    }
+
+    public async Task<Result<IEnumerable<BlogSearchDoc>?, Err>> RecommendSearchBlogByUser(IRequester? requester, Paging paging)
+    {
+        if (requester == null)
+            return  Result<IEnumerable<BlogSearchDoc>?, Err>.Err(UtilErrors.ErrNoPermission());
+                
+        var r= await  _searchBlogRepository.RecommendSearchBlogByUser(requester, paging);
+        if (!r.IsOk)
+        {
+            return Result<IEnumerable<BlogSearchDoc>?, Err>.Err(r.Error);
+            
+        }
+        return r;
+    }
+
+    public async Task<Result<IEnumerable<BlogSearchDoc>?, Err>> RandomBlog(int seed, Paging paging)
+    {
+        var r= await  _searchBlogRepository.RandomBlog(seed, paging);
+        if (!r.IsOk)
+        {
+            return Result<IEnumerable<BlogSearchDoc>?, Err>.Err(r.Error);
+            
+        }
+        return r;
+        
+    }
 }
