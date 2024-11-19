@@ -36,11 +36,11 @@ else
             </div>
         </a>
         <div class="text-xs">
-            <span><a class="text-black hover:underline" @onclick='()=>OnNavClick("/123")'
+            <span><a class="text-black hover:underline" @onclick='()=>OnNavClick($"/profile/{Blog?.User?.UserName}")'
                      @onclick:stopPropagation="true"
                      @onclick:preventDefault="true">Name</a></span>
             <span class="text-gray-900">in</span>
-            <span><a class="text-black hover:underline" @onclick='()=>OnNavClick("/123")'
+            <span><a class="text-black hover:underline" @onclick='()=>OnNavClick($"/profile/{Blog?.User?.UserName}")'
                      @onclick:stopPropagation="true"
                      @onclick:preventDefault="true">UIT</a></span>
         </div>
