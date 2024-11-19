@@ -79,6 +79,7 @@ builder.Services.AddScoped<ISearchBlogRepository,EsSearchBlogRepository>();
 builder.Services.AddScoped<ITagRepository, EfTagRepository>();
 builder.Services.AddScoped<IBlogTagRepository, EfBlogTagRepo>();
 builder.Services.AddScoped<IMigrationRepository, EsMigrationRepository>();
+builder.Services.AddScoped<ISearchTagRepository, EsSearchTagRepository>();
 
 builder.Services.AddScoped<IUserSignUpService, UserSignUpService>();
 builder.Services.AddScoped<IUserLoginService, UserLoginService>();
@@ -92,7 +93,7 @@ builder.Services.AddScoped<IBlogGetService, BlogGetService>();
 builder.Services.AddScoped<IBlogDeleteService, BlogDeleteService>();
 builder.Services.AddScoped<IMigrationSearchDataService,MigrationSearchDataService>();
 builder.Services.AddScoped<ISearchBlogService, SearchBlogService>();
-
+builder.Services.AddScoped<ISearchTagService, SearchTagService>();
 
 builder.Services.AddAutoMapper(typeof(BlogMappingProfile));
 builder.Services.AddAutoMapper(typeof(AdminMappingProfile));
