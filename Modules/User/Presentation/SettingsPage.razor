@@ -10,11 +10,12 @@
 @using HiHoHuBlog.Modules.User.Service.Interface
 @using HiHoHuBlog.Utils
 @using HiHoHuBlog.Modules.Admin.Presentation.Components
+@using HiHoHuBlog.Modules.User.Components
 @layout MainLayout
 @inject IUserProfileService UserProfileService
 @inject IBlogGetService BlogGetService
 <Container ContainerClass="flex justify-between space-x-10 max-w-7xl">
-    
+    <ProfileModal Open="true" Title="Profile information"></ProfileModal>
     <div class="max-w-4xl py-10 w-full">
         <div class="flex flex-col justify-between space-y-10 px-8 mt-3 mb-4">
             <div class="flex justify-between">
