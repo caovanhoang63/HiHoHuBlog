@@ -23,7 +23,7 @@
                 {
                     foreach (var blog in _searchDocs)
                     {
-                        <BlogCard BlogSearchDoc="@blog" OnCardClickCallback="HandleCardClick"/>
+                        <BlogCard BlogSearchDoc="@blog"/>
                     }
                 }
                 @* Paging *@
@@ -138,13 +138,7 @@
     private Paging PagingTopic = new Paging(1, 10);
     private IEnumerable<BlogSearchDoc>? _searchDocs = new List<BlogSearchDoc>();
     private IEnumerable<TagSearchDoc>? _searchTag = new List<TagSearchDoc>();
-    private async Task HandleCardClick(BlogSearchDoc clickedDoc)
-    {
-        Console.WriteLine($"Clicked on: {clickedDoc.Title}");
-        // Điều hướng hoặc xử lý khác
-        NavigationManager.NavigateTo($"/blog/{clickedDoc.Id}");
-    }
-
+    
     private async Task GetSearchTags()
     {
         var result = await SearchTagService.SearchTags(SearchTerm, PagingTopic);

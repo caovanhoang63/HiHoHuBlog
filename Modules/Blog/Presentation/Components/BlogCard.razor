@@ -1,4 +1,5 @@
 @using HiHoHuBlog.Modules.Search.Entity
+@inject NavigationManager NavigationManager
 
 <a class="p-5" @onclick="OnCardClick"
    
@@ -43,13 +44,12 @@
 
 @code { 
     [Parameter] public BlogSearchDoc? BlogSearchDoc { get; set; }
-    [Parameter] public EventCallback<BlogSearchDoc> OnCardClickCallback { get; set; }
 
     private async Task OnCardClick()
     {
         if (BlogSearchDoc is not null)
         {
-            await OnCardClickCallback.InvokeAsync(BlogSearchDoc);
+            NavigationManager.NavigateTo($"blog/{BlogSearchDoc.Id}");
         }
     }
  }
