@@ -1,15 +1,13 @@
 using HiHoHuBlog.Modules.Blog.Entity;
 using HiHoHuBlog.Modules.Search.Entity;
+using HiHoHuBlog.Modules.Search.Repository.Interface;
 using HiHoHuBlog.Utils;
 using Nest;
-using Index = System.Index;
 
-namespace HiHoHuBlog.Modules.Search.Repository.Interface;
+namespace HiHoHuBlog.Modules.Search.Repository.Implementation;
 
 public class EsSearchBlogRepository(EsClient client) : ISearchBlogRepository
 {
-    private ISearchBlogRepository _searchBlogRepositoryImplementation;
-
     public async Task<Result<Unit, Err>> AddBulkAsync(IEnumerable<Entity.BlogSearchDoc> blogs, DateTime? date)
     {
         var r = await client.Client.BulkAsync(b => b.Index<BlogSearchDoc>().IndexMany(blogs));
@@ -35,33 +33,6 @@ public class EsSearchBlogRepository(EsClient client) : ISearchBlogRepository
         }
     
         return Result<Unit, Err>.Ok(new Unit());
-    }
-
-
-    public async Task<Result<MigrationTimestamp?, Err>> GetLastMigrateTime()
-    {
-        var searchResponse = await client.Client.SearchAsync<MigrationTimestamp>(s => s
-            .Index<MigrationTimestamp>()
-            .Query(q => q
-                .Term(t => t
-                    .Field(f => f.Index ).Value("blog_search")
-                )
-            )
-            .Sort(sort => sort
-                    .Descending(p => p.Timestamp) 
-            )
-            .Size(1)
-        );
-
-        
-        if (searchResponse.IsValid && searchResponse.Documents.Any())
-        {
-            var lastDocument = searchResponse.Documents.First();
-
-            return Result<MigrationTimestamp?, Err>.Ok(lastDocument);
-        }
-    
-        return Result<MigrationTimestamp?, Err>.Err(new Err("No documents found or an error occurred"));
     }
 
     public async Task<Result<IEnumerable<BlogSearchDoc>?, Err>> SearchBlog(string arg , Paging paging)
@@ -168,7 +139,7 @@ public class EsSearchBlogRepository(EsClient client) : ISearchBlogRepository
                             .Type(TextQueryType.PhrasePrefix)
                         )
                     )
-                    .Filter(filters)  // Áp dụng bộ lọc đã tạo
+                    .Filter(filters)  
                 )
             )
         );
@@ -182,4 +153,54 @@ public class EsSearchBlogRepository(EsClient client) : ISearchBlogRepository
         return Result<IEnumerable<BlogSearchDoc>?, Err>.Err(UtilErrors.InternalServerError(searchResponse.OriginalException));
 }
 
+    public Task<Result<IEnumerable<BlogSearchDoc>?, Err>> RecommendSearchBlogByUser(IRequester requester, Paging paging)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<Result<IEnumerable<BlogSearchDoc>?, Err>> RecommendSearchBlogByBlog(IRequester? requester, BlogSearchDoc searchDoc, Paging paging)
+    {
+        var docs = await client.Client.SearchAsync<BlogSearchDoc>(s => s
+            .Size(paging.PageSize)
+            .From(paging.Page - 1)
+            .Query(q => q
+                .MoreLikeThis( m=> m
+                    .Fields(f => f.Field("title").Field("content"))
+                    .Like(l => l
+                        .Document(d => d
+                        .Id(searchDoc.Id)))
+                    .MinTermFrequency(1)
+                    .MinDocumentFrequency(1)
+                    .MaxQueryTerms(25))
+        ));
+        
+        if (docs.IsValid && docs.Documents.Any())
+        {
+            paging.Total = (int)docs.Total;
+            return Result<IEnumerable<BlogSearchDoc>?, Err>.Ok(docs.Documents);
+        }
+        return Result<IEnumerable<BlogSearchDoc>?, Err>.Err(UtilErrors.InternalServerError(docs.OriginalException));
+    }
+
+    public async Task<Result<IEnumerable<BlogSearchDoc>?, Err>> RandomBlog(int seed, Paging paging)
+    {
+
+        var docs = await client.Client.SearchAsync<BlogSearchDoc>(s => s
+            .Size(paging.PageSize)
+            .From(paging.Page - 1)
+            .Query(q => q
+            .FunctionScore(f => f
+                .Functions(ff => ff
+                    .RandomScore(ss=> ss
+                        .Seed(seed)))))
+        );
+        
+        if (docs.IsValid && docs.Documents.Any())
+        {
+            paging.Total = (int)docs.Total;
+            return Result<IEnumerable<BlogSearchDoc>?, Err>.Ok(docs.Documents);
+        }
+        return Result<IEnumerable<BlogSearchDoc>?, Err>.Err(UtilErrors.InternalServerError(docs.OriginalException));
+
+    }
 }

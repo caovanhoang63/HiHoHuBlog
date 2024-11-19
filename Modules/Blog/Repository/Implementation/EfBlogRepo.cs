@@ -208,12 +208,9 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
 
             if (paging is null)
             {
-                
                 var result = await queryable
                     .Include(b => b.User)
                     .Select(b => b).ToListAsync();
-                
-                
                 return Result<IEnumerable<Entity.Blog>?, Err>.Ok(result);
             }
             

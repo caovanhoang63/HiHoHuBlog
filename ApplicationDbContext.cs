@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using HiHoHuBlog.Modules.Admin.Entity;
 using HiHoHuBlog.Modules.Blog.Entity;
+using HiHoHuBlog.Modules.Tag.Entity;
 using HiHoHuBlog.Modules.User.Entity;
 using HiHoHuBlog.Utils;
 using Microsoft.EntityFrameworkCore;
@@ -17,12 +18,18 @@ public class ApplicationDbContext : DbContext
     
     public DbSet<User> Users { get; set; }
     public DbSet<Blog> Blogs { get; set; }
+    public DbSet<Tag> Tags { get; set; }
+    public DbSet<BlogTag> BlogTags { get; set; }
     public DbSet<BlogBlocked> BlogBlocked { get; set; }
     public DbSet<ReasonBlogBlock> ReasonBlogBlock { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>().ToTable("users");
         modelBuilder.Entity<Blog>().ToTable("blogs");
+        modelBuilder.Entity<Tag>().ToTable("tags");
+        modelBuilder.Entity<BlogTag>().ToTable("blog_tag");
+        modelBuilder.Entity<BlogTag>().HasKey(b => b.TagId);
+        modelBuilder.Entity<BlogTag>().HasKey(b => b.BlogId);
         modelBuilder.Entity<BlogBlocked>().ToTable("blog_blocked");
         modelBuilder.Entity<ReasonBlogBlock>().ToTable("reason_blog_block");
         

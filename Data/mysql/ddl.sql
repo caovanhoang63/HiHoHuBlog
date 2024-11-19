@@ -137,7 +137,6 @@ CREATE TABLE `comments` (
 )ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
 
 
-
 DROP TABLE IF EXISTS `blog_blocked`;
 CREATE TABLE `blog_blocked` (
     `id` INT NOT NULL AUTO_INCREMENT,
@@ -149,3 +148,47 @@ CREATE TABLE `blog_blocked` (
     PRIMARY KEY (`id`),
     KEY `status` (`status`) USING BTREE
 )ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
+
+DROP TABLE IF EXISTS `tags`;
+CREATE TABLE `tags` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(255) NOT NULL,
+    `status` INT NOT NULL DEFAULT '1',
+    `total_blog` INT NOT NULL DEFAULT 0,
+    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `status` (`status`) USING BTREE
+)ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
+
+DROP TABLE IF EXISTS `blog_tag`;
+CREATE TABLE `blog_tag` (
+    `tag_id` INT NOT NULL,
+    `blog_id` INT NOT NULL,
+    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`tag_id`,`blog_id`),
+    KEY `blog_id` (`blog_id`) USING BTREE
+)ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
