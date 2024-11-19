@@ -7,7 +7,7 @@
 @using HiHoHuBlog.Utils
 @inject ISearchBlogService SearchBlogService
 @inject NavigationManager NavigationManager
-
+@inject ISearchTagService SearchTagService
 <Container ContainerClass="flex justify-between space-x-10 max-w-7xl">
     <div class="grow max-w-4xl py-10">
         <div class="text-3xl font-bold ">
@@ -70,7 +70,14 @@
                    @onchange="@(() => ChangeTab(2,"topics"))"/>
             <div role="tabpanel" class="tab-content mt-10">
                 <div class="flex flex-wrap gap-2">
-                    <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live</div>
+                    @if(_searchTag is not null)
+                    {
+                        foreach (var tag in _searchTag)
+                        {
+                            <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">@tag.Name</div>
+                        }
+                    }
+                    @*<div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live</div>
                     <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live Streaming</div>
                     <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Liverpool</div>
                     <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live Music</div>
@@ -87,7 +94,7 @@
                     <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Liverpool</div>
                     <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live Music</div>
                     <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Livestream</div>
-                    <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live Casino</div>
+                    <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live Casino</div>*@
                 </div>
             </div>
         </div>
@@ -128,18 +135,43 @@
     [SupplyParameterFromQuery(Name = "type")] string? Type { get; set; } 
     private int activeTab = 0;
     private Paging Paging = new Paging(1, 3);
+    private Paging PagingTopic = new Paging(1, 10);
     private IEnumerable<BlogSearchDoc>? _searchDocs = new List<BlogSearchDoc>();
+    private IEnumerable<TagSearchDoc>? _searchTag = new List<TagSearchDoc>();
     private async Task HandleCardClick(BlogSearchDoc clickedDoc)
     {
         Console.WriteLine($"Clicked on: {clickedDoc.Title}");
         // Điều hướng hoặc xử lý khác
         NavigationManager.NavigateTo($"/blog/{clickedDoc.Id}");
     }
+
+    private async Task GetSearchTags()
+    {
+        var result = await SearchTagService.SearchTags(SearchTerm, PagingTopic);
+        if (result.IsOk)
+        {
+            Console.WriteLine("Search result");
+            foreach (var val in result.Value)
+            {
+                Console.WriteLine(val.Name);
+            }
+
+            var totalResult = result.Value.Count();
+            _searchTag = result.Value;
+        }
+        else
+        {
+            Console.WriteLine(result.Error);
+            _searchTag = new List<TagSearchDoc>();
+        }
+    }
+    
     
     // Chuyển từ OnInitializedAsync sang OnParametersSetAsync
     protected override async Task OnParametersSetAsync()
     {
         await GetBlogs();
+        await GetSearchTags();
     }
     private bool ShouldDisplayPage(int page)
     {
@@ -177,7 +209,8 @@
         }
     }
     private async Task GetBlogs()
-    {if (string.IsNullOrEmpty(SearchTerm))
+    {
+        if (string.IsNullOrEmpty(SearchTerm))
         {
             SearchTerm = "";
         }
