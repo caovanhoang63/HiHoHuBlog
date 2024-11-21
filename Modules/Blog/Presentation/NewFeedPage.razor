@@ -54,32 +54,20 @@
     {
         _requester = await AuthUtils.GetInfo(authenticationStateTask);
         seed = Guid.NewGuid().GetHashCode();
+        
+        var r = _requester is null ? 
+            await BlogSearch.RandomBlog(seed, _paging) : 
+            await BlogSearch.RecommendSearchBlogByUser(_requester,seed,_paging);
 
-        if (_requester is null)
+        if (r.IsOk)
         {
-            var r = await BlogSearch.RandomBlog(seed, _paging);
-            if (r.IsOk)
-            {
-                _blogs = r.Value;
-            }
-            else
-            {
-                ToastService.ShowError(r.Error.Message);
-            }
+            _blogs = r.Value;
         }
         else
         {
-             var r = await BlogSearch.RecommendSearchBlogByUser(_requester,seed,_paging);
-             Console.WriteLine(seed);
-            if (r.IsOk)
-            {
-                _blogs = r.Value;
-            }
-            else
-            {
-                ToastService.ShowError(r.Error.Message);
-            }
+            ToastService.ShowError(r.Error.Message);
         }
+       
     }
 
 }
