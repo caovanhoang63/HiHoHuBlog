@@ -4,7 +4,7 @@ namespace HiHoHuBlog.Utils;
 
 public static class GetThumbnail
 {
-    public static async Task<Image> GetThumbnailFromHtml(string htmlContent)
+    public static async Task<Image?> GetThumbnailFromHtml(string htmlContent)
     {
         var doc = new HtmlDocument();
         doc.LoadHtml(htmlContent);
