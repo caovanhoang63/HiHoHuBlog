@@ -1,0 +1,126 @@
+﻿@using HiHoHuBlog.Modules.User.Entity
+@using HiHoHuBlog.Modules.User.Service.Interface
+@using HiHoHuBlog.Utils
+@inject IUploadProvider UploadProvider
+
+<div>
+    <dialog id="profile_modal" class="modal">
+        <div class="modal-box ">
+            <InputFile id="hiddenFileInput" class="hidden" OnChange="HandleSelectedFiles"  />
+            <h3 class="text-lg font-bold text-center">Profile Information</h3>
+            <div class="flex flex-col w-full space-y-5">
+                <div class="flex flex-col justify-between space-y-2">
+                    <p class="text-sm font-medium">Photo</p>
+                    <div class="flex w-full justify-between space-x-5">
+                        <label class="avatar cursor-pointer" for="hiddenFileInput">
+                            <div class="w-20 rounded-full">
+                                <img  src=" @(NewImage is not null  ? NewImage.Url : _userSettingsProfile?.Avatar?.Url is not null 
+                                        ? _userSettingsProfile.Avatar.Url :
+                                        "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp")"
+                                     alt="Tailwind CSS Navbar component"/>
+                            </div>
+                        </label>
+                        <div class="flex flex-col w-full">
+                            <div class="flex space-x-4">
+                                <label class="cursor-pointer text-green-600" for="hiddenFileInput">Update</label>
+                                <p class="cursor-pointer text-red-600">Remove</p>
+                            </div>
+                            <p class="text-sm font-normal">Recommended: Square JPG, PNG, or GIF, at least 1,000 pixels
+                                per side.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-col w-full space-y-2">
+                    <p class="text-sm font-medium">First Name</p>
+                    <input  type="text" placeholder="First Name" class="input input-bordered w-full"/>
+
+                </div>
+                <div class="flex flex-col w-full space-y-2">
+                    <p class="text-sm font-medium">Last Name</p>
+                    <input  type="text" placeholder="Last Name" class="input input-bordered w-full"/>
+
+                </div>
+                <div class="flex flex-col w-full space-y-2">
+                    <p class="text-sm font-medium">Short bio</p>
+                    <textarea placeholder="Short bio" class="textarea textarea-bordered"></textarea>
+
+                </div>
+            </div>
+            <div class="modal-action">
+                <!-- if there is a button in form, it will close the modal -->
+                <button  class="btn btn-success rounded-full text-white">Save</button>
+                <button @onclick="() => { NewImage=null;}" class="btn rounded-full text-success">Close</button>
+            </div>
+        </div>
+    </dialog>    
+</div>
+
+
+@code {
+    [Parameter] public bool Open { get; set; }
+    [Parameter] public string? Type { get; set; }
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Message { get; set; }
+    [Parameter] public EventCallback<UserSettingsProfile?> OnConfirm { get; set; }
+    [Parameter] public EventCallback OnDeny { get; set; }
+    [Parameter] public UserSettingsProfile? _userSettingsProfile { get; set; }
+    private UserSettingsProfile? UserSettingsProfile { get; set; } = new UserSettingsProfile();
+    private Image? NewImage { get; set; }
+    private string? FirstName { get; set; } = "";
+    private string? LastName { get; set; }="";
+    private string? ShortBio { get; set; }="";
+    private IBrowserFile? _selectedFile;
+    private IEnumerable<IBrowserFile>? _selectedFiles;
+
+    private void Confirm()
+    {
+        if (UserSettingsProfile != null)
+        {
+            UserSettingsProfile.FirstName = FirstName;
+            UserSettingsProfile.LastName = LastName;
+            UserSettingsProfile.ShortBio = ShortBio;
+        }
+        Console.WriteLine(UserSettingsProfile.FirstName);
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        FirstName = _userSettingsProfile?.FirstName;
+        LastName = _userSettingsProfile?.LastName;
+        ShortBio = _userSettingsProfile?.ShortBio;
+    }
+
+    private async Task<Result<Image, Err>> HandleSelectedFiles(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        var allowedFormats = new[] { "image/jpeg", "image/png", "image/gif", "image/bmp", "image/tiff" };
+        if (!allowedFormats.Contains(file.ContentType))
+        {
+            Console.WriteLine("Only image files (JPEG, PNG, GIF, BMP, TIFF) are allowed.");
+            return Result<Image, Err>.Err(new Err("Only image files are allowed"));
+            
+        }
+
+        var resizedImageFile = await file.RequestImageFileAsync(file.ContentType, 800, 600);
+        using var stream = resizedImageFile.OpenReadStream(resizedImageFile.Size);
+        using var memoryStream = new MemoryStream();
+        await stream.CopyToAsync(memoryStream);
+        var base64String = Convert.ToBase64String(memoryStream.ToArray());
+        // Convert base64 to bytes
+        byte[] fileData = Convert.FromBase64String(base64String);
+
+        // Generate unique filename with original extension
+        string extension = Path.GetExtension(file.Name);
+        string newFileName = $"{Guid.NewGuid()}{extension}";
+        var result = await UploadProvider.UploadImage(fileData, newFileName);
+        if (!result.IsOk)
+        {
+            return Result<Image, Err>.Err(result.Error);
+        }
+
+        NewImage = result.Value;
+        _userSettingsProfile.Avatar = result.Value;
+        return Result<Image,Err>.Ok(result.Value);
+    }
+}

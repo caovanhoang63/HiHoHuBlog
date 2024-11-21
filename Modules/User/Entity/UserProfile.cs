@@ -2,7 +2,7 @@
 
 namespace HiHoHuBlog.Modules.User.Entity;
 
-public class UserProfile
+public class UserProfile :BaseEntity
 {
     public int Id { get; set; }
     public string Email { get; set; }
