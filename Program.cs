@@ -80,6 +80,7 @@ builder.Services.AddScoped<ITagRepository, EfTagRepository>();
 builder.Services.AddScoped<IBlogTagRepository, EfBlogTagRepo>();
 builder.Services.AddScoped<IMigrationRepository, EsMigrationRepository>();
 builder.Services.AddScoped<ISearchTagRepository, EsSearchTagRepository>();
+builder.Services.AddScoped<IUserBlogActionRepository, EfUserBlogActionRepo>();
 
 builder.Services.AddScoped<IUserSignUpService, UserSignUpService>();
 builder.Services.AddScoped<IUserLoginService, UserLoginService>();
@@ -88,6 +89,7 @@ builder.Services.AddScoped<IBlogBlockedService,BlogBlockedService>();
 builder.Services.AddScoped<IReasonBlogBlockService,ReasonBlogBlockService>();
 builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+builder.Services.AddScoped<IUserBlogActionService, UserBlogActionService>();
 
 builder.Services.AddScoped<ICreateBlogService,CreateBlogService>();
 builder.Services.AddScoped<IBlogUpdateService, BlogUpdateService>();

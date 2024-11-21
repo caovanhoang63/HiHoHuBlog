@@ -121,10 +121,15 @@ CREATE TABLE  `bookmarks` (
 
 DROP TABLE IF EXISTS `user_read_blogs`;
 CREATE TABLE  `user_read_blogs` (
-                                    `user_id` INT,
-                                    `blog_id` INT,
-                                    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                                    PRIMARY KEY (`user_id`,`blog_id`)
+                            `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+                            `user_id` INT,
+                            `blog_id` INT,
+                            `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+                            `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                            PRIMARY KEY (`id`),
+                            KEY `user_id` (`user_id`) USING BTREE,
+                            KEY `blog_id` (`blog_id`) USING BTREE,
+                            KEY `updated_at` (`updated_at`) USING BTREE 
 )ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
 
 DROP TABLE IF EXISTS `comments`;
