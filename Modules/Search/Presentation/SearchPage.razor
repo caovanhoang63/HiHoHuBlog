@@ -8,6 +8,8 @@
 @inject ISearchBlogService SearchBlogService
 @inject NavigationManager NavigationManager
 @inject ISearchTagService SearchTagService
+@inject ISearchUserService SearchUserService
+
 <Container ContainerClass="flex justify-between space-x-10 max-w-7xl">
     <div class="grow max-w-4xl py-10">
         <div class="text-3xl font-bold ">
@@ -59,11 +61,14 @@
                 checked="@isActiveTab(1)"
                 @onchange="@(() => ChangeTab(1,"people"))"/>
             <div role="tabpanel" class="tab-content">
-                @*Row Children*@
-                <MatchingPeopleCard/>
-                <MatchingPeopleCard/>
-
-
+                @if (_searchUser is not null)
+                {
+                    @foreach (var user in _searchUser)
+                    {
+                        <MatchingPeopleCard User="user"/>
+                    }    
+                }
+                
             </div>
 
             <input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="Topics" checked="@isActiveTab(2)"
@@ -138,24 +143,20 @@
     private Paging PagingTopic = new Paging(1, 10);
     private IEnumerable<BlogSearchDoc>? _searchDocs = new List<BlogSearchDoc>();
     private IEnumerable<TagSearchDoc>? _searchTag = new List<TagSearchDoc>();
+    private IEnumerable<UserSearchDoc>? _searchUser = new List<UserSearchDoc>();
     
     private async Task GetSearchTags()
     {
         var result = await SearchTagService.SearchTags(SearchTerm, PagingTopic);
         if (result.IsOk)
         {
-            Console.WriteLine("Search result");
-            foreach (var val in result.Value)
-            {
-                Console.WriteLine(val.Name);
-            }
+
 
             var totalResult = result.Value.Count();
             _searchTag = result.Value;
         }
         else
         {
-            Console.WriteLine(result.Error);
             _searchTag = new List<TagSearchDoc>();
         }
     }
@@ -166,6 +167,7 @@
     {
         await GetBlogs();
         await GetSearchTags();
+        await GetUsers();
     }
     private bool ShouldDisplayPage(int page)
     {
@@ -202,6 +204,35 @@
             await GetBlogs();
         }
     }
+    
+    private async Task GetUsers()
+    {
+        if (string.IsNullOrEmpty(SearchTerm))
+        {
+            SearchTerm = "";
+        }
+        if (!string.IsNullOrEmpty(Type))
+        {
+            activeTab = Type switch
+            {
+                "blogs" => 0,
+                "people" => 1,
+                "topics" => 2,
+                _ => 0
+            };
+        }
+        
+        var result = await SearchUserService.SearchUsers(SearchTerm, Paging);
+        if (result.IsOk)
+        {
+            _searchUser = result.Value;
+            foreach (var user in _searchUser)
+            {
+                Console.WriteLine(user.UserName);
+            }
+        }
+    }
+    
     private async Task GetBlogs()
     {
         if (string.IsNullOrEmpty(SearchTerm))
@@ -223,18 +254,13 @@
         var result = await SearchBlogService.SearchBlog(SearchTerm, Paging);
         if (result.IsOk)
         {
-            Console.WriteLine("Search result");
-            foreach (var val in result.Value)
-            {
-                Console.WriteLine(val.Title);
-            }
+
 
             var totalResult = result.Value.Count();
             _searchDocs = result.Value;
         }
         else
         {
-            Console.WriteLine(result.Error);
             _searchDocs = new List<BlogSearchDoc>();
         }
     }
