@@ -3,6 +3,7 @@ using HiHoHuBlog.Modules.User.Entity;
 using HiHoHuBlog.Utils;
 using Microsoft.EntityFrameworkCore;
 using HiHoHuBlog.Utils;
+using Newtonsoft.Json;
 
 namespace HiHoHuBlog.Modules.User.Repository.Implementation;
 
@@ -83,6 +84,7 @@ public class EfRepo  : IUserRepository
             var r = await queryable
                 .Include(b => b.UserDetails)
                 .Select(b => b).ToListAsync();
+            
             return Result<IEnumerable<Entity.User>, Err>.Ok(r);
         }
         catch (Exception ex)
@@ -220,4 +222,6 @@ public class EfRepo  : IUserRepository
         }
         
     }
+    
+    
 }

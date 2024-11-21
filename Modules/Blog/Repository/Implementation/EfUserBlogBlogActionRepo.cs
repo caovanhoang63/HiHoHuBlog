@@ -56,10 +56,6 @@ public class EfUserBlogActionRepo(ApplicationDbContext context, IMapper mapper) 
                 .OrderByDescending(b  => b.UpdatedAt)
                 .Select(b => _mapper.Map<UserReadBlogList>(b)).ToListAsync();
 
-            foreach (var list in lists)
-            {
-                Console.WriteLine(JsonConvert.SerializeObject(list));
-            }
             
             return Result<IEnumerable<UserReadBlogList>?, Err>.Ok(lists);
         }
