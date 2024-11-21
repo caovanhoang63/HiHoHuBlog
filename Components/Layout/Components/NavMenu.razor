@@ -1,3 +1,4 @@
+@using HiHoHuBlog.Utils
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRuntime
 
@@ -78,7 +79,7 @@
                         tabindex="0"
                         class="menu menu-sm dropdown-content bg-white rounded-box z-[1] mt-3 w-52 p-2 shadow">
                         <li>
-                            <a href="/profile" class="justify-between">
+                            <a href="/profile/@_requester.GetUsername()" class="justify-between">
                                 Profile
                                 <span class="">New</span>
                             </a>
@@ -107,6 +108,15 @@
     private bool _isRemovingItem = false;
 
     
+    private IRequester _requester;
+    [CascadingParameter] 
+    Task<AuthenticationState> authenticationStateTask { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        _requester = await AuthUtils.GetInfo(authenticationStateTask); 
+        Console.WriteLine(_requester.GetUsername());
+        Console.WriteLine(_requester.GetSystemRole());
+    }
     
     private async Task OnSubmitSearch()
     {
