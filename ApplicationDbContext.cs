@@ -16,6 +16,7 @@ public class ApplicationDbContext : DbContext
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options):base(options){}
     
     public DbSet<User> Users { get; set; }
+    public DbSet<UserDetails> UserDetails { get; set; }
     public DbSet<Blog> Blogs { get; set; }
     public DbSet<BlogBlocked> BlogBlocked { get; set; }
     public DbSet<ReasonBlogBlock> ReasonBlogBlock { get; set; }
@@ -23,6 +24,7 @@ public class ApplicationDbContext : DbContext
     {
         modelBuilder.Entity<User>().ToTable("users");
         modelBuilder.Entity<Blog>().ToTable("blogs");
+        modelBuilder.Entity<UserDetails>().ToTable("user_details");
         modelBuilder.Entity<BlogBlocked>().ToTable("blog_blocked");
         modelBuilder.Entity<ReasonBlogBlock>().ToTable("reason_blog_block");
         

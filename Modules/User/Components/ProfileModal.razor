@@ -1,19 +1,22 @@
-﻿@using HiHoHuBlog.Utils
+﻿@using HiHoHuBlog.Modules.User.Entity
+@using HiHoHuBlog.Modules.User.Service.Interface
+@using HiHoHuBlog.Utils
 @inject IUploadProvider UploadProvider
 
-
 <div>
-    <dialog id="my_modal_1" class="modal @(Open ? "modal-open" : " ")">
+    <dialog id="profile_modal" class="modal">
         <div class="modal-box ">
             <InputFile id="hiddenFileInput" class="hidden" OnChange="HandleSelectedFiles"  />
-            <h3 class="text-lg font-bold text-center">@Title</h3>
+            <h3 class="text-lg font-bold text-center">Profile Information</h3>
             <div class="flex flex-col w-full space-y-5">
                 <div class="flex flex-col justify-between space-y-2">
                     <p class="text-sm font-medium">Photo</p>
                     <div class="flex w-full justify-between space-x-5">
                         <label class="avatar cursor-pointer" for="hiddenFileInput">
                             <div class="w-20 rounded-full">
-                                <img src=" @(newImage is not null ? newImage : "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp")"
+                                <img  src=" @(NewImage is not null  ? NewImage.Url : _userSettingsProfile?.Avatar?.Url is not null 
+                                        ? _userSettingsProfile.Avatar.Url :
+                                        "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp")"
                                      alt="Tailwind CSS Navbar component"/>
                             </div>
                         </label>
@@ -28,8 +31,13 @@
                     </div>
                 </div>
                 <div class="flex flex-col w-full space-y-2">
-                    <p class="text-sm font-medium">Name*</p>
-                    <input type="text" placeholder="Name" class="input input-bordered w-full"/>
+                    <p class="text-sm font-medium">First Name</p>
+                    <input  type="text" placeholder="First Name" class="input input-bordered w-full"/>
+
+                </div>
+                <div class="flex flex-col w-full space-y-2">
+                    <p class="text-sm font-medium">Last Name</p>
+                    <input  type="text" placeholder="Last Name" class="input input-bordered w-full"/>
 
                 </div>
                 <div class="flex flex-col w-full space-y-2">
@@ -40,8 +48,8 @@
             </div>
             <div class="modal-action">
                 <!-- if there is a button in form, it will close the modal -->
-                <button @onclick="OnConfirm" class="btn btn-success rounded-full text-white">Save</button>
-                <button @onclick="OnDeny" class="btn rounded-full text-success">Close</button>
+                <button  class="btn btn-success rounded-full text-white">Save</button>
+                <button @onclick="() => { NewImage=null;}" class="btn rounded-full text-success">Close</button>
             </div>
         </div>
     </dialog>    
@@ -53,14 +61,35 @@
     [Parameter] public string? Type { get; set; }
     [Parameter] public string? Title { get; set; }
     [Parameter] public string? Message { get; set; }
-    [Parameter] public EventCallback OnConfirm { get; set; }
+    [Parameter] public EventCallback<UserSettingsProfile?> OnConfirm { get; set; }
     [Parameter] public EventCallback OnDeny { get; set; }
-    
-    public Image newImage { get; set; }
-    
-    private InputFile? fileInputElement;
-    private IBrowserFile? selectedFile;
-    private IEnumerable<IBrowserFile>? selectedFiles;
+    [Parameter] public UserSettingsProfile? _userSettingsProfile { get; set; }
+    private UserSettingsProfile? UserSettingsProfile { get; set; } = new UserSettingsProfile();
+    private Image? NewImage { get; set; }
+    private string? FirstName { get; set; } = "";
+    private string? LastName { get; set; }="";
+    private string? ShortBio { get; set; }="";
+    private IBrowserFile? _selectedFile;
+    private IEnumerable<IBrowserFile>? _selectedFiles;
+
+    private void Confirm()
+    {
+        if (UserSettingsProfile != null)
+        {
+            UserSettingsProfile.FirstName = FirstName;
+            UserSettingsProfile.LastName = LastName;
+            UserSettingsProfile.ShortBio = ShortBio;
+        }
+        Console.WriteLine(UserSettingsProfile.FirstName);
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        FirstName = _userSettingsProfile?.FirstName;
+        LastName = _userSettingsProfile?.LastName;
+        ShortBio = _userSettingsProfile?.ShortBio;
+    }
 
     private async Task<Result<Image, Err>> HandleSelectedFiles(InputFileChangeEventArgs e)
     {
@@ -90,8 +119,8 @@
             return Result<Image, Err>.Err(result.Error);
         }
 
-        newImage = result.Value;
-        Console.WriteLine(newImage.ToString());
+        NewImage = result.Value;
+        _userSettingsProfile.Avatar = result.Value;
         return Result<Image,Err>.Ok(result.Value);
     }
 }

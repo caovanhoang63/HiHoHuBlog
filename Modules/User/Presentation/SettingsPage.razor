@@ -13,9 +13,67 @@
 @using HiHoHuBlog.Modules.User.Components
 @layout MainLayout
 @inject IUserProfileService UserProfileService
+@inject IUserSettingsService UserSettingsService
 @inject IBlogGetService BlogGetService
+@inject IUploadProvider UploadProvider
 <Container ContainerClass="flex justify-between space-x-10 max-w-7xl">
-    <ProfileModal Open="true" Title="Profile information"></ProfileModal>
+    <dialog id="profile_modal" class="modal">
+        <div class="modal-box ">
+            <InputFile id="hiddenFileInput" class="hidden" OnChange="HandleSelectedFiles"  />
+            <h3 class="text-lg font-bold text-center">Profile Information</h3>
+            <div class="flex flex-col w-full space-y-5">
+                <div class="flex flex-col justify-between space-y-2">
+                    <p class="text-sm font-medium">Photo</p>
+                    <div class="flex w-full justify-between space-x-5">
+                        <label class="avatar cursor-pointer" for="hiddenFileInput">
+                            <div class="w-20 rounded-full">
+                                <img  src=" @(NewImage is not null  ? NewImage.Url : UserSettingsProfile?.Avatar?.Url is not null
+                                                ? UserSettingsProfile.Avatar.Url :
+                                                BaseImage)"
+                                      alt="Tailwind CSS Navbar component"/>
+                            </div>
+                        </label>
+                        <div class="flex flex-col w-full">
+                            <div class="flex space-x-4">
+                                <label class="cursor-pointer text-green-600" for="hiddenFileInput">Update</label>
+                                <p class="cursor-pointer text-red-600" @onclick="()=>{NewImage = null;
+                                                                           UserSettingsProfile.Avatar=null;
+                                                                           StateHasChanged();}">Remove
+                                    </p>
+                            </div>
+                            <p class="text-sm font-normal">Recommended: Square JPG, PNG, or GIF, at least 1,000 pixels
+                                per side.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-col w-full space-y-2">
+                    <p class="text-sm font-medium">First Name</p>
+                    <input @bind="@FirstName"  type="text" placeholder="First Name" class="input input-bordered w-full"/>
+
+                </div>
+                <div class="flex flex-col w-full space-y-2">
+                    <p class="text-sm font-medium">Last Name</p>
+                    <input @bind="@LastName" type="text" placeholder="Last Name" class="input input-bordered w-full"/>
+
+                </div>
+                <div class="flex flex-col w-full space-y-2">
+                    <p class="text-sm font-medium">Short bio</p>
+                    <textarea @bind="@ShortBio" placeholder="Short bio" class="textarea textarea-bordered"></textarea>
+
+                </div>
+            </div>
+            <div class="modal-action">
+                <form method="dialog">
+                <!-- if there is a button in form, it will close the modal -->
+                <button @onclick="SaveModal" class="btn btn-success rounded-full text-white">Save</button>
+                <button @onclick="() => { NewImage = null; }" class="btn rounded-full text-success">Close</button>
+                </form>
+            </div>
+        </div>
+    </dialog>
+    @*
+    <ProfileModal _userSettingsProfile="UserSettingsProfile" OnConfirm="SaveModal" OnDeny="CloseProfileInformation" Open="IsOpenProfileModal" Title="Profile information"></ProfileModal>
+    *@
     <div class="max-w-4xl py-10 w-full">
         <div class="flex flex-col justify-between space-y-10 px-8 mt-3 mb-4">
             <div class="flex justify-between">
@@ -44,7 +102,8 @@
                             <span class=" font-sans text-sm">Username and subdomain</span>
                             <span class=" font-sans text-sm">@UserProfile?.UserName</span>
                         </div>
-                        <div class="max-w-full flex justify-between items-center hover:cursor-pointer">
+                        <div class="max-w-full flex justify-between items-center hover:cursor-pointer"
+                             onclick="profile_modal.showModal()">
                             <span class=" font-sans text-sm">Profile infomation</span>
                             <span class=" font-sans text-sm">@Name</span>
                         </div>
@@ -100,29 +159,105 @@
 
         </div>
     </div>
-
 </Container>
 @code {
     [Parameter]
-    public string Username { get; set; }
-    public string Name { get; set; }
-    public UserProfile UserProfile { get; set; }
+    public string? Username { get; set; }
+    public string? Name { get; set; }
+    public UserProfile? UserProfile { get; set; }
+    public UserSettingsProfile? UserSettingsProfile { get; set; }
     [CascadingParameter] 
     Task<AuthenticationState> authenticationStateTask { get; set; }
-    public IRequester requester;
+    public IRequester? Requester;
+    private Image? NewImage { get; set; }
+    [Parameter]
+    public string? FirstName { get; set; } = "";
+    [Parameter]
+    public string? LastName { get; set; }="";
+    [Parameter]
+    public string? ShortBio { get; set; }="";
+
+    private const string BaseImage = "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp";
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        requester = await AuthUtils.GetInfo(authenticationStateTask);
-        var r = await UserProfileService.GetUserProfile(requester.GetUsername());
+        Requester = await AuthUtils.GetInfo(authenticationStateTask);
+        var r = await UserProfileService.GetUserProfile(Requester.GetUsername());
         if (!r.IsOk || r.Value is null)
         {
             Console.WriteLine(r.Error.Message);
             return;
         }
         UserProfile = r.Value;
-        Name = UserProfile.FirstName +" "+  UserProfile.LastName;
+        Name = UserProfile.LastName +" "+ UserProfile.FirstName ;
+        var u = await UserSettingsService.GetProfileInformation(Requester.GetUsername());
+        if (!u.IsOk)
+        {
+            Console.WriteLine(u.Error.Message);
+            return;
+        }
+        UserSettingsProfile = u.Value;
+        FirstName = UserSettingsProfile?.FirstName;
+        LastName = UserSettingsProfile?.LastName;
+        ShortBio = UserSettingsProfile?.ShortBio;
+    }
+
+    private async void SaveModal()
+    {
+        
+        if (UserSettingsProfile != null)
+        {
+            UserSettingsProfile.FirstName = FirstName;
+            UserSettingsProfile.LastName = LastName;
+            UserSettingsProfile.ShortBio = ShortBio;
+            Name =LastName + " " + FirstName ;
+            Console.WriteLine(FirstName);
+            Console.WriteLine("UserSettingsProfile.FirstName");
+                var u = await UserSettingsService.UpdateProfileInformation(Requester,UserSettingsProfile);
+                if (!u.IsOk)
+                {
+                    Console.WriteLine(u.Error.Message);
+                    Console.WriteLine("Loi r");
+                    return;
+                }
+                Console.WriteLine("Cap nhat thanh cong");
+        }
+
+        StateHasChanged();
     }
     
+    private async Task<Result<Image, Err>> HandleSelectedFiles(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        var allowedFormats = new[] { "image/jpeg", "image/png" };
+        if (!allowedFormats.Contains(file.ContentType))
+        {
+            Console.WriteLine("Only image files (JPEG, PNG) are allowed.");
+            return Result<Image, Err>.Err(new Err("Only image files are allowed"));
+            
+        }
 
+        var resizedImageFile = await file.RequestImageFileAsync(file.ContentType, 800, 600);
+        using var stream = resizedImageFile.OpenReadStream(resizedImageFile.Size);
+        using var memoryStream = new MemoryStream();
+        await stream.CopyToAsync(memoryStream);
+        var base64String = Convert.ToBase64String(memoryStream.ToArray());
+        // Convert base64 to bytes
+        byte[] fileData = Convert.FromBase64String(base64String);
+
+        // Generate unique filename with original extension
+        string extension = Path.GetExtension(file.Name);
+        string newFileName = $"{Guid.NewGuid()}{extension}";
+        var result = await UploadProvider.UploadImage(fileData, newFileName);
+        if (!result.IsOk)
+        {
+            return Result<Image, Err>.Err(result.Error);
+        }
+
+        NewImage = result.Value;
+        //NewImage = $"data:image/png;base64,{base64String}";
+        if (UserSettingsProfile != null) UserSettingsProfile.Avatar = result.Value;
+        return Result<Image,Err>.Ok(result.Value);
+    }
 }
