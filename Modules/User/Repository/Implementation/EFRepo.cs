@@ -129,7 +129,7 @@ public class EfRepo  : IUserRepository
         {
             var userSettingsProfile = await  (
                     from u in _dbSet
-                    join ud in _dbDetailsSet on u.Id equals ud.Id into detailsGroup
+                    join ud in _dbDetailsSet on u.Id equals ud.UserId into detailsGroup
                     from ud in detailsGroup.DefaultIfEmpty()
                     where (u.UserName == userName)
                         select new UserSettingsProfile()
