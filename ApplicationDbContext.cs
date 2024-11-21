@@ -17,6 +17,7 @@ public class ApplicationDbContext : DbContext
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options):base(options){}
     
     public DbSet<User> Users { get; set; }
+    public DbSet<UserDetails> UserDetails { get; set; }
     public DbSet<Blog> Blogs { get; set; }
     public DbSet<Tag> Tags { get; set; }
     public DbSet<BlogTag> BlogTags { get; set; }
@@ -31,6 +32,7 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<BlogTag>().ToTable("blog_tag");
         modelBuilder.Entity<BlogTag>().HasKey(b => b.TagId);
         modelBuilder.Entity<BlogTag>().HasKey(b => b.BlogId);
+        modelBuilder.Entity<UserDetails>().ToTable("user_details");
         modelBuilder.Entity<BlogBlocked>().ToTable("blog_blocked");
         modelBuilder.Entity<ReasonBlogBlock>().ToTable("reason_blog_block");
         modelBuilder.Entity<UserReadBlog>().ToTable("user_read_blogs");

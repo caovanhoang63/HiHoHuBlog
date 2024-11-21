@@ -90,6 +90,7 @@ builder.Services.AddScoped<IReasonBlogBlockService,ReasonBlogBlockService>();
 builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 builder.Services.AddScoped<IUserBlogActionService, UserBlogActionService>();
+builder.Services.AddScoped<IUserSettingsService, UserSettingsService>();
 
 builder.Services.AddScoped<ICreateBlogService,CreateBlogService>();
 builder.Services.AddScoped<IBlogUpdateService, BlogUpdateService>();
