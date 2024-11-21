@@ -17,9 +17,12 @@
 @inject IBlogGetService BlogGetService
 @inject IUploadProvider UploadProvider
 <Container ContainerClass="flex justify-between space-x-10 max-w-7xl">
-    <dialog id="profile_modal" class="modal">
+    <FullScreenSpinner IsLoading="IsLoading"></FullScreenSpinner>
+    @if (!IsLoading)
+    {
+        <dialog id="profile_modal" class="modal">
         <div class="modal-box ">
-            <InputFile id="hiddenFileInput" class="hidden" OnChange="HandleSelectedFiles"  />
+            <InputFile id="hiddenFileInput" class="hidden" OnChange="HandleSelectedFiles"/>
             <h3 class="text-lg font-bold text-center">Profile Information</h3>
             <div class="flex flex-col w-full space-y-5">
                 <div class="flex flex-col justify-between space-y-2">
@@ -27,19 +30,15 @@
                     <div class="flex w-full justify-between space-x-5">
                         <label class="avatar cursor-pointer" for="hiddenFileInput">
                             <div class="w-20 rounded-full">
-                                <img  src=" @(NewImage is not null  ? NewImage.Url : UserSettingsProfile?.Avatar?.Url is not null
-                                                ? UserSettingsProfile.Avatar.Url :
-                                                BaseImage)"
-                                      alt="Tailwind CSS Navbar component"/>
+                                <img src=" @(NewImage is not null ? NewImage.Url : UserSettingsProfile?.Avatar?.Url is not null ? UserSettingsProfile.Avatar.Url : BaseImage)"
+                                     alt="Tailwind CSS Navbar component"/>
                             </div>
                         </label>
                         <div class="flex flex-col w-full">
                             <div class="flex space-x-4">
                                 <label class="cursor-pointer text-green-600" for="hiddenFileInput">Update</label>
-                                <p class="cursor-pointer text-red-600" @onclick="()=>{NewImage = null;
-                                                                           UserSettingsProfile.Avatar=null;
-                                                                           StateHasChanged();}">Remove
-                                    </p>
+                                <p class="cursor-pointer text-red-600" @onclick="() => { NewImage = null; UserSettingsProfile.Avatar = null; StateHasChanged(); }">Remove
+                                </p>
                             </div>
                             <p class="text-sm font-normal">Recommended: Square JPG, PNG, or GIF, at least 1,000 pixels
                                 per side.</p>
@@ -48,7 +47,7 @@
                 </div>
                 <div class="flex flex-col w-full space-y-2">
                     <p class="text-sm font-medium">First Name</p>
-                    <input @bind="@FirstName"  type="text" placeholder="First Name" class="input input-bordered w-full"/>
+                    <input @bind="@FirstName" type="text" placeholder="First Name" class="input input-bordered w-full"/>
 
                 </div>
                 <div class="flex flex-col w-full space-y-2">
@@ -64,9 +63,9 @@
             </div>
             <div class="modal-action">
                 <form method="dialog">
-                <!-- if there is a button in form, it will close the modal -->
-                <button @onclick="SaveModal" class="btn btn-success rounded-full text-white">Save</button>
-                <button @onclick="() => { NewImage = null; }" class="btn rounded-full text-success">Close</button>
+                    <!-- if there is a button in form, it will close the modal -->
+                    <button @onclick="SaveModal" class="btn btn-success rounded-full text-white">Save</button>
+                    <button @onclick="() => { NewImage = null; }" class="btn rounded-full text-success">Close</button>
                 </form>
             </div>
         </div>
@@ -142,7 +141,7 @@
         <div class="flex flex-col sticky top-20">
             <div class="avatar">
                 <div class="w-24 rounded-full">
-                    <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                    <img src=" @(UserSettingsProfile?.Avatar?.Url is not null ? UserSettingsProfile.Avatar.Url : BaseImage)"
                          alt="Tailwind CSS Navbar component"/>
                 </div>
             </div>
@@ -159,6 +158,8 @@
 
         </div>
     </div>
+    }
+    
 </Container>
 @code {
     [Parameter]
@@ -176,13 +177,18 @@
     public string? LastName { get; set; }="";
     [Parameter]
     public string? ShortBio { get; set; }="";
+    public bool IsLoading { get; set; } = false;
 
     private const string BaseImage = "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp";
 
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
         Requester = await AuthUtils.GetInfo(authenticationStateTask);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        IsLoading = true;
         var r = await UserProfileService.GetUserProfile(Requester.GetUsername());
         if (!r.IsOk || r.Value is null)
         {
@@ -201,6 +207,7 @@
         FirstName = UserSettingsProfile?.FirstName;
         LastName = UserSettingsProfile?.LastName;
         ShortBio = UserSettingsProfile?.ShortBio;
+        IsLoading = false;
     }
 
     private async void SaveModal()
