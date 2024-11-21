@@ -43,7 +43,54 @@ public class EfRepo  : IUserRepository
 
         return Result<Entity.User?, Err>.Ok(user);
     }
-    
+
+    public async Task<Result<IEnumerable<Entity.User>, Err>> ListUsers(UserFilter? filter, Paging? paging)
+    {
+        var queryable = _dbSet.AsQueryable();
+        if (filter != null)
+        {
+            if (filter.Status is not null)
+            {
+                queryable = queryable.Where(b => filter.Status.Contains(b.Status));
+            }
+            if (filter.LtCreatedAt is not null)
+            {
+                queryable = queryable.Where(b => b.CreatedAt <= filter.LtCreatedAt);
+            }
+            if (filter.GtCreatedAt is not null)
+            {
+                queryable = queryable.Where(b => b.CreatedAt >= filter.GtCreatedAt);
+            }
+                
+            if (filter.LtUpdatedAt is not null)
+            {
+                queryable = queryable.Where(b => b.UpdatedAt <= filter.LtUpdatedAt);
+            }
+            if (filter.GtUpdatedAt is not null)
+            {
+                queryable = queryable.Where(b => b.UpdatedAt >= filter.GtUpdatedAt);
+            }
+        }
+
+        if (paging is not null)
+        {
+            queryable =  queryable.Skip(paging.GetOffSet())
+                .Take(paging.PageSize);
+        }
+        
+        try
+        {
+            var r = await queryable
+                .Include(b => b.UserDetails)
+                .Select(b => b).ToListAsync();
+            return Result<IEnumerable<Entity.User>, Err>.Ok(r);
+        }
+        catch (Exception ex)
+        {
+            return Result<IEnumerable<Entity.User>, Err>.Err(UtilErrors.InternalServerError(ex));
+        }
+    }
+
     public async Task<Result<Entity.User?, Err>> FindByEmailAndUserName(string email,string userName)
     {
         var user = await _dbSet.Where(u => u.Email == email )

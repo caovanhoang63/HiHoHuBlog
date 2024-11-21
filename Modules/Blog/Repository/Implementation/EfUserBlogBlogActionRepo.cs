@@ -2,6 +2,7 @@ using AutoMapper;
 using HiHoHuBlog.Modules.Blog.Entity;
 using HiHoHuBlog.Utils;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace HiHoHuBlog.Modules.Blog.Repository.Implementation;
 
@@ -51,9 +52,15 @@ public class EfUserBlogActionRepo(ApplicationDbContext context, IMapper mapper) 
                 .Take(paging.PageSize)
                 .Skip(paging.GetOffSet())
                 .Include(b => b.Blog)
-                .Include(b => b.Blog.User)
-                .OrderByDescending(b => b.UpdatedAt)
+                .ThenInclude(b => b.User)
+                .OrderByDescending(b  => b.UpdatedAt)
                 .Select(b => _mapper.Map<UserReadBlogList>(b)).ToListAsync();
+
+            foreach (var list in lists)
+            {
+                Console.WriteLine(JsonConvert.SerializeObject(list));
+            }
+            
             return Result<IEnumerable<UserReadBlogList>?, Err>.Ok(lists);
         }
         catch (Exception ex)

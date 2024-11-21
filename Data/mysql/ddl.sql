@@ -63,7 +63,13 @@ CREATE TABLE `user_details` (
                                 PRIMARY KEY (`id`)
 )ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
 
-SELECT * from blogs;
+
+
+ALTER TABLE user_details MODIFY id INT NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE user_details
+ADD COLUMN `user_id`
+INT NOT NULL AFTER `id`;
 
 DROP TABLE IF EXISTS `blogs`;
 CREATE TABLE `blogs` (

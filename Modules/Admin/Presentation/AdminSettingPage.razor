@@ -37,7 +37,7 @@
                 <button class="btn btn-primary " @onclick='OnMigrateTagData'>
                     Migrate tag data
                 </button>
-                <button class="btn btn-primary " @onclick='OnMigrateBlogData'>
+                <button class="btn btn-primary " @onclick='OnMigrateUserData'>
                     Migrate user data
                 </button>
             </div>
@@ -88,6 +88,19 @@
     private  async Task OnMigrateTagData()
     {
         var r = await MigrateService.MigrateTagDataAsync();
+        if (!r.IsOk)
+        {
+            Console.WriteLine(r.Error);
+            ToastService.ShowError(r.Error.ToString());
+            return;
+        }
+        Console.WriteLine("Success");
+        ToastService.ShowSuccess("Success");
+    }
+    
+    private  async Task OnMigrateUserData()
+    {
+        var r = await MigrateService.MigrateUserDataAsync();
         if (!r.IsOk)
         {
             Console.WriteLine(r.Error);
