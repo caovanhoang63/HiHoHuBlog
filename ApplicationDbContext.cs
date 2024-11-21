@@ -36,6 +36,10 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<BlogBlocked>().ToTable("blog_blocked");
         modelBuilder.Entity<ReasonBlogBlock>().ToTable("reason_blog_block");
         modelBuilder.Entity<UserReadBlog>().ToTable("user_read_blogs");
+        modelBuilder.Entity<User>()
+            .HasOne(u => u.UserDetails)       
+            .WithOne()                        
+            .HasForeignKey<UserDetails>(ud => ud.UserId);
         modelBuilder.Entity<Blog>()
             .Property(b => b.Thumbnail)
             .HasConversion<string>(
