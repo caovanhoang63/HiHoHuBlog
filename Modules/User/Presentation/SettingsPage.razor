@@ -21,9 +21,59 @@
     @if (!IsLoading)
     {
         <dialog id="profile_modal" class="modal">
+            <div class="modal-box ">
+                <InputFile id="hiddenFileInput" class="hidden" OnChange="HandleSelectedFiles"/>
+                <h3 class="text-lg font-bold text-center">Profile Information</h3>
+                <div class="flex flex-col w-full space-y-5">
+                    <div class="flex flex-col justify-between space-y-2">
+                        <p class="text-sm font-medium">Photo</p>
+                        <div class="flex w-full justify-between space-x-5">
+                            <label class="avatar cursor-pointer" for="hiddenFileInput">
+                                <div class="w-20 rounded-full">
+                                    <img src=" @(NewImage is not null ? NewImage.Url : UserSettingsProfile?.Avatar?.Url is not null ? UserSettingsProfile.Avatar.Url : BaseImage)"
+                                         alt="Tailwind CSS Navbar component"/>
+                                </div>
+                            </label>
+                            <div class="flex flex-col w-full">
+                                <div class="flex space-x-4">
+                                    <label class="cursor-pointer text-green-600" for="hiddenFileInput">Update</label>
+                                    <p class="cursor-pointer text-red-600" @onclick="() => { NewImage = null; UserSettingsProfile.Avatar = null; StateHasChanged(); }">Remove
+                                    </p>
+                                </div>
+                                <p class="text-sm font-normal">Recommended: Square JPG, PNG, or GIF, at least 1,000 pixels
+                                    per side.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col w-full space-y-2">
+                        <p class="text-sm font-medium">First Name</p>
+                        <input @bind="@FirstName" type="text" placeholder="First Name" class="input input-bordered w-full"/>
+
+                    </div>
+                    <div class="flex flex-col w-full space-y-2">
+                        <p class="text-sm font-medium">Last Name</p>
+                        <input @bind="@LastName" type="text" placeholder="Last Name" class="input input-bordered w-full"/>
+
+                    </div>
+                    <div class="flex flex-col w-full space-y-2">
+                        <p class="text-sm font-medium">Short bio</p>
+                        <textarea @bind="@ShortBio" placeholder="Short bio" class="textarea textarea-bordered"></textarea>
+
+                    </div>
+                </div>
+                <div class="modal-action">
+                    <form method="dialog">
+                        <!-- if there is a button in form, it will close the modal -->
+                        <button @onclick="SaveModal" class="btn btn-success rounded-full text-white">Save</button>
+                        <button @onclick="() => { NewImage = null; }" class="btn rounded-full text-success">Close</button>
+                    </form>
+                </div>
+            </div>
+        </dialog>
+        
+        <dialog id="username_modal" class="modal">
         <div class="modal-box ">
-            <InputFile id="hiddenFileInput" class="hidden" OnChange="HandleSelectedFiles"/>
-            <h3 class="text-lg font-bold text-center">Profile Information</h3>
+            <h3 class="text-lg font-bold text-center">Username</h3>
             <div class="flex flex-col w-full space-y-5">
                 <div class="flex flex-col justify-between space-y-2">
                     <p class="text-sm font-medium">Photo</p>
