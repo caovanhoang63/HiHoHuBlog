@@ -45,11 +45,11 @@ public class EfUserBlogActionRepo(ApplicationDbContext context, IMapper mapper) 
         try
         {
             var lists =  await _context.Set<UserReadBlog>()
-                .Take(paging.PageSize)
-                .Skip(paging.GetOffSet())
                 .Where(b => b.UserId == userId)
                 .Where(b => b.Blog.IsPublished == true)
                 .Where(b => b.Blog.Status == 1)
+                .Take(paging.PageSize)
+                .Skip(paging.GetOffSet())
                 .Include(b => b.Blog)
                 .Include(b => b.Blog.User)
                 .OrderByDescending(b => b.UpdatedAt)

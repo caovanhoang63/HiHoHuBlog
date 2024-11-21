@@ -69,9 +69,16 @@
         }
         else
         {
-            // BlogSearch.RecommendSearchBlogByUser()
+             var r = await BlogSearch.RecommendSearchBlogByUser(_requester,_paging);
+            if (r.IsOk)
+            {
+                _blogs = r.Value;
+            }
+            else
+            {
+                ToastService.ShowError(r.Error.Message);
+            }
         }
-       
     }
 
 }
