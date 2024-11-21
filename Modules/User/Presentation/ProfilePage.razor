@@ -81,15 +81,20 @@
                 <span class="font-medium font-sans text-sm text-gray-500">I'm Tiset, a CS/Physics student at Brown 
                     University. I write about science and technology here and on my blog harysdalvi.com</span>
             </div>
-            <div class="mt-6 mb-10 flex justify-start space-x-2">
-                <button class="btn text-white bg-emerald-600 hover:bg-emerald-700/90 rounded-full">Follow</button>
-                <button class="btn btn-circle text-white bg-emerald-600 hover:bg-emerald-700/90">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" 
-                              d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/>
-                    </svg>
-                </button>
-            </div>
+            
+            @if (!IsOwner)
+            {
+                <div class="mt-6 mb-10 flex justify-start space-x-2">
+                    <button class="btn text-white bg-emerald-600 hover:bg-emerald-700/90 rounded-full">Follow</button>
+                    <button class="btn btn-circle text-white bg-emerald-600 hover:bg-emerald-700/90">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" 
+                                  d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/>
+                        </svg>
+                    </button>
+                </div>
+            }
+            
             <div>
                 <span class="font-medium font-sans text-base ">Following</span>
                 <ul class="mt-5">
@@ -127,10 +132,15 @@
     private Paging Paging { get; set; } = new Paging(0, 20);
     private Filter Filter { get; set; } 
     [Parameter] public IEnumerable<BlogList>? BlogList { get; set; } = null;
+    [CascadingParameter] 
+    Task<AuthenticationState> authenticationStateTask { get; set; }
+    public IRequester? Requester;
+    private bool IsOwner { get; set; } = false;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        Requester = await AuthUtils.GetInfo(authenticationStateTask);
         var r = await UserProfileService.GetUserProfile(Username);
         if (!r.IsOk || r.Value is null)
         {
@@ -147,15 +157,16 @@
             IsPublished = null,
             UserId = UserProfile.Id,
         };
-        Name = UserProfile.FirstName +" "+  UserProfile.LastName;
+        Name =UserProfile.LastName +" "+ UserProfile.FirstName ;
         var i = await BlogGetService.GetBlogs(Filter, Paging);
         if (!r.IsOk)
         {
             return;
         }
         BlogList = i.Value;
+        if (Requester.GetUsername() == Username) IsOwner = true;
+        StateHasChanged();
         Console.WriteLine(BlogList.Count().ToString());
+        Console.WriteLine(IsOwner);
     }
-    
-
 }
