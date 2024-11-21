@@ -162,44 +162,55 @@ public class EsSearchBlogRepository(EsClient client, IUserBlogActionRepository u
             UtilErrors.InternalServerError(searchResponse.OriginalException));
     }
 
-    public async Task<Result<IEnumerable<BlogSearchDoc>?, Err>> RecommendSearchBlogByUser(IRequester requester, Paging paging)
+    public async Task<Result<IEnumerable<BlogSearchDoc>?, Err>> RecommendSearchBlogByUser(IRequester requester,int seed, Paging paging)
     {
-        var history = await _userBlogRepo.ListReadHistory(requester.GetId(),new Paging(1, 3));
+        var history = await _userBlogRepo.ListReadHistory(requester.GetId(),new Paging(1, 2));
 
         if (!history.IsOk || history.Value is null )
         {
-            return await RandomBlog(Guid.NewGuid().GetHashCode(),paging);
+            return await RandomBlog(seed,paging);
         }
-        
-        
-        
         
         var docs = await client.Client.SearchAsync<BlogSearchDoc>(s => s
             .Size(paging.PageSize)
             .From(paging.Page - 1)
             .Query(q => q
                 .Bool(b => b
-                    .Must(sh => sh
-                        .MoreLikeThis(m => m
-                            .Fields(f => f.Field("title").Field("content"))
-                            .Like(l =>
-                                {
-                                    foreach (var u in history.Value)
+                    .Must(
+                        qq => qq.FunctionScore(f => f
+                            .Query(mlt => mlt
+                                .MoreLikeThis(m => m
+                                    .Fields(ff => ff.Field("title").Field("content"))
+                                    .Like(l =>
                                     {
-                                        l.Document(d => d.Id(u?.Blog?.Id));
-                                    }
-                                    return l;
-                                })
-                            .MinTermFrequency(1)
-                            .MinDocumentFrequency(1)
-                            .MaxQueryTerms(25)))
+                                        foreach (var u in history.Value)
+                                        {
+                                            l.Document(d => d.Id(u?.Blog?.Id));
+                                        }
+                                        return l;
+                                    })
+                                    .MinTermFrequency(1)
+                                    .MinDocumentFrequency(1)
+                                    .MaxQueryTerms(25)
+                                )
+                            )
+                            .Functions(ff => ff
+                                .RandomScore(ss => ss
+                                        .Seed(seed)
+                                        .Weight(2) 
+                                )
+                            )
+                        )
+                    )
                     .Filter(f => f
                             .Term(t => t.Field("isPublished").Value(true)),
                         f => f
                             .Term(t => t.Field("status").Value(1))
                     )
-                )));
-
+                )
+            )
+            .Sort(ss => ss.Descending(SortSpecialField.Score))
+        );
         if (docs.IsValid && docs.Documents.Any())
         {
             paging.Total = (int)docs.Total;

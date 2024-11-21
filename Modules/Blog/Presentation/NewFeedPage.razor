@@ -53,10 +53,10 @@
     protected override async Task OnInitializedAsync()
     {
         _requester = await AuthUtils.GetInfo(authenticationStateTask);
+        seed = Guid.NewGuid().GetHashCode();
 
         if (_requester is null)
         {
-            seed = Guid.NewGuid().GetHashCode();
             var r = await BlogSearch.RandomBlog(seed, _paging);
             if (r.IsOk)
             {
@@ -69,7 +69,8 @@
         }
         else
         {
-             var r = await BlogSearch.RecommendSearchBlogByUser(_requester,_paging);
+             var r = await BlogSearch.RecommendSearchBlogByUser(_requester,seed,_paging);
+             Console.WriteLine(seed);
             if (r.IsOk)
             {
                 _blogs = r.Value;

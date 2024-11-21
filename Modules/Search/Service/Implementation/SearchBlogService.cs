@@ -45,12 +45,12 @@ public class SearchBlogService(ISearchBlogRepository searchBlogRepository) : ISe
         return r;
     }
 
-    public async Task<Result<IEnumerable<BlogSearchDoc>?, Err>> RecommendSearchBlogByUser(IRequester? requester, Paging paging)
+    public async Task<Result<IEnumerable<BlogSearchDoc>?, Err>> RecommendSearchBlogByUser(IRequester? requester,int seed, Paging paging)
     {
         if (requester == null)
             return  Result<IEnumerable<BlogSearchDoc>?, Err>.Err(UtilErrors.ErrNoPermission());
                 
-        var r= await  _searchBlogRepository.RecommendSearchBlogByUser(requester, paging);
+        var r= await  _searchBlogRepository.RecommendSearchBlogByUser(requester,seed, paging);
         if (!r.IsOk)
         {
             return Result<IEnumerable<BlogSearchDoc>?, Err>.Err(r.Error);
