@@ -10,7 +10,6 @@ namespace HiHoHuBlog.Modules.Blog.Repository.Implementation;
 public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRepository
 {
     private readonly DbSet<Entity.Blog> _dbSet = context.Set<Entity.Blog>();
-
     public async Task<Result<Unit, Err>> Create(BlogCreate blog)
     {
         try
@@ -294,6 +293,55 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
         catch (Exception ex)
         {
             return Result<Unit, Err>.Err(UtilErrors.InternalServerError(ex));
+        }
+    }
+
+    public async Task<Result<Unit, Err>> UpdateTotalLikes(int id)
+    {
+        try
+        {
+            var totalLikesResult = await GetTotalLikes(id);
+            var updateTotalLikes = await _dbSet.Where(u=>u.Id==id)
+                .ExecuteUpdateAsync(
+                    b => b.SetProperty(u => u.TotalLike, totalLikesResult.Value));
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception e)
+        {
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+    }
+
+    public async Task<Result<Unit, Err>> LikeBlog(int userId, int blogId)
+    {
+        try
+        {
+            await context.UserLikeBlogs.AddAsync(new UserLikeBlog
+            {
+                BlogId = blogId,
+                UserId = userId
+            });
+            await context.SaveChangesAsync();
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception e)
+        {
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+         
+    }
+
+    private async Task<Result<int?, Err>> GetTotalLikes( int blogId)
+    {
+        try
+        {
+            int totalLikes = await context.UserLikeBlogs.CountAsync(ulb => ulb.BlogId == blogId);
+            return Result<int?, Err>.Ok(totalLikes);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
         }
     }
 }

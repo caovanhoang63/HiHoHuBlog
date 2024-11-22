@@ -9,4 +9,8 @@ public interface IBlogUpdateService
     Task<Result<Unit,Err>> UpdateThumbnail(IRequester requester,int id, Image? image);
     Task<Result<Unit,Err>> Publish(IRequester requester,int id , string content);
     Task<Result<Unit,Err>> UnPublish(IRequester requester,int id);
+    Task<Result<Unit,Err>> UpdateTotalLikes(int id);
+    
+    Task<Result<Unit,Err>> LikeBlog(int userId,int blogId);
+
 }

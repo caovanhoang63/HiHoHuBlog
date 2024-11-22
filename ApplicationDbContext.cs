@@ -16,6 +16,7 @@ public class ApplicationDbContext : DbContext
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options):base(options){}
     
+    public DbSet<UserLikeBlog> UserLikeBlogs { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<Blog> Blogs { get; set; }
     public DbSet<Tag> Tags { get; set; }
@@ -32,7 +33,8 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<BlogTag>().HasKey(b => b.BlogId);
         modelBuilder.Entity<BlogBlocked>().ToTable("blog_blocked");
         modelBuilder.Entity<ReasonBlogBlock>().ToTable("reason_blog_block");
-        
+        modelBuilder.Entity<UserLikeBlog>().ToTable("user_like_blog");
+
         modelBuilder.Entity<Blog>()
             .Property(b => b.Thumbnail)
             .HasConversion<string>(
@@ -46,6 +48,8 @@ public class ApplicationDbContext : DbContext
                 v => JsonConvert.SerializeObject(v),       
                 v => JsonConvert.DeserializeObject<Image?>(v) 
             );
+        modelBuilder.Entity<UserLikeBlog>()
+            .HasKey(ulb=> new {ulb.BlogId, ulb.UserId});
         
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
         {

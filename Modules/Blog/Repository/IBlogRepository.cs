@@ -1,5 +1,6 @@
 using HiHoHuBlog.Modules.Blog.Entity;
 using HiHoHuBlog.Utils;
+using Nest;
 
 namespace HiHoHuBlog.Modules.Blog.Repository;
 
@@ -18,4 +19,8 @@ public interface IBlogRepository
     Task<Result<Unit,Err>> UpdateThumbnail(int id ,Image? thumbnail);
     Task<Result<Unit, Err>> Publish(int id, int minToRead,Image? thumbnail);
     Task<Result<Unit, Err>> UnPublish(int id);
+    Task<Result<Unit,Err>> UpdateTotalLikes(int id);
+    Task<Result<Unit,Err>> LikeBlog(int userId,int blogId);
+
+
 }

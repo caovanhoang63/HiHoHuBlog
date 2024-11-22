@@ -2,6 +2,7 @@ using HiHoHuBlog.Modules.Blog.Repository;
 using HiHoHuBlog.Modules.Blog.Service.Interface;
 using HiHoHuBlog.Utils;
 using HtmlAgilityPack;
+using Nest;
 
 namespace HiHoHuBlog.Modules.Blog.Service.Implementation;
 
@@ -136,6 +137,32 @@ public class BlogUpdateService(IBlogRepository blogRepo) : IBlogUpdateService
         if (!r.IsOk)
         {
             return Result<Unit, Err>.Err(r.Error);
+        }
+        return Result<Unit, Err>.Ok(new Unit());
+    }
+
+    public async Task<Result<Unit, Err>> UpdateTotalLikes(int id)
+    {
+        var _totalLikes = await _blogRepo.UpdateTotalLikes(id);
+        if (!_totalLikes.IsOk)
+        {
+            return Result<Unit, Err>.Err(_totalLikes.Error);
+        }
+
+        return Result<Unit, Err>.Ok(new Unit());
+    }
+
+    public async Task<Result<Unit, Err>> LikeBlog(int userId,int blogId)
+    {
+        var likeBLog = await _blogRepo.LikeBlog(userId, blogId);
+        if (!likeBLog.IsOk)
+        {
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        var updateLikeBlog = await UpdateTotalLikes(blogId);
+        if (!updateLikeBlog.IsOk)
+        {
+            return Result<Unit, Err>.Err(updateLikeBlog.Error);
         }
         return Result<Unit, Err>.Ok(new Unit());
     }
