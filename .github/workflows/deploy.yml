@@ -5,8 +5,10 @@ on:
       - deploy
 jobs:
   Build:
-    name: Build
+    name: Build &  Deploy
     runs-on: ubuntu-latest
+    outputs:
+      ecr-registry: ${{ steps.login-ecr-public.outputs.registry }}  # Output the registry name
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -39,7 +41,7 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
 
-      - name: Build & Deploy
+      - name:  Deploy
         env:
           PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           HOSTNAME: ${{ secrets.SSH_HOST }}
@@ -53,7 +55,8 @@ jobs:
               docker pull ${{ needs.Build.outputs.ecr-registry }}/${{ secrets.REPO_NAME }}:h5shop-backend-${{ steps.get-commit-hash.outputs.commit-hash }} &&
               docker run -d --name ${APP_NAME} \
               --network h5shop \
-              -v /etc/h5shop/config/appsettings.Local.json:/app/appsettings.Local.json \
+              -v ./appsettings.Production.json:/app/appsettings.Production.json \
+              -e ASPNETCORE_ENVIRONMENT=Production \
               -p 8080:8080 \
               ${{ steps.login-ecr-public.outputs.registry }}/${{ secrets.REPO_NAME }}:h5shop-backend-${{ steps.get-commit-hash.outputs.commit-hash }}
           '
