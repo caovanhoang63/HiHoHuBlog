@@ -18,11 +18,14 @@ RUN npx tailwindcss -i wwwroot/app.css -o wwwroot/app.min.css
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+
 COPY ["HiHoHuBlog.csproj", "./"]
 RUN dotnet restore "HiHoHuBlog.csproj"
+
 COPY . .
-COPY --from=node-build /src/node_modules ./node_modules
 COPY --from=node-build /src/wwwroot/app.min.css wwwroot/
+COPY --from=node-build /src/node_modules ./node_modules
+
 WORKDIR "/src/"
 RUN dotnet build "HiHoHuBlog.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
