@@ -52,7 +52,7 @@ jobs:
               APP_NAME=hihohublog &&
               docker rm -f ${APP_NAME} &&
               echo pull &&
-              docker pull ${{ needs.Build.outputs.ecr-registry }}/${{ secrets.REPO_NAME }}:hihohublog-${{ steps.get-commit-hash.outputs.commit-hash }} &&
+              docker pull ${{ steps.login-ecr-public.outputs.registry }}/${{ secrets.REPO_NAME }}:hihohublog-${{ steps.get-commit-hash.outputs.commit-hash }} &&
               docker run -d --name ${APP_NAME} \
               --network h5shop \
               -v /config/appsettings.Production.json:/app/appsettings.Production.json \
