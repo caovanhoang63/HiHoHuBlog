@@ -55,7 +55,7 @@ jobs:
               docker pull ${{ needs.Build.outputs.ecr-registry }}/${{ secrets.REPO_NAME }}:h5shop-backend-${{ steps.get-commit-hash.outputs.commit-hash }} &&
               docker run -d --name ${APP_NAME} \
               --network h5shop \
-              -v /appsettings.Production.json:/app/appsettings.Production.json \
+              -v /config/appsettings.Production.json:/app/appsettings.Production.json \
               -e ASPNETCORE_ENVIRONMENT=Production \
               -p 8080:8080 \
               ${{ steps.login-ecr-public.outputs.registry }}/${{ secrets.REPO_NAME }}:hihohublog-${{ steps.get-commit-hash.outputs.commit-hash }}
