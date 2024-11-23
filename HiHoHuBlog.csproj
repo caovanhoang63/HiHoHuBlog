@@ -191,6 +191,10 @@
         <_ContentIncludedByDefault Remove="wwwroot\lib\tinymce\tinymce.d.ts" />
         <_ContentIncludedByDefault Remove="wwwroot\lib\tinymce\tinymce.js" />
         <_ContentIncludedByDefault Remove="wwwroot\lib\tinymce\tinymce.min.js" />
+        <_ContentIncludedByDefault Remove="wwwroot\uploads\980bb6f8-f2da-4411-a2ce-2359ca565122.png" />
+        <_ContentIncludedByDefault Remove="wwwroot\uploads\a8ea5056-a349-4045-bb47-e516f7df65aa.png" />
+        <_ContentIncludedByDefault Remove="wwwroot\uploads\e1843386-4b85-4fb0-bf15-08fbc562f57e.png" />
+        <_ContentIncludedByDefault Remove="wwwroot\uploads\fc47eb3f-0831-4fb5-8e2d-abef65d9f98a.png" />
     </ItemGroup>
 
     <ItemGroup>

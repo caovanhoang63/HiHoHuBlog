@@ -21,6 +21,7 @@ WORKDIR /src
 COPY ["HiHoHuBlog.csproj", "./"]
 RUN dotnet restore "HiHoHuBlog.csproj"
 COPY . .
+COPY --from=node-build /src/node_modules ./node_modules
 COPY --from=node-build /src/wwwroot/app.min.css wwwroot/
 WORKDIR "/src/"
 RUN dotnet build "HiHoHuBlog.csproj" -c $BUILD_CONFIGURATION -o /app/build
