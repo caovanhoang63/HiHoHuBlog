@@ -35,7 +35,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-          IMAGE_TAG:  h5shop-backend-${{ steps.get-commit-hash.outputs.commit-hash }}
+          IMAGE_TAG:  hihohublog-${{ steps.get-commit-hash.outputs.commit-hash }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
@@ -58,7 +58,6 @@ jobs:
               -v /appsettings.Production.json:/app/appsettings.Production.json \
               -e ASPNETCORE_ENVIRONMENT=Production \
               -p 8080:8080 \
-              ${{ steps.login-ecr-public.outputs.registry }}/${{ secrets.REPO_NAME }}:h5shop-backend-${{ steps.get-commit-hash.outputs.commit-hash }}
+              ${{ steps.login-ecr-public.outputs.registry }}/${{ secrets.REPO_NAME }}:hihohublog-${{ steps.get-commit-hash.outputs.commit-hash }}
           '
 
-  
