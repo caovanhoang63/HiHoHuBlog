@@ -226,4 +226,8 @@
       <PackageReference Include="WYSIWYGTextEditor" Version="1.0.1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Content Include=".github\workflows\deploy.yml" />
+    </ItemGroup>
+
 </Project>

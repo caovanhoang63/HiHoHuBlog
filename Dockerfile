@@ -4,6 +4,17 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
+FROM node:20-alpine AS node-build
+WORKDIR /src
+
+COPY package.json package-lock.json ./
+
+RUN npm ci
+
+COPY . .
+
+RUN npx tailwindcss -i wwwroot/app.css -o wwwroot/app.min.css
+
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
