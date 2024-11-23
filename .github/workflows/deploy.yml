@@ -7,8 +7,6 @@ jobs:
   Build:
     name: Build &  Deploy
     runs-on: ubuntu-latest
-    outputs:
-      ecr-registry: ${{ steps.login-ecr-public.outputs.registry }}  # Output the registry name
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -55,9 +53,8 @@ jobs:
               docker pull ${{ steps.login-ecr-public.outputs.registry }}/${{ secrets.REPO_NAME }}:hihohublog-${{ steps.get-commit-hash.outputs.commit-hash }} &&
               docker run -d --name ${APP_NAME} \
               --network h5shop \
-              -v /config/appsettings.Production.json:/app/appsettings.Production.json \
+              -v ${PWD}/config/appsettings.Production.json:/app/appsettings.Production.json \
               -e ASPNETCORE_ENVIRONMENT=Production \
               -p 8080:8080 \
               ${{ steps.login-ecr-public.outputs.registry }}/${{ secrets.REPO_NAME }}:hihohublog-${{ steps.get-commit-hash.outputs.commit-hash }}
           '
-
