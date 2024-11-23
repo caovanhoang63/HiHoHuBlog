@@ -70,7 +70,7 @@ jobs:
               -e VIRTUAL_HOST="h5shop.shop" \
               -e LETSENCRYPT_HOST="h5shop.shop" \
               -e LETSENCRYPT_EMAIL="caovanhoang204@gmail.com" \
-              -p 3000:3000 \
+              -p 8080:8080 \
               ${{ needs.Build.outputs.ecr-registry }}/${{ secrets.REPO_NAME }}:h5shop-backend-${{ steps.get-commit-hash.outputs.commit-hash }}
           '
 
