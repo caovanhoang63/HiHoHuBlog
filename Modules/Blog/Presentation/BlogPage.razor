@@ -79,13 +79,12 @@
 
             @if (_blog is not null)
             {
-                <TextEditor @ref="_textEditor" ReadOnly="true">
+                <TextEditor @key="_blog.Id" @ref="_textEditor" ReadOnly="true">
                     <EditorContent>
                         @((@MarkupString)_blog.Content)
                     </EditorContent>
                 </TextEditor>    
             }
-            
         </div>
         <div class="divider m-0 "></div>
         <div class="container mx-auto px-4 py-8">
@@ -154,12 +153,14 @@
     protected override async Task OnInitializedAsync()
     {
         _requester = await AuthUtils.GetInfo(authenticationStateTask);
+
     }
 
     protected override async Task OnParametersSetAsync()
     {
         var request = Slug.Split('-'); 
         string idString = request[^1];
+        _isLoading = true;
         int id;
         if (!Int32.TryParse(idString, out id))
         {
