@@ -52,11 +52,11 @@ jobs:
               echo pull &&
               docker pull ${{ steps.login-ecr-public.outputs.registry }}/${{ secrets.REPO_NAME }}:hihohublog-${{ steps.get-commit-hash.outputs.commit-hash }} &&
               docker run -d --name ${APP_NAME} \
-              --network h5shop \
+              --network hihohu \
               -v ${PWD}/config/appsettings.Production.json:/app/appsettings.Production.json \
               -e ASPNETCORE_ENVIRONMENT=Production \
-              -e VIRTUAL_HOST="blog.h5shop.shop" \
-              -e LETSENCRYPT_HOST="blog.h5shop.shop" \
+              -e VIRTUAL_HOST="api.h5shop.shop" \
+              -e LETSENCRYPT_HOST="api.h5shop.shop" \
               -e LETSENCRYPT_EMAIL="caovanhoang204@gmail.com" \
               -p 8080:8080 \
               ${{ steps.login-ecr-public.outputs.registry }}/${{ secrets.REPO_NAME }}:hihohublog-${{ steps.get-commit-hash.outputs.commit-hash }}
