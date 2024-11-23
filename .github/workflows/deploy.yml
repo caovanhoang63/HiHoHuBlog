@@ -59,19 +59,16 @@ jobs:
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
-              APP_NAME=h5shop &&
+              APP_NAME=hihohublog &&
               docker rm -f ${APP_NAME} &&
               echo pull &&
               docker pull ${{ needs.Build.outputs.ecr-registry }}/${{ secrets.REPO_NAME }}:h5shop-backend-${{ steps.get-commit-hash.outputs.commit-hash }} &&
               docker run -d --name ${APP_NAME} \
               --network h5shop \
-              -e SYSTEM_SECRET=${{ secrets.SYSTEM_SECRET }} \
-              -e MYSQL_HOST=${{ secrets.MYSQL_HOST }} \
-              -e MYSQL_USER=${{ secrets.MYSQL_USER }} \
-              -e MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }} \
-              -e MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }} \
-              -e VIRTUAL_HOST="api.h5shop.shop" \
-              -e LETSENCRYPT_HOST="api.h5shop.shop" \
+              -v /etc/h5shop/config/appsettings.Production.json:/app/appsettings.Production.json \
+              -e ASPNETCORE_ENVIRONMENT=Production \
+              -e VIRTUAL_HOST="h5shop.shop" \
+              -e LETSENCRYPT_HOST="h5shop.shop" \
               -e LETSENCRYPT_EMAIL="caovanhoang204@gmail.com" \
               -p 3000:3000 \
               ${{ needs.Build.outputs.ecr-registry }}/${{ secrets.REPO_NAME }}:h5shop-backend-${{ steps.get-commit-hash.outputs.commit-hash }}
