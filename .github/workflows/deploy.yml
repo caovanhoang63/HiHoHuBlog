@@ -7,8 +7,6 @@ jobs:
   Build:
     name: Build
     runs-on: ubuntu-latest
-    outputs:
-      ecr-registry: ${{ steps.login-ecr-public.outputs.registry }}  # Output the registry name
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -40,16 +38,6 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-  Deploy:
-    name: Deploy to EC2
-    runs-on: ubuntu-latest
-    needs: Build  # Add a dependency on the Build job to access its outputs
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Get commit hash
-        id: get-commit-hash
-        run: echo "::set-output name=commit-hash::$(git rev-parse --short HEAD)"
 
       - name: Build & Deploy
         env:
@@ -65,13 +53,9 @@ jobs:
               docker pull ${{ needs.Build.outputs.ecr-registry }}/${{ secrets.REPO_NAME }}:h5shop-backend-${{ steps.get-commit-hash.outputs.commit-hash }} &&
               docker run -d --name ${APP_NAME} \
               --network h5shop \
-              -v /etc/h5shop/config/appsettings.Production.json:/app/appsettings.Production.json \
-              -e ASPNETCORE_ENVIRONMENT=Production \
-              -e VIRTUAL_HOST="h5shop.shop" \
-              -e LETSENCRYPT_HOST="h5shop.shop" \
-              -e LETSENCRYPT_EMAIL="caovanhoang204@gmail.com" \
+              -v /etc/h5shop/config/appsettings.Local.json:/app/appsettings.Local.json \
               -p 8080:8080 \
-              ${{ needs.Build.outputs.ecr-registry }}/${{ secrets.REPO_NAME }}:h5shop-backend-${{ steps.get-commit-hash.outputs.commit-hash }}
+              ${{ steps.login-ecr-public.outputs.registry }}/${{ secrets.REPO_NAME }}:h5shop-backend-${{ steps.get-commit-hash.outputs.commit-hash }}
           '
 
   
