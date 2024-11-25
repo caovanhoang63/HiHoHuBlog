@@ -41,7 +41,7 @@ public class EsSearchBlogRepository(EsClient client, IUserBlogActionRepository u
     public async Task<Result<IEnumerable<BlogSearchDoc>?, Err>> SearchBlog(string arg, Paging paging)
     {
         var searchResponse = await client.Client.SearchAsync<BlogSearchDoc>(s => s
-            .From(paging.GetOffSet())
+            .From(paging.GetOffSet() - 1)
             .Size(paging.PageSize)
             .Query(q => q
                 .Bool(b => b
@@ -173,7 +173,7 @@ public class EsSearchBlogRepository(EsClient client, IUserBlogActionRepository u
         
         var docs = await client.Client.SearchAsync<BlogSearchDoc>(s => s
             .Size(paging.PageSize)
-            .From(paging.Page - 1)
+            .From(paging.GetOffSet())
             .Query(q => q
                 .Bool(b => b
                     .Must(
@@ -225,7 +225,7 @@ public class EsSearchBlogRepository(EsClient client, IUserBlogActionRepository u
     {
         var docs = await client.Client.SearchAsync<BlogSearchDoc>(s => s
             .Size(paging.PageSize)
-            .From(paging.Page - 1)
+            .From(paging.GetOffSet() )
             .Query(q => q
                 .Bool(b => b
                     .Must(sh => sh
@@ -257,7 +257,7 @@ public class EsSearchBlogRepository(EsClient client, IUserBlogActionRepository u
     {
         var docs = await client.Client.SearchAsync<BlogSearchDoc>(s => s
             .Size(paging.PageSize)
-            .From(paging.Page - 1)
+            .From(paging.GetOffSet())
             .Query(q => q
                 .Bool(b => b
                     .Must(mm => mm

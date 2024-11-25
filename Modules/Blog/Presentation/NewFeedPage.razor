@@ -6,9 +6,19 @@
 @using HiHoHuBlog.Utils
 @inject ISearchBlogService BlogSearch
 @inject IToastService ToastService
+@inject IJSRuntime JSRuntime
 
 @attribute [Authorize]
 @attribute [AllowAnonymous]
+<HeadContent>
+    <style>
+        body {
+            overflow-y: scroll;
+        }
+    </style>
+</HeadContent>
+
+
 <Container ContainerClass="flex justify-between space-x-10 max-w-7xl">
     <div class="grow max-w-4xl py-10">
         <div role="tablist" class="tabs tabs-bordered">
@@ -22,14 +32,19 @@
             <a role="tab" class="tab">Tab 3</a>
             <a role="tab" class="tab">Tab 4</a>
         </div>
-        @if (_blogs is not null)
-        {
+        <ul>
             @foreach (var blog in _blogs)
             {
-                <BlogCard BlogSearchDoc="blog"/>
-
+                <li class="list-none">
+                    <BlogCard BlogSearchDoc="blog"/>
+                </li>
             }
-        }
+        </ul>
+ 
+
+        <div class="text-center w-full">
+            <p class="@(_isLoading ? " " : "hidden" )">Loading...</p>
+        </div>
     </div>
     <div class="border-l-[1px] grow p-10 max-w-sm">
         <div class="flex flex-col space-y-2">
@@ -42,32 +57,72 @@
 </Container>
 
 @code {
-
     private IRequester? _requester;
+    private readonly List<BlogSearchDoc> _blogs = new List<BlogSearchDoc>();
+    private bool _isLoading = false;
+    private readonly Paging _paging = new Paging(1, 4);
+    private int _seed = 0;
+
     [CascadingParameter]
     Task<AuthenticationState> authenticationStateTask { get; set; }
 
-    private readonly Paging _paging = new Paging(1, 5);
-    private int seed = 0;
-    private IEnumerable<BlogSearchDoc>? _blogs;
     protected override async Task OnInitializedAsync()
     {
         _requester = await AuthUtils.GetInfo(authenticationStateTask);
-        seed = Guid.NewGuid().GetHashCode();
+        _seed = Guid.NewGuid().GetHashCode();
         
         var r = _requester is null ? 
-            await BlogSearch.RandomBlog(seed, _paging) : 
-            await BlogSearch.RecommendSearchBlogByUser(_requester,seed,_paging);
+            await BlogSearch.RandomBlog(_seed, _paging) : 
+            await BlogSearch.RecommendSearchBlogByUser(_requester, _seed, _paging);
 
-        if (r.IsOk)
+        if (r is { IsOk: true, Value: not null })
         {
-            _blogs = r.Value;
+            _blogs.AddRange(r.Value.ToList());
         }
         else
         {
             ToastService.ShowError(r.Error.Message);
         }
-       
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("addScrollListener", DotNetObjectReference.Create(this));
+        }
+    }
+
+    [JSInvokable]
+    public async Task LoadMoreBlogs()
+    {
+        if (_paging.IsLastPage()) return;
+        if (_isLoading)
+            return;
+        _isLoading = true;
+        await InvokeAsync(StateHasChanged);
+        _paging.Page++;
+        var r = _requester is null ? 
+            await BlogSearch.RandomBlog(_seed, _paging) : 
+            await BlogSearch.RecommendSearchBlogByUser(_requester, _seed, _paging);
+
+        await Task.Delay(1000);
+        if (r is { IsOk: true, Value: not null })
+        {
+            _blogs.AddRange(r.Value.ToList());
+        }
+        else
+        {
+            ToastService.ShowError(r.Error.Message);
+        }
+        _isLoading = false;
+        await InvokeAsync(StateHasChanged);  
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await JSRuntime.InvokeVoidAsync("removeScrollListener");
+    }
 }
+
+<script src="scroll.js"></script>
