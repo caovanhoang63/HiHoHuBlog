@@ -205,10 +205,11 @@
 
     <ItemGroup>
       <PackageReference Include="AutoMapper" Version="13.0.1" />
+      <PackageReference Include="AWSSDK.S3" Version="4.0.0-preview.4" />
+      <PackageReference Include="AWSSDK.SimpleEmail" Version="4.0.0-preview.4" />
       <PackageReference Include="HtmlAgilityPack.NetCore" Version="1.5.0.1" />
       <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.10" />
       <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.10" />
-      <PackageReference Include="AWSSDK.S3" Version="3.7.405.11" />
       <PackageReference Include="Blazored.Toast" Version="4.2.1" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="8.0.10" />

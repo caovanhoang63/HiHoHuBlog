@@ -4,12 +4,14 @@
 @using HiHoHuBlog.Modules.Admin.Service.Interface
 @using HiHoHuBlog.Modules.Search.Service.Interface
 @using HiHoHuBlog.Utils
+@using HiHoHuBlog.Utils.MailSender
 @layout AdminLayout
 @inject IReasonBlogBlockService Service
 @attribute [Authorize]
 @rendermode InteractiveServer
 @inject IMigrationSearchDataService MigrateService
 @inject IToastService ToastService
+@inject IMailSender MailSender
 
 <AuthorizeView Roles="admin, mod">
     <Authorized>
@@ -39,6 +41,9 @@
                 </button>
                 <button class="btn btn-primary " @onclick='OnMigrateUserData'>
                     Migrate user data
+                </button>
+                <button class="btn btn-primary " @onclick='OnSendTestMail'>
+                    Send Test Mail
                 </button>
             </div>
         </div>
@@ -109,5 +114,26 @@
         }
         Console.WriteLine("Success");
         ToastService.ShowSuccess("Success");
+    }
+
+    private async Task OnSendTestMail()
+    {
+        var r= await MailSender.Send(new MailRequest
+        {
+            toAddresses = new List<string>(){"caovanhoang204@gmail.com"},
+            bodyText = "Xin chao c#",
+            subject = "test",
+            senderAddress = "no-reply@hihohu.site",
+            bodyHtml = "<p>123</p>"
+        });
+        if (r.IsOk)
+        {
+            ToastService.ShowSuccess("SENDED");
+        }
+        else
+        {
+            Console.WriteLine(r.Error);
+            ToastService.ShowError("SEND FAILT");
+        }
     }
 }
