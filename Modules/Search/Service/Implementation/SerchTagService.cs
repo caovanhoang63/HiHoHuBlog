@@ -26,4 +26,21 @@ public class SearchTagService(ISearchTagRepository searchTagRepository) : ISearc
 
         return r;
     }
+
+    public async Task<Result<IEnumerable<TagSearchDoc>?, Err>> SearchTagsForPublish(string arg, Paging paging)
+    {
+        if (arg.IsNullOrWhiteSpace())
+        {
+            return Result<IEnumerable<TagSearchDoc>?, Err>.Ok(null);
+        }
+        
+        var r = await _searchTagRepository.SearchTagsForPublish(arg, paging);
+
+        if (!r.IsOk)
+        {
+            return Result<IEnumerable<TagSearchDoc>?, Err>.Err(r.Error);
+        }
+
+        return r;
+    }
 }
