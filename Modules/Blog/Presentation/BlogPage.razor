@@ -6,13 +6,15 @@
 @using HiHoHuBlog.Modules.Blog.Service.Interface
 @using HiHoHuBlog.Modules.Search.Entity
 @using HiHoHuBlog.Modules.Search.Service.Interface
+@using HiHoHuBlog.Modules.User.Service.Interface
+@using Nest
 @using HiHoHuBlog.Utils
 @rendermode InteractiveServer
 @inject IBlogGetService BlogGetService
 @inject NavigationManager NavigationManager
 @inject ISearchBlogService SearchBlogService
 @inject IBlogUpdateService BlogUpdateService
-
+@inject IUserFollowService UserFollowService
 <Container>
     <FullScreenSpinner IsLoading="_isLoading"></FullScreenSpinner>
     <div class="container mx-auto px-4 py-8">
@@ -28,8 +30,8 @@
                 </div>
                 <div>
                     <div class="flex items-center gap-2">
-                        <span class="font-medium">Sylvain Tiset</span>
-                        <button class="btn btn-sm btn-outline btn-primary">Follow</button>
+                        <span class="font-medium">@_blog?.User?.FirstName</span>
+                        <button class="btn btn-sm btn-outline btn-primary" @onclick="onFollowClick">Follow</button>
                     </div>
                     <div class="text-sm text-gray-600">
                         <span>13 min read</span>
@@ -167,6 +169,7 @@
         }
 
         _blog = r.Value;
+        Console.WriteLine(_blog?.User?.FirstName);
         await _textEditor.LoadHTMLContent(_blog.Content);
         
         var result = await SearchBlogService.RecommendSearchBlogByBlog(null, _blog.Id, _relatedPaging);
@@ -186,6 +189,13 @@
         _requester= await AuthUtils.GetInfo(authenticationStateTask);
     }
 
+    private async void onFollowClick()
+    {
+        Console.WriteLine(_requester.GetId());
+        Console.WriteLine(_blog.User.Id);
+        await UserFollowService.Follows(_requester.GetId(), _blog.User.Id);
+    }
+    
     private async void onLikeClick()
     {
 

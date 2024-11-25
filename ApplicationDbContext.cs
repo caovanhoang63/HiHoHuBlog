@@ -23,6 +23,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<BlogTag> BlogTags { get; set; }
     public DbSet<BlogBlocked> BlogBlocked { get; set; }
     public DbSet<ReasonBlogBlock> ReasonBlogBlock { get; set; }
+    public DbSet<UserFollow> UserFollows { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>().ToTable("users");
@@ -34,6 +35,8 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<BlogBlocked>().ToTable("blog_blocked");
         modelBuilder.Entity<ReasonBlogBlock>().ToTable("reason_blog_block");
         modelBuilder.Entity<UserLikeBlog>().ToTable("user_like_blog");
+        modelBuilder.Entity<UserFollow>().ToTable("user_follow");
+
 
         modelBuilder.Entity<Blog>()
             .Property(b => b.Thumbnail)
@@ -51,6 +54,8 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<UserLikeBlog>()
             .HasKey(ulb=> new {ulb.BlogId, ulb.UserId});
         
+        modelBuilder.Entity<UserFollow>()
+            .HasKey(ulb=> new {ulb.UserId, ulb.UserFollowing});
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
         {
             foreach (var property in entity.GetProperties())

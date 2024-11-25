@@ -9,4 +9,8 @@ public interface IUserRepository
     Task<Result<Entity.User?,Err>> FindByEmail(string email);
     Task<Result<Entity.UserProfile?,Err>> GetProfile(string email);
     Task<Result<Entity.User?, Err>> FindByEmailAndUserName(string email, string userName);
+    Task<Result<Unit, Err>> UpdateTotalFollows(int id);
+    Task<Result<Unit, Err>> Follows(int userId, int userFollowId);
+
+
 }

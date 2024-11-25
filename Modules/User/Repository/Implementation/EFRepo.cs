@@ -65,4 +65,52 @@ public class EfRepo  : IUserRepository
         }
         
     }
+    public async Task<Result<Unit, Err>> UpdateTotalFollows(int id)
+    {
+        try
+        {
+            var totalFollowsResult = await GetTotalFollows(id);
+            var updateTotalFollows = await _dbSet.Where(u=>u.Id==id)
+                .ExecuteUpdateAsync(
+                    b => b.SetProperty(u => u.TotalFollower, totalFollowsResult.Value));
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception e)
+        {
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+    }
+
+    public async Task<Result<Unit, Err>> Follows(int userId, int userFollowId)
+    {
+        try
+        {
+            await _dbContext.UserFollows.AddAsync(new UserFollow
+            {
+                UserId = userId,
+                UserFollowing = userFollowId
+            });
+            await _dbContext.SaveChangesAsync();
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception e)
+        {
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+         
+    }
+
+    private async Task<Result<int?, Err>> GetTotalFollows(int id)
+    {
+        try
+        {
+            int totalFollows = await _dbContext.UserFollows.CountAsync(ulb => ulb.UserFollowing == id);
+            return Result<int?, Err>.Ok(totalFollows);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
 }

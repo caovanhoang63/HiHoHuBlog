@@ -105,7 +105,7 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
     {
         try
         {
-            var entity = await _dbSet.SingleOrDefaultAsync(b => b.Id == id);
+            var entity = await _dbSet.Include(b=>b.User).SingleOrDefaultAsync(b => b.Id == id);
             
             return Result<BlogDetail?, Err>.Ok(mapper.Map<Entity.Blog?,BlogDetail>(entity));
         }
