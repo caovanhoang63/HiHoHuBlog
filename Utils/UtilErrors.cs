@@ -1,3 +1,6 @@
+using HiHoHuBlog.Utils.MailSender;
+using Newtonsoft.Json;
+
 namespace HiHoHuBlog.Utils;
 
 public static class UtilErrors
@@ -21,5 +24,10 @@ public static class UtilErrors
     public static Err ErrNoPermission()
     {
         return new Err("You do not have permission to access this resource");
+    }
+
+    public static Err ErrFailToSendEmail(MailRequest mailRequest, Exception ex)
+    {
+        return new Err($"Got an Error when send email: {JsonConvert.SerializeObject(mailRequest)}",ex,500);
     }
 }

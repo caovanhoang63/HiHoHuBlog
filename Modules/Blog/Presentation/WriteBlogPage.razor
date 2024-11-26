@@ -35,8 +35,16 @@
                                 <div class="flex flex-col w-1/2 space-y-2 p-4">
                                     <h3 class="text-lg font-bold pt-4">Story Preview</h3>
                                     <div class="bg-gray-100 h-52 flex items-center text-center">
-                                        <p class="text-base font-medium mx-12 text-gray-500">Include a high-quality 
-                                            image in your story to make it more inviting to readers.</p>
+                                        @if (FirstImage is not null)
+                                        {
+                                            <img src="@FirstImage.Url"
+                                                 alt="Tailwind CSS Navbar component"/>
+                                        }
+                                        else
+                                        {
+                                            <p class="text-base font-medium mx-12 text-gray-500">Include a high-quality
+                                                image in your story to make it more inviting to readers.</p>
+                                        }
                                     </div>
                                     <input value="@_blog.Title" type="text" placeholder="Tag name" 
                                            class="input w-full focus:ring-0 border-transparent 
@@ -55,8 +63,8 @@
                                 </div>
                             </div>
                             <div class="modal-action">
-                                <button @onclick="OnPublish" class="btn btn-success text-white rounded-full">Publish now</button>
                                 <form method="dialog">
+                                    <button  @onclick="OnPublish" class="btn btn-success text-white rounded-full">Publish now</button>
                                     <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                                     <!-- if there is a button, it will close the modal -->
                                     <button class="btn rounded-full">Close</button>
@@ -66,7 +74,7 @@
                     </div>
                 </dialog>
                 <div class="flex flex-row-reverse pt-2">
-                    <button onclick="publish_modal.showModal()" class="btn btn-success @(_blog.Id == 0 ? "btn-disabled" : " ") text-base-200 btn-sm ">Publish</button>
+                    <button @onclick="AddTag" class="btn btn-success @(_blog.Id == 0 ? "btn-disabled" : " ") text-base-200 btn-sm ">Publish</button>
                 </div>
                 <div class="flex justify-between pt-5 ">
                     <input value="@_blog.Title" @oninput="OnSearchQueryInput" placeholder="title" class="text-4xl w-full input focus:ring-0 border-transparent focus:border-transparent px-0 !outline-none"/>
@@ -115,6 +123,8 @@
     private readonly Subject<string?> _contentSubject = new();
     private bool _isSaving = false;
     private bool _firstChange = false;
+    
+    private Image? FirstImage { get; set; }
     private  void OnChange(string args)
     {
         _isSaving = true;
@@ -260,6 +270,7 @@
             return;
         }
         ToastService.ShowSuccess("Publish success!");
+         NavigationManager.NavigateTo($"blog/{_blog.Id}");
     }
     
     public void Dispose()
@@ -271,7 +282,14 @@
         // You can also change it to any url you want
         JSRuntime.InvokeVoidAsync("ChangeUrl", url);
     }
-    
+
+    private async void AddTag()
+    {
+        FirstImage = await GetThumbnail.GetThumbnailFromHtml(_blog.Content);
+        await JSRuntime.InvokeVoidAsync("openModal", "publish_modal");
+        await InvokeAsync(StateHasChanged);
+    }
+
 }
 
 <script>

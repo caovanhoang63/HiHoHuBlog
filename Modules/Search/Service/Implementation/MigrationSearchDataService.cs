@@ -6,6 +6,7 @@ using HiHoHuBlog.Modules.Search.Repository.Interface;
 using HiHoHuBlog.Modules.Search.Service.Interface;
 using HiHoHuBlog.Modules.Tag.Entity;
 using HiHoHuBlog.Modules.Tag.Repository.Interface;
+using HiHoHuBlog.Modules.User.Entity;
 using HiHoHuBlog.Modules.User.Repository;
 using HiHoHuBlog.Utils;
 using HtmlAgilityPack;
@@ -106,24 +107,24 @@ public class MigrationSearchDataService(IBlogRepository blogRepository, IMapper 
     public async Task<Result<Unit, Err>> MigrateUserDataAsync()
     {
         var now = DateTime.UtcNow;
-        var lastResult = await _targetRepository.GetLastMigrateTime("tag_search");
-        var r = await _tagRepository.FindWithFilter(new TagFilter
+        var lastResult = await _targetRepository.GetLastMigrateTime("user_search");
+        var r = await _userRepository.ListUsers(new UserFilter
         {
             GtUpdatedAt = lastResult.Value?.Timestamp,
-        });
+        },null);
         
         if (!r.IsOk)
         {
             return Result<Unit, Err>.Err(r.Error);
         }
         
-        if (r.Value is null || !r.Value.Any())
+        if (!r.Value.Any())
         {
             Console.WriteLine("No need to migrate blog data");
             return Result<Unit, Err>.Ok(new Unit());
         }
         
-        var result = await _targetRepository.AddBulkTagAsync(_mapper.Map<IEnumerable<TagSearchDoc>>(r.Value),now);
+        var result = await _targetRepository.AddBulkUserAsync(_mapper.Map<IEnumerable<UserSearchDoc>>(r.Value),now);
         
         if (!result.IsOk)
         {

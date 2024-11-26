@@ -114,8 +114,6 @@
     protected override async Task OnInitializedAsync()
     {
         _requester = await AuthUtils.GetInfo(authenticationStateTask); 
-        Console.WriteLine(_requester.GetUsername());
-        Console.WriteLine(_requester.GetSystemRole());
     }
     
     private async Task OnSubmitSearch()
