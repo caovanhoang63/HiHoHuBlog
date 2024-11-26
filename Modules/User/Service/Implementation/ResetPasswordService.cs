@@ -27,11 +27,12 @@ public class ResetPasswordService(IUserRepository userRepository, IMailSender ma
         
         if (!template.IsOk || template.Value is null) return Result<Unit, Err>.Err(UtilErrors.InternalServerError(template.Error));
         
+        
 
         var req = new MailRequest
         {
             toAddresses = new List<string>(){email},
-            bodyHtml = template.Value.Content,
+            bodyHtml =template.Value.Content.Replace("{token}", email),
             bodyText = "",
             subject = "Reset Password",
             senderAddress = "no-reply@hihohu.site"
@@ -42,7 +43,6 @@ public class ResetPasswordService(IUserRepository userRepository, IMailSender ma
          if (!r.IsOk) return Result<Unit, Err>.Err(r.Error);
         
         return Result<Unit, Err>.Ok(new Unit());
-        
     }
 
     public Task<Result<Unit, Err>> ResetPassword(string token, string newPassword, string confirmPassword)
