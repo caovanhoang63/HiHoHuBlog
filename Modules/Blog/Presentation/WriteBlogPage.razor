@@ -22,7 +22,7 @@
 @inject IBlogGetService BlogGetService
 @inject IToastService ToastService
 @inject ISearchTagService SearchTagService
-
+@inject IBlogTagService BlogTagService
 @attribute [Authorize]
 <AuthorizeView Roles="admin, user, mod">
     <Authorized>
@@ -322,6 +322,20 @@
             ToastService.ShowError(r.Error.Message);
             return;
         }
+
+        foreach (var blogTagCreate in _selectedTags.Select(tag => new BlogTagCreate()
+                 {
+                     BlogId = _blog.Id,
+                     TagId = tag.Id,
+                 }))
+        {
+            var aR = await BlogTagService.AddTagBlog(blogTagCreate);
+            if (!aR.IsOk)
+            {
+                //ToastService.ShowError(aR.Error.Message);
+            }
+        }
+        
         ToastService.ShowSuccess("Publish success!");
          NavigationManager.NavigateTo($"blog/{_blog.Id}");
     }
@@ -330,6 +344,7 @@
     {
         _titleSubscription?.Dispose();
         _contentSubscription?.Dispose();
+        _tagSubscription?.Dispose();
     }
     void ChangeUrl(string url){
         // You can also change it to any url you want
