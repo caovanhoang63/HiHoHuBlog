@@ -36,6 +36,7 @@ using HiHoHuBlog.Modules.User.Repository.Implementation;
 using HiHoHuBlog.Modules.User.Service.Implementation;
 using HiHoHuBlog.Modules.User.Service.Interface;
 using HiHoHuBlog.Utils;
+using HiHoHuBlog.Utils.MailSender;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
@@ -46,8 +47,7 @@ using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
 
-
-
+CronJobSetup.SetUp(builder.Services);
 
 builder.Services.AddSingleton<IAmazonS3>(sp =>
 {
@@ -120,6 +120,7 @@ builder.Services.AddScoped<IBlogDeleteService, BlogDeleteService>();
 builder.Services.AddScoped<IMigrationSearchDataService,MigrationSearchDataService>();
 builder.Services.AddScoped<ISearchBlogService, SearchBlogService>();
 builder.Services.AddScoped<ISearchTagService, SearchTagService>();
+builder.Services.AddScoped<IBlogTagService, BlogTagService>();
 builder.Services.AddScoped<IResetPasswordService, ResetPasswordService>();
 
 
