@@ -1,6 +1,6 @@
 namespace HiHoHuBlog.Modules.Email.Entity;
 
-public abstract class EmailTemplateCreate
+public  class EmailTemplateCreate
 {
     public int? Id { get; set; }
     public string Name { get; set; }

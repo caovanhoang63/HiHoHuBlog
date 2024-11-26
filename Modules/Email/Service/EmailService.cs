@@ -20,8 +20,8 @@ public class EmailService(IEmailRepository emailRepository) : IEmailService
         var old  = await  _emailRepository.FindByName(c.Name);
         
         if (!old.IsOk) return Result<Unit, Err>.Err(old.Error);
-
-        if (old.Value != null && old.Value.Status == 1 ) return Result<Unit, Err>.Err(UtilErrors.ErrEntityAlreadyExists("Email Template"));
+        
+        if (old.Value is not null && old.Value.Status == 1 ) return Result<Unit, Err>.Err(UtilErrors.ErrEntityAlreadyExists("Email Template"));
         
         var r = await _emailRepository.Create(c);
         

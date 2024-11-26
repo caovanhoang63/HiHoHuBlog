@@ -29,8 +29,8 @@ public class EfEmailRepository(ApplicationDbContext context, IMapper mapper) : I
     {
         try
         {
-            await _dbSet.FirstOrDefaultAsync(x => x.Name == name);
-            return Result<EmailTemplate?, Err>.Ok(new EmailTemplate());
+            var r =  await _dbSet.FirstOrDefaultAsync(x => x.Name == name);
+            return Result<EmailTemplate?, Err>.Ok(r);
         }
         catch (Exception ex)
         {
@@ -42,8 +42,8 @@ public class EfEmailRepository(ApplicationDbContext context, IMapper mapper) : I
     {
         try
         {
-            await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
-            return Result<EmailTemplate?, Err>.Ok(new EmailTemplate());
+             var r =  await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
+            return Result<EmailTemplate?, Err>.Ok(r);
         }
         catch (Exception ex)
         {
