@@ -79,6 +79,7 @@
         }
         else
         {
+            Console.WriteLine(123);
             ToastService.ShowError(r.Error.Message);
         }
     }
@@ -113,6 +114,7 @@
         }
         else
         {
+            Console.WriteLine(r.Error);
             ToastService.ShowError(r.Error.Message);
         }
         _isLoading = false;
