@@ -14,6 +14,9 @@
 
     visibility: visible !important;
 }
+.card-body-custom.card-body{
+    padding: 2rem !important;
+}
 @font-face {
     font-family: 'Charter';
     src: url('fonts/Charter-Regular.ttf') format('truetype');

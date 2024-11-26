@@ -177,18 +177,10 @@
                     </table>
                 </div>
                 @* Paging *@
-                <div class="join mt-5 flex justify-end">
-                    <button @onclick="OnPrevious" class="join-item btn btn-ghost btn-sm">«</button>
-                    <button class="join-item btn btn-ghost btn-sm">1</button>
-                    <button class="join-item btn btn-ghost btn-sm">2</button>
-                    <button class="join-item btn btn-ghost btn-disabled btn-sm">...</button>
-                    <button class="join-item btn btn-ghost btn-sm">99</button>
-                    <button class="join-item btn btn-ghost btn-sm">100</button>
-                    <button @onclick="OnNext" class="join-item btn btn-ghost btn-sm">»</button>
-                </div>
+                <Pagination Paging="Paging" FetchDataAsync="GetBlogs"></Pagination>
             </div>
         </div>
-    </Authorized>
+    </Authorized>   
 </AuthorizeView>
 
 @code {
