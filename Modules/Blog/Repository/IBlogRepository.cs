@@ -21,6 +21,9 @@ public interface IBlogRepository
     Task<Result<Unit, Err>> UnPublish(int id);
     Task<Result<Unit,Err>> UpdateTotalLikes(int id);
     Task<Result<Unit,Err>> LikeBlog(int userId,int blogId);
+    
+    Task<Result<Unit,Err>> UpdateTotalComments(int id);
+    Task<Result<Unit,Err>> Comment(int userId,int blogId,string content);
 
 
 }

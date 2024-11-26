@@ -166,4 +166,30 @@ public class BlogUpdateService(IBlogRepository blogRepo) : IBlogUpdateService
         }
         return Result<Unit, Err>.Ok(new Unit());
     }
+
+    public async Task<Result<Unit, Err>> UpdateTotalComments(int id)
+    {
+        var _totalComments = await _blogRepo.UpdateTotalComments(id);
+        if (!_totalComments.IsOk)
+        {
+            return Result<Unit, Err>.Err(_totalComments.Error);
+        }
+
+        return Result<Unit, Err>.Ok(new Unit());
+    }
+
+    public async Task<Result<Unit, Err>> Comments(int userId, int blogId,string content)
+    {
+        var comment = await _blogRepo.Comment(userId, blogId,content);
+        if (!comment.IsOk)
+        {
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        var updateTotalComments = await UpdateTotalComments(blogId);
+        if (!updateTotalComments.IsOk)
+        {
+            return Result<Unit, Err>.Err(updateTotalComments.Error);
+        }
+        return Result<Unit, Err>.Ok(new Unit());
+    }
 }

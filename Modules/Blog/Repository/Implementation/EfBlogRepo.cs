@@ -344,4 +344,51 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
             throw;
         }
     }
+    public async Task<Result<Unit, Err>> UpdateTotalComments(int id)
+    {
+        try
+        {
+            var totalCommentsResult = await GetTotalComments(id);
+            var updateTotalComments = await _dbSet.Where(u=>u.Id==id)
+                .ExecuteUpdateAsync(
+                    b => b.SetProperty(u => u.TotalComment, totalCommentsResult.Value));
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception e)
+        {
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+    }
+
+    public async Task<Result<Unit, Err>> Comment(int userId, int blogId, string content)
+    {
+        try
+        {
+            await context.UserCommentBlogs.AddAsync(new UserCommentBlog()
+            {
+                BlogId = blogId,
+                UserId = userId,
+                Content = content
+            });
+            await context.SaveChangesAsync();
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception e)
+        {
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+    }
+    private async Task<Result<int?, Err>> GetTotalComments( int blogId)
+    {
+        try
+        {
+            int totalComments = await context.UserCommentBlogs.CountAsync(ulb => ulb.BlogId == blogId);
+            return Result<int?, Err>.Ok(totalComments);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
 }

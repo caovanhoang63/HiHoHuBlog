@@ -91,6 +91,10 @@ CREATE TABLE `blogs` (
                          KEY `status` (`status`) USING BTREE
 )ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
 
+ALTER TABLE blogs
+    ADD COLUMN `total_comment`
+        INT NOT NULL AFTER `total_mark`;
+
 DROP TABLE IF EXISTS `categories`;
 CREATE TABLE  `categories` (
                                `id` INT NOT NULL AUTO_INCREMENT,

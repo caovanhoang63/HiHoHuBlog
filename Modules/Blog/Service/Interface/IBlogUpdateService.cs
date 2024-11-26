@@ -12,5 +12,10 @@ public interface IBlogUpdateService
     Task<Result<Unit,Err>> UpdateTotalLikes(int id);
     
     Task<Result<Unit,Err>> LikeBlog(int userId,int blogId);
+    
+    Task<Result<Unit,Err>> UpdateTotalComments(int id);
+    
+    Task<Result<Unit,Err>> Comments(int userId,int blogId,string content);
+    
 
 }
