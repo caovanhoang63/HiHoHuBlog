@@ -182,24 +182,18 @@ CREATE TABLE `blog_tag` (
 )ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+DROP TABLE IF EXISTS `email_template`;
+CREATE TABLE `email_template` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(255) NOT NULL,
+    `content` TEXT,
+    `status` INT NOT NULL DEFAULT '1',
+    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `name` (`name`)  USING BTREE,
+    KEY `status` (`status`) USING BTREE
+)ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
 
 
 

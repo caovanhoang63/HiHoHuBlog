@@ -198,6 +198,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Folder Include="Modules\Email\Comp\" />
         <Folder Include="Modules\Search\CronJobs\" />
         <Folder Include="Modules\Tag\Presentation\" />
         <Folder Include="wwwroot\lib\" />
