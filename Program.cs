@@ -2,6 +2,7 @@ using Amazon;
 using Amazon.Internal;
 using Amazon.Runtime;
 using Amazon.S3;
+using Amazon.SimpleEmail;
 using Blazored.Toast;
 using HiHoHuBlog;
 using HiHoHuBlog.Components;
@@ -41,7 +42,7 @@ using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
 
-
+CronJobSetup.SetUp(builder.Services);
 
 builder.Services.AddSingleton<IAmazonS3>(sp =>
 {
@@ -52,14 +53,24 @@ builder.Services.AddSingleton<IAmazonS3>(sp =>
     return new AmazonS3Client(awsAccessKeyId, awsSecretAccessKey,region);
 });
 
+builder.Services.AddSingleton<IAmazonSimpleEmailService>(sp =>
+{
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    var awsAccessKeyId = configuration["AWS:AccessKeyId"];
+    var awsSecretAccessKey = configuration["AWS:SecretAccessKey"];
+    var region = RegionEndpoint.GetBySystemName(configuration["AWS:Region"]);
+    return new AmazonSimpleEmailServiceClient(awsAccessKeyId, awsSecretAccessKey, region);
+});
+
 builder.Services.AddSingleton<EsClient>(sp =>
 {
     var configuration = sp.GetRequiredService<IConfiguration>();
     return new EsClient(configuration);
 });
 
-
+builder.Services.AddScoped<IMailSender, SesMailService>();
 builder.Services.AddScoped<IUploadProvider, S3UploadProvider>();
+
 // Add services to the container.
 builder.Services.AddServerSideBlazor()
     .AddCircuitOptions(options => 
@@ -80,6 +91,8 @@ builder.Services.AddScoped<ITagRepository, EfTagRepository>();
 builder.Services.AddScoped<IBlogTagRepository, EfBlogTagRepo>();
 builder.Services.AddScoped<IMigrationRepository, EsMigrationRepository>();
 builder.Services.AddScoped<ISearchTagRepository, EsSearchTagRepository>();
+builder.Services.AddScoped<IUserBlogActionRepository, EfUserBlogActionRepo>();
+builder.Services.AddScoped<ISearchUserRepository, EsSearchUserRepository>();
 
 builder.Services.AddScoped<IUserSignUpService, UserSignUpService>();
 builder.Services.AddScoped<IUserLoginService, UserLoginService>();
@@ -88,6 +101,9 @@ builder.Services.AddScoped<IBlogBlockedService,BlogBlockedService>();
 builder.Services.AddScoped<IReasonBlogBlockService,ReasonBlogBlockService>();
 builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+builder.Services.AddScoped<IUserBlogActionService, UserBlogActionService>();
+builder.Services.AddScoped<IUserSettingsService, UserSettingsService>();
+builder.Services.AddScoped<ISearchUserService, SearchUserService>();
 
 builder.Services.AddScoped<ICreateBlogService,CreateBlogService>();
 builder.Services.AddScoped<IBlogUpdateService, BlogUpdateService>();
@@ -97,6 +113,7 @@ builder.Services.AddScoped<IMigrationSearchDataService,MigrationSearchDataServic
 builder.Services.AddScoped<ISearchBlogService, SearchBlogService>();
 builder.Services.AddScoped<ISearchTagService, SearchTagService>();
 builder.Services.AddScoped<IUserFollowService, UserFollowService>();
+builder.Services.AddScoped<IBlogTagService, BlogTagService>();
 
 builder.Services.AddAutoMapper(typeof(UserMappingProfile));
 builder.Services.AddAutoMapper(typeof(BlogMappingProfile));

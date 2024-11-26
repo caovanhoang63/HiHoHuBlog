@@ -1,4 +1,5 @@
 using HiHoHuBlog.Modules.Blog.Entity;
+using HiHoHuBlog.Modules.Blog.Repository;
 using HiHoHuBlog.Modules.Search.Entity;
 using HiHoHuBlog.Modules.Search.Repository.Interface;
 using HiHoHuBlog.Utils;
@@ -6,8 +7,10 @@ using Nest;
 
 namespace HiHoHuBlog.Modules.Search.Repository.Implementation;
 
-public class EsSearchBlogRepository(EsClient client) : ISearchBlogRepository
+public class EsSearchBlogRepository(EsClient client, IUserBlogActionRepository userBlogRepo) : ISearchBlogRepository
 {
+    
+    private readonly IUserBlogActionRepository _userBlogRepo = userBlogRepo;
     public async Task<Result<Unit, Err>> AddBulkAsync(IEnumerable<BlogSearchDoc> blogs, DateTime? date)
     {
         var r = await client.Client.BulkAsync(b => b.Index<BlogSearchDoc>().IndexMany(blogs));
@@ -38,7 +41,7 @@ public class EsSearchBlogRepository(EsClient client) : ISearchBlogRepository
     public async Task<Result<IEnumerable<BlogSearchDoc>?, Err>> SearchBlog(string arg, Paging paging)
     {
         var searchResponse = await client.Client.SearchAsync<BlogSearchDoc>(s => s
-            .From(paging.GetOffSet())
+            .From(paging.GetOffSet() - 1)
             .Size(paging.PageSize)
             .Query(q => q
                 .Bool(b => b
@@ -159,9 +162,62 @@ public class EsSearchBlogRepository(EsClient client) : ISearchBlogRepository
             UtilErrors.InternalServerError(searchResponse.OriginalException));
     }
 
-    public Task<Result<IEnumerable<BlogSearchDoc>?, Err>> RecommendSearchBlogByUser(IRequester requester, Paging paging)
+    public async Task<Result<IEnumerable<BlogSearchDoc>?, Err>> RecommendSearchBlogByUser(IRequester requester,int seed, Paging paging)
     {
-        throw new NotImplementedException();
+        var history = await _userBlogRepo.ListReadHistory(requester.GetId(),new Paging(1, 2));
+
+        if (!history.IsOk || history.Value is null )
+        {
+            return await RandomBlog(seed,paging);
+        }
+        
+        var docs = await client.Client.SearchAsync<BlogSearchDoc>(s => s
+            .Size(paging.PageSize)
+            .From(paging.GetOffSet())
+            .Query(q => q
+                .Bool(b => b
+                    .Must(
+                        qq => qq.FunctionScore(f => f
+                            .Query(mlt => mlt
+                                .MoreLikeThis(m => m
+                                    .Fields(ff => ff.Field("title").Field("content"))
+                                    .Like(l =>
+                                    {
+                                        foreach (var u in history.Value)
+                                        {
+                                            l.Document(d => d.Id(u?.Blog?.Id));
+                                        }
+                                        return l;
+                                    })
+                                    .MinTermFrequency(1)
+                                    .MinDocumentFrequency(1)
+                                    .MaxQueryTerms(25)
+                                )
+                            )
+                            .Functions(ff => ff
+                                .RandomScore(ss => ss
+                                        .Seed(seed)
+                                        .Weight(2) 
+                                )
+                            )
+                        )
+                    )
+                    .Filter(f => f
+                            .Term(t => t.Field("isPublished").Value(true)),
+                        f => f
+                            .Term(t => t.Field("status").Value(1))
+                    )
+                )
+            )
+            .Sort(ss => ss.Descending(SortSpecialField.Score))
+        );
+        if (docs.IsValid )
+        {
+            paging.Total = (int)docs.Total;
+            return Result<IEnumerable<BlogSearchDoc>?, Err>.Ok(docs.Documents);
+        }
+
+        return Result<IEnumerable<BlogSearchDoc>?, Err>.Err(UtilErrors.InternalServerError(docs.OriginalException));
     }
 
     public async Task<Result<IEnumerable<BlogSearchDoc>?, Err>> RecommendSearchBlogByBlog(IRequester? requester, int id,
@@ -169,7 +225,7 @@ public class EsSearchBlogRepository(EsClient client) : ISearchBlogRepository
     {
         var docs = await client.Client.SearchAsync<BlogSearchDoc>(s => s
             .Size(paging.PageSize)
-            .From(paging.Page - 1)
+            .From(paging.GetOffSet() )
             .Query(q => q
                 .Bool(b => b
                     .Must(sh => sh
@@ -201,7 +257,7 @@ public class EsSearchBlogRepository(EsClient client) : ISearchBlogRepository
     {
         var docs = await client.Client.SearchAsync<BlogSearchDoc>(s => s
             .Size(paging.PageSize)
-            .From(paging.Page - 1)
+            .From(paging.GetOffSet())
             .Query(q => q
                 .Bool(b => b
                     .Must(mm => mm

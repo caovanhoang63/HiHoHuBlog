@@ -6,8 +6,20 @@
 @using HiHoHuBlog.Utils
 @inject ISearchBlogService BlogSearch
 @inject IToastService ToastService
+@inject IJSRuntime JSRuntime
 
-<Container ContainerClass="flex justify-between space-x-10 max-w-7xl">
+@attribute [Authorize]
+@attribute [AllowAnonymous]
+<HeadContent>
+    <style>
+        body {
+            overflow-y: scroll;
+        }
+    </style>
+</HeadContent>
+
+
+<Container ContainerClass="flex justify-between space-x-10 max-w-7xl relative">
     <div class="grow max-w-4xl py-10">
         <div role="tablist" class="tabs tabs-bordered">
             <button class="tab">
@@ -20,16 +32,19 @@
             <a role="tab" class="tab">Tab 3</a>
             <a role="tab" class="tab">Tab 4</a>
         </div>
-        @if (_blogs is not null)
-        {
+        <ul >
             @foreach (var blog in _blogs)
             {
-                <BlogCard BlogSearchDoc="blog"/>
-
+                <li class="list-none">
+                    <BlogCard BlogSearchDoc="blog"/>
+                </li>
             }
-        }
+        </ul>
+        <div class="text-center w-full">
+            <p class="@(_isLoading ? " " : "hidden" )">Loading...</p>
+        </div>
     </div>
-    <div class="border-l-[1px] grow p-10 max-w-sm">
+    <div class="border-l-[1px]  p-10 pt-20 max-w-sm max-h-screen sticky top-0">
         <div class="flex flex-col space-y-2">
             <span class="text-black">Staff pick</span>
             <TinyBlogCard/>
@@ -40,23 +55,101 @@
 </Container>
 
 @code {
-
     private IRequester? _requester;
-    private readonly Paging _paging = new Paging(1, 5);
-    private int seed = 0;
-    private IEnumerable<BlogSearchDoc>? _blogs;
+    private readonly List<BlogSearchDoc> _blogs = new List<BlogSearchDoc>();
+    private bool _isLoading = false;
+    private readonly Paging _paging = new Paging(1, 4);
+    private int _seed = 0;
+
+    [CascadingParameter]
+    Task<AuthenticationState> authenticationStateTask { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        seed = Guid.NewGuid().GetHashCode();
-        var r = await BlogSearch.RandomBlog(seed, _paging);
-        if (r.IsOk)
+        _requester = await AuthUtils.GetInfo(authenticationStateTask);
+        _seed = Guid.NewGuid().GetHashCode();
+        
+        var r = _requester is null ? 
+            await BlogSearch.RandomBlog(_seed, _paging) : 
+            await BlogSearch.RecommendSearchBlogByUser(_requester, _seed, _paging);
+
+        if (r is { IsOk: true, Value: not null })
         {
-            _blogs = r.Value;
+            _blogs.AddRange(r.Value.ToList());
         }
         else
         {
+            Console.WriteLine(123);
             ToastService.ShowError(r.Error.Message);
         }
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Task.Delay(500);
+            await LoadMoreBlogs(); 
+            await LoadMoreBlogs();
+            await JSRuntime.InvokeVoidAsync("addScrollListener", DotNetObjectReference.Create(this));
+            await JSRuntime.InvokeVoidAsync("addVisibilityListener", DotNetObjectReference.Create(this));
+        }
+    }
+
+    [JSInvokable]
+    public async Task LoadMoreBlogs()
+    {
+        if (_paging.IsLastPage()) return;
+        if (_isLoading)
+            return;
+        _isLoading = true;
+        await InvokeAsync(StateHasChanged);
+        _paging.Page++;
+        var r = _requester is null ? 
+            await BlogSearch.RandomBlog(_seed, _paging) : 
+            await BlogSearch.RecommendSearchBlogByUser(_requester, _seed, _paging);
+        if (r is { IsOk: true, Value: not null })
+        {
+            _blogs.AddRange(r.Value.ToList());
+        }
+        else
+        {
+            Console.WriteLine(r.Error);
+            ToastService.ShowError(r.Error.Message);
+        }
+        _isLoading = false;
+
+        await InvokeAsync(StateHasChanged);  
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await JSRuntime.InvokeVoidAsync("removeScrollListener");
+    }
 }
+
+<script src="scroll.js"></script>
+<script>
+    async function  addVisibilityListener(dotNetHelper) {
+        const blogList = document.querySelector('ul');
+        if (!blogList) return;
+       while (blogList.offsetHeight + 300 <= window.innerHeight) {
+         if (blogList.offsetHeight ===0) {
+               await new Promise(r => setTimeout(r, 500))
+              continue;
+            };
+            console.log(blogList.offsetHeight)
+            console.log(window.innerHeight)
+        await dotNetHelper.invokeMethodAsync('LoadMoreBlogs');
+       }
+    }
+    function isElementInViewport(el) {
+        const rect = el.getBoundingClientRect();
+        return (
+            rect.top >= 0 &&
+            rect.left >= 0 &&
+            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+        );
+    }
+</script>

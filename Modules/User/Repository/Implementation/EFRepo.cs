@@ -3,20 +3,23 @@ using HiHoHuBlog.Modules.User.Entity;
 using HiHoHuBlog.Utils;
 using Microsoft.EntityFrameworkCore;
 using HiHoHuBlog.Utils;
+using Newtonsoft.Json;
 
 namespace HiHoHuBlog.Modules.User.Repository.Implementation;
 
 public class EfRepo  : IUserRepository
 {
     private readonly DbSet<Entity.User> _dbSet;
+    private readonly DbSet<Entity.UserDetails> _dbDetailsSet;
     private readonly ApplicationDbContext _dbContext;
     private readonly IMapper _mapper;
-
+    
     public EfRepo( ApplicationDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
         _dbSet = _dbContext.Set<Entity.User>();
+        _dbDetailsSet = _dbContext.Set<Entity.UserDetails>();
     }
 
     public async Task<Result<Unit, Err>> Create(UserSignUp userSignUp)
@@ -41,13 +44,167 @@ public class EfRepo  : IUserRepository
 
         return Result<Entity.User?, Err>.Ok(user);
     }
-    
+
+    public async Task<Result<IEnumerable<Entity.User>, Err>> ListUsers(UserFilter? filter, Paging? paging)
+    {
+        var queryable = _dbSet.AsQueryable();
+        if (filter != null)
+        {
+            if (filter.Status is not null)
+            {
+                queryable = queryable.Where(b => filter.Status.Contains(b.Status));
+            }
+            if (filter.LtCreatedAt is not null)
+            {
+                queryable = queryable.Where(b => b.CreatedAt <= filter.LtCreatedAt);
+            }
+            if (filter.GtCreatedAt is not null)
+            {
+                queryable = queryable.Where(b => b.CreatedAt >= filter.GtCreatedAt);
+            }
+                
+            if (filter.LtUpdatedAt is not null)
+            {
+                queryable = queryable.Where(b => b.UpdatedAt <= filter.LtUpdatedAt);
+            }
+            if (filter.GtUpdatedAt is not null)
+            {
+                queryable = queryable.Where(b => b.UpdatedAt >= filter.GtUpdatedAt);
+            }
+        }
+
+        if (paging is not null)
+        {
+            queryable =  queryable.Skip(paging.GetOffSet())
+                .Take(paging.PageSize);
+        }
+        
+        try
+        {
+            var r = await queryable
+                .Include(b => b.UserDetails)
+                .Select(b => b).ToListAsync();
+            
+            return Result<IEnumerable<Entity.User>, Err>.Ok(r);
+        }
+        catch (Exception ex)
+        {
+            return Result<IEnumerable<Entity.User>, Err>.Err(UtilErrors.InternalServerError(ex));
+        }
+    }
+
     public async Task<Result<Entity.User?, Err>> FindByEmailAndUserName(string email,string userName)
     {
         var user = await _dbSet.Where(u => u.Email == email )
             .Where(u => u.UserName == userName).FirstOrDefaultAsync();
 
         return Result<Entity.User?, Err>.Ok(user);
+    }
+
+    public async Task<Result<Unit, Err>> UpdateSettingsProfile(UserSettingsProfile userSettingsProfile)
+    {
+        using var transaction = await _dbContext.Database.BeginTransactionAsync();
+        try
+        {
+            var userUpdateResult = await _dbSet
+                .Where(u => u.Id == userSettingsProfile.Id)
+                .ExecuteUpdateAsync(
+                    u => u
+                        .SetProperty(i => i.Avatar, userSettingsProfile.Avatar)
+                        .SetProperty(i => i.FirstName, userSettingsProfile.FirstName)
+                        .SetProperty(i => i.LastName, userSettingsProfile.LastName)
+                );
+
+            var userDetails = await _dbDetailsSet
+                .Where(ud => ud.Id == userSettingsProfile.Id)
+                .FirstOrDefaultAsync();
+
+            if (userDetails != null)
+            {
+                var userDetailsUpdateResult =await _dbDetailsSet
+                    .Where(ud => ud.Id == userSettingsProfile.Id)
+                    .ExecuteUpdateAsync(
+                        ud => ud
+                            .SetProperty(i => i.Bio, userSettingsProfile.ShortBio)
+                            .SetProperty(i => i.Status, 1)
+                    );
+                
+                if (userUpdateResult > 0&& userDetailsUpdateResult>0)
+                {
+                    await transaction.CommitAsync();
+                    Console.WriteLine("Cap nhap thanh cong 2");
+                    return Result<Unit, Err>.Ok(new Unit());
+                }
+                else
+                {            
+                    await transaction.RollbackAsync();
+                    return Result<Unit, Err>.Err(UtilErrors.InternalServerError(null));
+                }
+            }
+            else
+            {
+                var newUserDetails = new UserDetails
+                {
+                    Id = userSettingsProfile.Id,
+                    Bio = userSettingsProfile.ShortBio,
+                };
+                await _dbDetailsSet.AddAsync(newUserDetails);
+                var saveResult = await _dbContext.SaveChangesAsync();
+                Console.WriteLine(saveResult.ToString());
+
+                if (saveResult > 0)
+                {
+                    Console.WriteLine("Cap nhap thanh cong 2");
+                    await transaction.CommitAsync();
+                    return Result<Unit, Err>.Ok(new Unit());
+                }
+                else
+                {            
+                    await transaction.RollbackAsync();
+                    return Result<Unit, Err>.Err(UtilErrors.InternalServerError(null));
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            await transaction.RollbackAsync();
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+    }
+
+    public async Task<Result<UserSettingsProfile?, Err>> GetSettingsProfile(string userName)
+    {
+        try
+        {
+            var userSettingsProfile = await  (
+                    from u in _dbSet
+                    join ud in _dbDetailsSet on u.Id equals ud.UserId into detailsGroup
+                    from ud in detailsGroup.DefaultIfEmpty()
+                    where (u.UserName == userName)
+                        select new UserSettingsProfile()
+                        {
+                            Id = u.Id,
+                            Avatar = u.Avatar,
+                            FirstName = u.FirstName,
+                            LastName = u.LastName,
+                            ShortBio = ud != null ? ud.Bio : null,
+                        }
+                    
+                ).FirstOrDefaultAsync();
+            
+            if (userSettingsProfile == null)
+            {
+                return Result<UserSettingsProfile?, Err>.Err(UtilErrors.ErrEntityNotFound(nameof(UserSettingsProfile)));
+            }
+
+            return Result<UserSettingsProfile?, Err>.Ok(userSettingsProfile);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("loi cmnr");
+            Console.WriteLine(e.Message);
+            return Result<UserSettingsProfile?, Err>.Err(UtilErrors.InternalServerError(e));
+        }
     }
 
     public async Task<Result<UserProfile?, Err>> GetProfile(string userName)
@@ -113,4 +270,6 @@ public class EfRepo  : IUserRepository
             throw;
         }
     }
+    
+    
 }

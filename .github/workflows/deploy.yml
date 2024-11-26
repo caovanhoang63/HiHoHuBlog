@@ -1,0 +1,61 @@
+name: Push the Docker image to AWS ECR Repo
+on:
+  push:
+    branches:
+      - deploy
+jobs:
+  Build:
+    name: Build &  Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR Public
+        id: login-ecr-public
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: public
+
+      - name: Get commit hash
+        id: get-commit-hash
+        run: echo "::set-output name=commit-hash::$(git rev-parse --short HEAD)"
+
+      - name: Build, tag, and push the image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
+          IMAGE_TAG:  hihohublog-${{ steps.get-commit-hash.outputs.commit-hash }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+
+      - name:  Deploy
+        env:
+          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          HOSTNAME: ${{ secrets.SSH_HOST }}
+          USER_NAME: ${{ secrets.SSH_USER_NAME }}
+        run: |
+          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
+              APP_NAME=hihohublog &&
+              docker rm -f ${APP_NAME} &&
+              echo pull &&
+              docker pull ${{ steps.login-ecr-public.outputs.registry }}/${{ secrets.REPO_NAME }}:hihohublog-${{ steps.get-commit-hash.outputs.commit-hash }} &&
+              docker run -d --name ${APP_NAME} \
+              --network hihohu \
+              -v ${PWD}/config/appsettings.Production.json:/app/appsettings.Production.json \
+              -e ASPNETCORE_ENVIRONMENT=Production \
+              -e VIRTUAL_HOST="www.hihohu.site" \
+              -p 8080:8080 \
+              ${{ steps.login-ecr-public.outputs.registry }}/${{ secrets.REPO_NAME }}:hihohublog-${{ steps.get-commit-hash.outputs.commit-hash }}
+          '

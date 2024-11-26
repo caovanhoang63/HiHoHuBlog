@@ -18,12 +18,14 @@ public class ApplicationDbContext : DbContext
     
     public DbSet<UserLikeBlog> UserLikeBlogs { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<UserDetails> UserDetails { get; set; }
     public DbSet<Blog> Blogs { get; set; }
     public DbSet<Tag> Tags { get; set; }
     public DbSet<BlogTag> BlogTags { get; set; }
     public DbSet<BlogBlocked> BlogBlocked { get; set; }
     public DbSet<ReasonBlogBlock> ReasonBlogBlock { get; set; }
     public DbSet<UserFollow> UserFollows { get; set; }
+    public DbSet<UserReadBlog> userReadBlog { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>().ToTable("users");
@@ -32,12 +34,18 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<BlogTag>().ToTable("blog_tag");
         modelBuilder.Entity<BlogTag>().HasKey(b => b.TagId);
         modelBuilder.Entity<BlogTag>().HasKey(b => b.BlogId);
+        modelBuilder.Entity<UserDetails>().ToTable("user_details");
         modelBuilder.Entity<BlogBlocked>().ToTable("blog_blocked");
         modelBuilder.Entity<ReasonBlogBlock>().ToTable("reason_blog_block");
         modelBuilder.Entity<UserLikeBlog>().ToTable("user_like_blog");
         modelBuilder.Entity<UserFollow>().ToTable("user_follow");
 
 
+        modelBuilder.Entity<UserReadBlog>().ToTable("user_read_blogs");
+        modelBuilder.Entity<User>()
+            .HasOne(u => u.UserDetails)       
+            .WithOne()                        
+            .HasForeignKey<UserDetails>(ud => ud.UserId);
         modelBuilder.Entity<Blog>()
             .Property(b => b.Thumbnail)
             .HasConversion<string>(

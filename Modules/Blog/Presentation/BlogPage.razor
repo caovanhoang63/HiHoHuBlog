@@ -13,6 +13,10 @@
 @inject IBlogGetService BlogGetService
 @inject NavigationManager NavigationManager
 @inject ISearchBlogService SearchBlogService
+@inject IUserBlogActionService UserBlogAction 
+
+@attribute [Authorize]
+@attribute [AllowAnonymous]
 @inject IBlogUpdateService BlogUpdateService
 @inject IUserFollowService UserFollowService
 <Container>
@@ -77,8 +81,14 @@
         @* Content *@
         <div>
 
-            <TextEditor @ref="_textEditor" ReadOnly="true">
-            </TextEditor>
+            @if (_blog is not null)
+            {
+                <TextEditor @key="_blog.Id" @ref="_textEditor" ReadOnly="true">
+                    <EditorContent>
+                        @((@MarkupString)_blog.Content)
+                    </EditorContent>
+                </TextEditor>    
+            }
         </div>
         <div class="divider m-0 "></div>
         <div class="container mx-auto px-4 py-8">
@@ -136,21 +146,25 @@
 @code {
     [Parameter]
     public string Slug { get; set; }
-    private bool _isLoading = true;
-    private IEnumerable<BlogSearchDoc>? _relatedBlog = new List<BlogSearchDoc>();
-    private Paging _relatedPaging = new Paging(1, 4);
-    private TextEditor _textEditor;
-    private IRequester? _requester;
     [CascadingParameter]
     Task<AuthenticationState> authenticationStateTask { get; set; }
-
-    
-    
+    private TextEditor _textEditor;
+    private bool _isLoading = true;
+    private IEnumerable<BlogSearchDoc>? _relatedBlog = new List<BlogSearchDoc>();
+    private readonly Paging _relatedPaging = new Paging(1, 4);
+    private IRequester? _requester;
     private BlogDetail _blog { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        _requester = await AuthUtils.GetInfo(authenticationStateTask);
+
+    }
+
     protected override async Task OnParametersSetAsync()
     {
         var request = Slug.Split('-'); 
         string idString = request[^1];
+        _isLoading = true;
         int id;
         if (!Int32.TryParse(idString, out id))
         {
@@ -169,8 +183,6 @@
         }
 
         _blog = r.Value;
-        Console.WriteLine(_blog?.User?.FirstName);
-        await _textEditor.LoadHTMLContent(_blog.Content);
         
         var result = await SearchBlogService.RecommendSearchBlogByBlog(null, _blog.Id, _relatedPaging);
 
@@ -178,17 +190,18 @@
         {
             _relatedBlog = result.Value;
         }
-        
+
         _isLoading = false;
+        await InvokeAsync(StateHasChanged);
+        if (_requester is not null )
+        {
+            _ = UserBlogAction.ReadBlog(_requester, _blog.Id);
+        }
         
         
     }
 
-    protected override async Task OnInitializedAsync()
-    {
-        _requester= await AuthUtils.GetInfo(authenticationStateTask);
-    }
-
+    
     private async void onFollowClick()
     {
         Console.WriteLine(_requester.GetId());
