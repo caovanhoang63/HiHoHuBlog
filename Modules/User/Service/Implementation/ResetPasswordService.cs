@@ -28,7 +28,13 @@ public class ResetPasswordService(IUserRepository userRepository, IMailSender ma
         if (!template.IsOk || template.Value is null) return Result<Unit, Err>.Err(UtilErrors.InternalServerError(template.Error));
         
         
-
+        
+        // JWT => Secret => Hash Claims
+        // TODO: Claims = [email, expired time = 5p]
+        // JWT => Secret => Hash Claims
+        
+        // 
+        
         var req = new MailRequest
         {
             toAddresses = new List<string>(){email},
@@ -37,6 +43,7 @@ public class ResetPasswordService(IUserRepository userRepository, IMailSender ma
             subject = "Reset Password",
             senderAddress = "no-reply@hihohu.site"
         };
+        
         
          var r =  await _mailSender.Send(req);
          
