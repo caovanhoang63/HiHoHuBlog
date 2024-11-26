@@ -114,6 +114,7 @@ builder.Services.AddScoped<IBlogDeleteService, BlogDeleteService>();
 builder.Services.AddScoped<IMigrationSearchDataService,MigrationSearchDataService>();
 builder.Services.AddScoped<ISearchBlogService, SearchBlogService>();
 builder.Services.AddScoped<ISearchTagService, SearchTagService>();
+builder.Services.AddScoped<IBlogTagService, BlogTagService>();
 
 builder.Services.AddAutoMapper(typeof(UserMappingProfile));
 builder.Services.AddAutoMapper(typeof(BlogMappingProfile));
