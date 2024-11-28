@@ -36,7 +36,6 @@ using HiHoHuBlog.Modules.User.Repository.Implementation;
 using HiHoHuBlog.Modules.User.Service.Implementation;
 using HiHoHuBlog.Modules.User.Service.Interface;
 using HiHoHuBlog.Utils;
-using HiHoHuBlog.Utils.MailSender;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
@@ -99,7 +98,7 @@ builder.Services.AddScoped<ISearchTagRepository, EsSearchTagRepository>();
 builder.Services.AddScoped<IUserBlogActionRepository, EfUserBlogActionRepo>();
 builder.Services.AddScoped<ISearchUserRepository, EsSearchUserRepository>();
 builder.Services.AddScoped<IEmailRepository,EfEmailRepository>();
-
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddScoped<IUserSignUpService, UserSignUpService>();
 builder.Services.AddScoped<IUserLoginService, UserLoginService>();

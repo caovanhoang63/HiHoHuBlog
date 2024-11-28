@@ -36,4 +36,9 @@ public static class UtilErrors
     {
         return new Err($"Got an Error when send email: {JsonConvert.SerializeObject(mailRequest)}",ex,500);
     }
+
+    public static Err ErrTokenExpired()
+    {
+        return new Err("Token expired");
+    }  
 }
