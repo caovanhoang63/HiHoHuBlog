@@ -1,3 +1,4 @@
+using HiHoHuBlog.Modules.Blog.Entity;
 using HiHoHuBlog.Utils;
 
 namespace HiHoHuBlog.Modules.Blog.Service.Interface;
@@ -17,5 +18,6 @@ public interface IBlogUpdateService
     
     Task<Result<Unit,Err>> Comments(int userId,int blogId,string content);
     
+    Task<Result<IEnumerable<UserCommentBlog>?, Err>> GetCommentsById(int blogId);    
 
 }

@@ -1,6 +1,7 @@
 ﻿@using HiHoHuBlog.Modules.Blog.Entity
 @using HiHoHuBlog.Modules.Blog.Service.Interface
 @using HiHoHuBlog.Utils
+@using HiHoHuBlog.Modules.Blog.Presentation.Components.TextEditor
 @inject IBlogUpdateService BlogUpdateService
 @inject NavigationManager NavigationManager
 <div class=" fixed flex inset-0 items-start mx-auto justify-end bg-gray-900 bg-opacity-50 rounded-lg z-[999999]  @(IsOpen ? " " : "hidden") "
@@ -32,32 +33,14 @@
 
         <!-- Response List -->
         <div class="space-y-4">
-            <div class="flex gap-4">
-                <!-- Avatar -->
-                <div class="avatar">
-                    <div class="w-10 h-10 rounded-full bg-success text-white flex items-center justify-center">
-                        <span class="text-lg font-semibold">H</span>
-                    </div>
-                </div>
-
-                <!-- Comment Content -->
-                <div class="flex-1">
-                    <div class="flex items-center gap-2 mb-1">
-                        <span class="font-semibold">Hieu Nguyen</span>
-                        <div class="flex-1"></div>
-                        <button class="btn btn-ghost btn-circle btn-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
-                            </svg>
-                        </button>
-                    </div>
-                    <p class="mb-2">hehe</p>
-                </div>
-                
-            </div>
+            @foreach (var comment in comments)
+            {
+                <CommentContent UserCommentBlog="comment"></CommentContent>
+            }
+            
         </div>
         
-    </div>
+    </div>      
    
 </div>
 
@@ -70,7 +53,21 @@
     [Parameter] public bool IsOpen { get; set; }
     [Parameter] public EventCallback OnClose { get; set; }
     private string commentText = string.Empty;
+    private List< UserCommentBlog> comments = new();
+    
 
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Blog != null)
+        {
+            var result = await BlogUpdateService.GetCommentsById(Blog.Id);
+            if (result.IsOk)
+            {
+                if (result.Value != null) 
+                    comments = result.Value.ToList();
+            }
+        }
+    }
 
     private async void OnSubmitComment()
     {
@@ -81,6 +78,16 @@
         {
             
             var response = await BlogUpdateService.Comments(Requester.GetId(), Blog.Id, commentText);
+            if (response.IsOk)
+            {
+                commentText = string.Empty;
+                var result = await BlogUpdateService.GetCommentsById(Blog.Id);
+                if (result.IsOk)
+                {
+                    if (result.Value != null) 
+                        comments = result.Value.ToList();
+                }
+            }
             // Clear input after successful submission
             if (response.IsOk) // Adjust condition based on your API response
             {
@@ -91,6 +98,8 @@
         {
             NavigationManager.NavigateTo("/login");
         }
+        StateHasChanged();
+
     }
     
     

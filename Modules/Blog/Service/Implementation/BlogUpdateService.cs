@@ -1,3 +1,4 @@
+using HiHoHuBlog.Modules.Blog.Entity;
 using HiHoHuBlog.Modules.Blog.Repository;
 using HiHoHuBlog.Modules.Blog.Service.Interface;
 using HiHoHuBlog.Utils;
@@ -157,7 +158,7 @@ public class BlogUpdateService(IBlogRepository blogRepo) : IBlogUpdateService
         var likeBLog = await _blogRepo.LikeBlog(userId, blogId);
         if (!likeBLog.IsOk)
         {
-            return Result<Unit, Err>.Ok(new Unit());
+            return Result<Unit, Err>.Err(likeBLog.Error);
         }
         var updateLikeBlog = await UpdateTotalLikes(blogId);
         if (!updateLikeBlog.IsOk)
@@ -183,7 +184,7 @@ public class BlogUpdateService(IBlogRepository blogRepo) : IBlogUpdateService
         var comment = await _blogRepo.Comment(userId, blogId,content);
         if (!comment.IsOk)
         {
-            return Result<Unit, Err>.Ok(new Unit());
+            return Result<Unit, Err>.Err(comment.Error);
         }
         var updateTotalComments = await UpdateTotalComments(blogId);
         if (!updateTotalComments.IsOk)
@@ -191,5 +192,15 @@ public class BlogUpdateService(IBlogRepository blogRepo) : IBlogUpdateService
             return Result<Unit, Err>.Err(updateTotalComments.Error);
         }
         return Result<Unit, Err>.Ok(new Unit());
+    }
+
+    public async Task<Result<IEnumerable<UserCommentBlog>?, Err>> GetCommentsById(int blogId)
+    {
+        var listComments = await blogRepo.GetCommentsById(blogId);
+        if (!listComments.IsOk)
+        {
+            return Result<IEnumerable<UserCommentBlog>?, Err>.Err(listComments.Error);
+        }
+        return Result<IEnumerable<UserCommentBlog>?, Err>.Ok(listComments.Value);
     }
 }

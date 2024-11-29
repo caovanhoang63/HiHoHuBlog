@@ -364,7 +364,6 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
     {
         try
         {            
-            Console.WriteLine("OK1 ");
 
             await context.UserCommentBlogs.AddAsync(new UserCommentBlog()
             {
@@ -381,6 +380,24 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
             return Result<Unit, Err>.Err(UtilErrors.InternalServerError(e));
         }
     }
+
+    public async Task<Result<IEnumerable<UserCommentBlog>?, Err>> GetCommentsById(int blogId)
+    {
+        try
+        {
+            var comments = await context.UserCommentBlogs
+                .Where(ulb => ulb.BlogId == blogId)
+                .Include(ulb => ulb.User)
+                .Select(ulb => ulb)
+                .ToListAsync();
+            return Result<IEnumerable<UserCommentBlog>?, Err>.Ok(comments);
+        }
+        catch (Exception e)
+        {
+            return Result<IEnumerable<UserCommentBlog>?, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+    }
+
     private async Task<Result<int?, Err>> GetTotalComments( int blogId)
     {
         try

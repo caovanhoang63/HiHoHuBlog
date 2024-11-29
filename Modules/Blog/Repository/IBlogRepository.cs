@@ -24,6 +24,8 @@ public interface IBlogRepository
     
     Task<Result<Unit,Err>> UpdateTotalComments(int id);
     Task<Result<Unit,Err>> Comment(int userId,int blogId,string content);
+    
+    Task<Result<IEnumerable<UserCommentBlog>?,Err>> GetCommentsById(int blogId);
 
 
 }
