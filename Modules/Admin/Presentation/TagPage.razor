@@ -7,7 +7,7 @@
 @using HiHoHuBlog.Utils
 @using HiHoHuBlog.Components.Components
 @layout AdminLayout
-@attribute [Authorize]
+@attribute [Authorize(Roles="admin, mod")]
 @inject ITagService TagService
 @inject IToastService toastService
 @inject NavigationManager NavigationManager

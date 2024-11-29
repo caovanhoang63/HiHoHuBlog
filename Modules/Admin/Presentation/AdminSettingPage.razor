@@ -7,11 +7,11 @@
 @using HiHoHuBlog.Utils.MailSender
 @layout AdminLayout
 @inject IReasonBlogBlockService Service
-@attribute [Authorize]
 @rendermode InteractiveServer
 @inject IMigrationSearchDataService MigrateService
 @inject IToastService ToastService
 @inject IMailSender MailSender
+@attribute [Authorize(Roles="admin, mod")]
 
 <AuthorizeView Roles="admin, mod">
     <Authorized>
