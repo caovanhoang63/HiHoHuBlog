@@ -2,7 +2,7 @@
 @using HiHoHuBlog.Modules.Blog.Service.Interface
 @using HiHoHuBlog.Utils
 @inject IBlogUpdateService BlogUpdateService
-
+@inject NavigationManager NavigationManager
 <div class=" fixed flex inset-0 items-start mx-auto justify-end bg-gray-900 bg-opacity-50 rounded-lg z-[999999]  @(IsOpen ? " " : "hidden") "
      @onclick="OnClose">
     <div class=" bg-white h-full p-4" @onclick:stopPropagation="true">
@@ -86,6 +86,10 @@
             {
                 commentText = string.Empty;
             }
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/login");
         }
     }
     

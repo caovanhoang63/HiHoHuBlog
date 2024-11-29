@@ -144,12 +144,14 @@ CREATE TABLE  `user_read_blogs` (
 
 DROP TABLE IF EXISTS `comments`;
 CREATE TABLE `comments` (
+                            `id` INT NOT NULL AUTO_INCREMENT,
                             `user_id` INT,
                             `blog_id` INT,
                             `content` text,
                             `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                            PRIMARY KEY (`user_id`,`blog_id`)
+                            PRIMARY KEY (`id`)
 )ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
+
 
 
 DROP TABLE IF EXISTS `blog_blocked`;

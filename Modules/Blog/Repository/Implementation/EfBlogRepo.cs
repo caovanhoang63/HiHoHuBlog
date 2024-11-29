@@ -363,7 +363,9 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
     public async Task<Result<Unit, Err>> Comment(int userId, int blogId, string content)
     {
         try
-        {
+        {            
+            Console.WriteLine("OK1 ");
+
             await context.UserCommentBlogs.AddAsync(new UserCommentBlog()
             {
                 BlogId = blogId,
@@ -375,6 +377,7 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
         }
         catch (Exception e)
         {
+            Console.WriteLine(e.Message);
             return Result<Unit, Err>.Err(UtilErrors.InternalServerError(e));
         }
     }

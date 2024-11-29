@@ -64,7 +64,7 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<UserLikeBlog>()
             .HasKey(ulb=> new {ulb.BlogId, ulb.UserId});
         modelBuilder.Entity<UserCommentBlog>()
-            .HasKey(ulb => new {ulb.UserId, ulb.BlogId});
+            .HasKey(ulb => new {ulb.Id});
         modelBuilder.Entity<UserFollow>()
             .HasKey(ulb=> new {ulb.UserId, ulb.UserFollowing});
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
