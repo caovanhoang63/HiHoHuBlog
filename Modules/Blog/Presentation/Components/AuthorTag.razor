@@ -17,10 +17,10 @@ else
                             <div class="h-12 avatar aspect-square">
                                 <div class="rounded-full">
 
-                                    <img src="@(Blog?.Thumbnail?.Url is null ? "https://placehold.co/600x400?text=Hihohublog" : Blog.Thumbnail.Url)" alt="author-avatar"/>
+                                    <img src="@(Blog?.User?.Avatar?.Url is null ? "https://placehold.co/600x400?text=Hihohublog" : Blog?.User?.Avatar?.Url)" alt="author-avatar"/>
                                 </div>
                             </div>
-                            <h2 class="card-title">@Blog?.User?.UserName</h2>
+                            <h2 class="card-title">@Blog?.User?.FirstName @Blog?.User?.LastName</h2>
                         </div>
                         <button class="btn btn-sm my-auto rounded-2xl"
                                 @onclick:stopPropagation="true"
@@ -31,18 +31,14 @@ else
             </div>
             <div class="avatar h-full aspect-square">
                 <div class="rounded-full">
-                    <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" alt="author-avatar"/>
+                    <img src="@(Blog?.User?.Avatar?.Url is null ? "https://placehold.co/600x400?text=Hihohublog" : Blog?.User?.Avatar?.Url)" alt="author-avatar"/>
                 </div>
             </div>
         </a>
         <div class="text-xs">
             <span><a class="text-black hover:underline" @onclick='()=>OnNavClick($"/profile/{Blog?.User?.UserName}")'
                      @onclick:stopPropagation="true"
-                     @onclick:preventDefault="true">Name</a></span>
-            <span class="text-gray-900">in</span>
-            <span><a class="text-black hover:underline" @onclick='()=>OnNavClick($"/profile/{Blog?.User?.UserName}")'
-                     @onclick:stopPropagation="true"
-                     @onclick:preventDefault="true">UIT</a></span>
+                     @onclick:preventDefault="true">@Blog?.User?.FirstName @Blog?.User?.LastName</a></span>
         </div>
     </div>
 }

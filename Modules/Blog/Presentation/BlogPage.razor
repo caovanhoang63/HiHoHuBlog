@@ -22,7 +22,7 @@
 <Container>
     <CommentSection IsOpen="_isOpen" comments="_comments" OnClose='() => _isOpen = false' Blog="_blog" Requester="_requester"></CommentSection>
     <FullScreenSpinner IsLoading="_isLoading"></FullScreenSpinner>
-    <div class="container mx-auto px-4 py-8">
+    <div class="container mx-auto px-4 pb-8">
         <!-- Header Section -->
         <div class="mb-8">
             <h1 class="text-4xl font-bold mb-4">@_blog?.Title</h1>
@@ -41,7 +41,7 @@
                     <div class="text-sm text-gray-600">
                         <span>13 min read</span>
                         <span class="mx-2">·</span>
-                        <span>Sep 18, 2024</span>
+                        <span>@_blog?.CreatedAt</span>
                     </div>
                 </div>
             </div>
@@ -277,6 +277,7 @@
         {
             if (!_isLiked)
             {
+                Console.WriteLine("Like OK");
                 await BlogUpdateService.LikeBlog(_requester.GetId(), _blog.Id);
                 _isLiked = !_isLiked;
                 var totalLikes = await BlogUpdateService.GetTotalLikes(_blog.Id);
@@ -285,6 +286,7 @@
             }
             else
             {
+                Console.WriteLine("UnLike OK");
                 await BlogUpdateService.DisikeBlog(_requester.GetId(), _blog.Id);
                 _isLiked = !_isLiked;
                 var totalLikes = await BlogUpdateService.GetTotalLikes(_blog.Id);
