@@ -6,7 +6,7 @@
 @inject NavigationManager NavigationManager
 <div class=" fixed flex inset-0 items-start mx-auto justify-end bg-gray-900 bg-opacity-50 rounded-lg z-[999999]  @(IsOpen ? " " : "hidden") "
      @onclick="OnClose">
-    <div class=" bg-white h-full p-4" @onclick:stopPropagation="true">
+    <div class=" bg-white h-full p-4  h-screen overflow-y-scroll" @onclick:stopPropagation="true ">
         <!-- Header -->
         <div class="flex justify-between items-center mb-4">
             <h1 class="text-xl font-semibold">Responses (@comments.Count)</h1>    
@@ -53,30 +53,35 @@
     [Parameter] public bool IsOpen { get; set; }
     [Parameter] public EventCallback OnClose { get; set; }
     private string commentText = string.Empty;
-    private List< UserCommentBlog> comments = new();
-    
+    [Parameter] public List<UserCommentBlog> comments { get; set; }
 
-    protected override async Task OnParametersSetAsync()
+
+    /*protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (Blog != null)
+        if (firstRender)
         {
-            var result = await BlogUpdateService.GetCommentsById(Blog.Id);
-            if (result.IsOk)
+            if (Blog != null)
             {
-                if (result.Value != null) 
-                    comments = result.Value.ToList();
+                var result = await BlogUpdateService.GetCommentsById(Blog.Id);
+                if (result.IsOk)
+                {
+                    if (result.Value != null)
+                    {
+                        comments = result.Value.ToList();
+                        Console.WriteLine("Comments: " + comments.Count);
+                    }
+
+                }
             }
         }
-    }
+    }*/
 
     private async void OnSubmitComment()
     {
-        Console.WriteLine(commentText);
-        Console.WriteLine(Requester?.GetId());
-        
+
         if (Requester != null && !string.IsNullOrWhiteSpace(commentText) && Blog != null)
         {
-            
+
             var response = await BlogUpdateService.Comments(Requester.GetId(), Blog.Id, commentText);
             if (response.IsOk)
             {
@@ -84,10 +89,11 @@
                 var result = await BlogUpdateService.GetCommentsById(Blog.Id);
                 if (result.IsOk)
                 {
-                    if (result.Value != null) 
+                    if (result.Value != null)
                         comments = result.Value.ToList();
                 }
             }
+
             // Clear input after successful submission
             if (response.IsOk) // Adjust condition based on your API response
             {
@@ -99,8 +105,6 @@
             NavigationManager.NavigateTo("/login");
         }
         StateHasChanged();
-
     }
-    
-    
+
 }

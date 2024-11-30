@@ -20,13 +20,12 @@
 @inject IBlogUpdateService BlogUpdateService
 @inject IUserFollowService UserFollowService
 <Container>
-    <CommentSection IsOpen="_isOpen" OnClose='() =>  _isOpen = false' Blog="_blog" Requester="_requester"></CommentSection>
+    <CommentSection IsOpen="_isOpen" comments="_comments" OnClose='() => _isOpen = false' Blog="_blog" Requester="_requester"></CommentSection>
     <FullScreenSpinner IsLoading="_isLoading"></FullScreenSpinner>
     <div class="container mx-auto px-4 py-8">
         <!-- Header Section -->
         <div class="mb-8">
             <h1 class="text-4xl font-bold mb-4">@_blog?.Title</h1>
-
             <div class="flex items-center gap-4 mb-4">
                 <div class="avatar">
                     <div class="h-11 rounded-full">
@@ -49,7 +48,7 @@
             <div class="flex items-center gap-4">
                 <div class="flex items-center gap-2">
                     <button class="btn btn-circle btn-ghost" @onclick="onLikeClick">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 " fill="@(_isLiked ? "red" : "none")" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                         </svg>
                     </button>
@@ -64,7 +63,7 @@
                     <span>10</span>
                 </div>
 
-                <div class="flex-grow"></div>
+                @*<div class="flex-grow"></div>
                 <button class="btn btn-circle btn-ghost">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"/>
@@ -74,7 +73,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
                     </svg>
-                </button>
+                </button>*@
             </div>
             <div class="divider m-0"></div>
 
@@ -128,8 +127,6 @@
             <button class="btn btn-wide rounded-3xl bg-base-100 border-1 border-black ">See all from Sylvain Tiset</button>
             @*Recommended from Medium Section*@
             <div class="divider mt-24 mb-20 w-screen relative left-1/2 -translate-x-1/2 m-0"></div>
-
-
             <span class="font-bold text-2xl">Recommended from Medium</span>
             <!-- Articles -->
             <div class="grid grid-cols-2 mt-8 gap-8">
@@ -157,11 +154,23 @@
     private IRequester? _requester;
     private BlogDetail _blog { get; set; }
     private bool _isOpen = false;
-    private void onOpenComment()
+    private bool _isLiked = false;
+    private List<UserCommentBlog> _comments = new List<UserCommentBlog>();
+    
+    private async Task onOpenComment()
     {
         _isOpen = !_isOpen;
+        var result = await BlogUpdateService.GetCommentsById(_blog.Id);
+        if (result.IsOk)
+        {
+            if (result.Value != null)
+            {
+                 var comments = result.Value.ToList();
+                _comments = comments;
+            }
+                
+        }
     }
-    
     
     protected override async Task OnInitializedAsync()
     {
@@ -202,12 +211,20 @@
 
         _isLoading = false;
         await InvokeAsync(StateHasChanged);
-        if (_requester is not null )
-        {
-            _ =  await Task.Run(async () => await UserBlogAction.ReadBlog(_requester, _blog.Id)) ;
+
+        if (_requester != null)
+        { 
+            var _result =  await UserBlogAction.ReadBlog(_requester, _blog.Id);
+            
+            
+            var isLiked = await BlogUpdateService.IsLiked(_requester.GetId(), _blog.Id);
+            if (!isLiked.IsOk)
+            {
+                Console.WriteLine("12345  "+isLiked.Error);
+            }
+            Console.WriteLine(isLiked.Value);
+            _isLiked = isLiked.Value;
         }
-        
-        
     }
 
     
@@ -220,8 +237,28 @@
     
     private async void onLikeClick()
     {
+        if (_requester is not null)
+        {
+            if (!_isLiked)
+            {
+                await BlogUpdateService.LikeBlog(_requester.GetId(), _blog.Id);
+                _isLiked = !_isLiked;
+                Console.WriteLine("sau like"+_isLiked);
+            }
+            else
+            {
+                await BlogUpdateService.DisikeBlog(_requester.GetId(), _blog.Id);
+                _isLiked = !_isLiked;
+                Console.WriteLine("sau dislike "+_isLiked);
 
-        await BlogUpdateService.LikeBlog(_requester.GetId(), _blog.Id);
+            }
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/login");
+        }
+       
+        StateHasChanged();
     }
     
     void ChangeUrl(string url){

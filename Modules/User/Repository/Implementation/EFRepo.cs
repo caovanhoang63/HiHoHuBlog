@@ -266,8 +266,8 @@ public class EfRepo  : IUserRepository
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            throw;
+            return Result<int?, Err>.Err(UtilErrors.InternalServerError(e));
+
         }
     }
     

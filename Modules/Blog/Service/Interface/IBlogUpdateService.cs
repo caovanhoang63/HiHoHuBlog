@@ -12,7 +12,11 @@ public interface IBlogUpdateService
     Task<Result<Unit,Err>> UnPublish(IRequester requester,int id);
     Task<Result<Unit,Err>> UpdateTotalLikes(int id);
     
+    
     Task<Result<Unit,Err>> LikeBlog(int userId,int blogId);
+    Task<Result<Unit,Err>> DisikeBlog(int userId,int blogId);
+    Task<Result<bool,Err>> IsLiked(int userId,int blogId);
+    
     
     Task<Result<Unit,Err>> UpdateTotalComments(int id);
     

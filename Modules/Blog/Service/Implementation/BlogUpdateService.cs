@@ -4,6 +4,7 @@ using HiHoHuBlog.Modules.Blog.Service.Interface;
 using HiHoHuBlog.Utils;
 using HtmlAgilityPack;
 using Nest;
+using Err = HiHoHuBlog.Utils.Err;
 
 namespace HiHoHuBlog.Modules.Blog.Service.Implementation;
 
@@ -166,6 +167,32 @@ public class BlogUpdateService(IBlogRepository blogRepo) : IBlogUpdateService
             return Result<Unit, Err>.Err(updateLikeBlog.Error);
         }
         return Result<Unit, Err>.Ok(new Unit());
+    }
+
+    public async Task<Result<Unit, Err>> DisikeBlog(int userId, int blogId)
+    {
+        var disLikeBLog = await _blogRepo.DislikeBlog(userId, blogId);
+        if (!disLikeBLog.IsOk)
+        {
+            return Result<Unit, Err>.Err(disLikeBLog.Error);
+        }
+        var updateLikeBlog = await UpdateTotalLikes(blogId);
+        if (!updateLikeBlog.IsOk)
+        {
+            return Result<Unit, Err>.Err(updateLikeBlog.Error);
+        }
+        return Result<Unit, Err>.Ok(new Unit());
+    }
+
+    public async Task<Result<bool, Err>> IsLiked(int userId, int blogId)
+    {
+        var isLiked = await _blogRepo.IsLiked(userId, blogId);
+        if (!isLiked.IsOk)
+        {
+            return Result<bool, Err>.Err(isLiked.Error);
+        }
+
+        return Result<bool,Err>.Ok(isLiked.Value);
     }
 
     public async Task<Result<Unit, Err>> UpdateTotalComments(int id)

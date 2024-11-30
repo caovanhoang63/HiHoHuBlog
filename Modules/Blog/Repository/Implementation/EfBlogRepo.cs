@@ -331,6 +331,38 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
          
     }
 
+    public async Task<Result<Unit, Err>> DislikeBlog(int userId, int blogId)
+    {
+        try
+        {
+            context.UserLikeBlogs.Remove(new UserLikeBlog
+            {
+                BlogId = blogId,
+                UserId = userId
+            });
+            await context.SaveChangesAsync();
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception e)
+        {
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+    }
+
+    public async Task<Result<bool, Err>> IsLiked(int userId, int blogId)
+    {
+        try
+        {
+            var isLiked = await context.Set<UserLikeBlog>().AnyAsync(ulb => ulb.BlogId == blogId && ulb.UserId == userId);
+            return Result<bool, Err>.Ok(isLiked);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return Result<bool, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+    }
+
     private async Task<Result<int?, Err>> GetTotalLikes( int blogId)
     {
         try
@@ -340,8 +372,8 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            throw;
+            return Result<int?, Err>.Err(UtilErrors.InternalServerError(e));
+
         }
     }
     public async Task<Result<Unit, Err>> UpdateTotalComments(int id)
@@ -365,7 +397,7 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
         try
         {            
 
-            await context.UserCommentBlogs.AddAsync(new UserCommentBlog()
+            await context.UserCommentBlogs.AddAsync(new UserCommentBlog
             {
                 BlogId = blogId,
                 UserId = userId,
@@ -408,7 +440,7 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
         catch (Exception e)
         {
             Console.WriteLine(e);
-            throw;
+            return Result<int?, Err>.Err(UtilErrors.InternalServerError(e));
         }
     }
 }
