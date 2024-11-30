@@ -35,8 +35,9 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="font-medium">@_blog?.User?.FirstName @_blog?.User?.LastName</span>
-                        <button class="btn btn-sm btn-outline btn-primary" @onclick="onFollowClick">Follow</button>
-                    </div>
+                        @*<button class="btn btn-sm btn-outline btn-primary  @(_isFollowed? "bg-amber-300":   "") " @onclick="onFollowClick">Follow</button>*@
+                        <FollowButton IsFollow="_isFollowed" OnFollowClick="onFollowClick"></FollowButton>                    
+                        </div>
                     <div class="text-sm text-gray-600">
                         <span>13 min read</span>
                         <span class="mx-2">·</span>
@@ -156,6 +157,7 @@
     private int? _totalLikes = 0;
     private bool _isOpen = false;
     private bool _isLiked = false;
+    private bool _isFollowed = false;
     private List<UserCommentBlog> _comments = new List<UserCommentBlog>();
     
     private async Task onOpenComment()
@@ -221,7 +223,18 @@
             {
                 _totalLikes = totalLikes.Value;
             }
-            
+
+            if (_blog.User != null)
+            {
+                var isFollowed = await UserFollowService.IsFollowed(_requester.GetId(), _blog.User.Id);
+                if (isFollowed.IsOk)
+                {
+                     Console.WriteLine("isFollowed "+isFollowed.Value);
+                    _isFollowed = isFollowed.Value;
+                }
+            }
+
+
             var isLiked = await BlogUpdateService.IsLiked(_requester.GetId(), _blog.Id);
             if (!isLiked.IsOk)
             {
@@ -235,9 +248,27 @@
     
     private async void onFollowClick()
     {
-        Console.WriteLine(_requester.GetId());
-        Console.WriteLine(_blog.User.Id);
-        await UserFollowService.Follows(_requester.GetId(), _blog.User.Id);
+        if (_requester is not null)
+        {
+            if (!_isFollowed)
+            {
+                await UserFollowService.Follows(_requester.GetId(), _blog.User.Id);
+                _isFollowed = !_isFollowed;
+                
+            }
+            else
+            {
+                await UserFollowService.UnFollow(_requester.GetId(), _blog.User.Id);
+                _isFollowed = !_isFollowed;
+
+            }
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/login");
+        }
+       
+        StateHasChanged();
     }
     
     private async void onLikeClick()

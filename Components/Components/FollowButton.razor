@@ -1,0 +1,10 @@
+﻿<button 
+    class="btn h-2 rounded-3xl text-white @(IsFollow ? "bg-gray-500" : "bg-black")" 
+    @onclick="OnFollowClick">
+    @(IsFollow ? "Unfollow" : "Follow")
+</button>
+
+@code {
+    [Parameter] public bool IsFollow { get; set; }
+    [Parameter] public EventCallback OnFollowClick { get; set; }
+}
