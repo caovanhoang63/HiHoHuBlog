@@ -52,7 +52,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                         </svg>
                     </button>
-                    <span>688</span>
+                    <span>@_totalLikes</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <button class="btn btn-circle btn-ghost" @onclick="onOpenComment">
@@ -153,6 +153,7 @@
     private readonly Paging _relatedPaging = new Paging(1, 4);
     private IRequester? _requester;
     private BlogDetail _blog { get; set; }
+    private int? _totalLikes = 0;
     private bool _isOpen = false;
     private bool _isLiked = false;
     private List<UserCommentBlog> _comments = new List<UserCommentBlog>();
@@ -215,7 +216,11 @@
         if (_requester != null)
         { 
             var _result =  await UserBlogAction.ReadBlog(_requester, _blog.Id);
-            
+            var totalLikes = await BlogUpdateService.GetTotalLikes(_blog.Id);
+            if (totalLikes.IsOk)
+            {
+                _totalLikes = totalLikes.Value;
+            }
             
             var isLiked = await BlogUpdateService.IsLiked(_requester.GetId(), _blog.Id);
             if (!isLiked.IsOk)
@@ -243,12 +248,16 @@
             {
                 await BlogUpdateService.LikeBlog(_requester.GetId(), _blog.Id);
                 _isLiked = !_isLiked;
+                var totalLikes = await BlogUpdateService.GetTotalLikes(_blog.Id);
+                if (totalLikes.Value != null) _totalLikes = totalLikes.Value;
                 Console.WriteLine("sau like"+_isLiked);
             }
             else
             {
                 await BlogUpdateService.DisikeBlog(_requester.GetId(), _blog.Id);
                 _isLiked = !_isLiked;
+                var totalLikes = await BlogUpdateService.GetTotalLikes(_blog.Id);
+                if (totalLikes.Value != null) _totalLikes = totalLikes.Value;
                 Console.WriteLine("sau dislike "+_isLiked);
 
             }

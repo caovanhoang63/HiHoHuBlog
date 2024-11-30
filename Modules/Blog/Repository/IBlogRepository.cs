@@ -19,6 +19,7 @@ public interface IBlogRepository
     Task<Result<Unit,Err>> UpdateThumbnail(int id ,Image? thumbnail);
     Task<Result<Unit, Err>> Publish(int id, int minToRead,Image? thumbnail);
     Task<Result<Unit, Err>> UnPublish(int id);
+    Task<Result<int?, Err>> GetTotalLikes(int blogId);
     Task<Result<Unit,Err>> UpdateTotalLikes(int id);
     Task<Result<Unit,Err>> LikeBlog(int userId,int blogId);
     Task<Result<Unit,Err>> DislikeBlog(int userId,int blogId);

@@ -12,7 +12,7 @@ public interface IUserRepository
     Task<Result<Entity.User?, Err>> FindByEmailAndUserName(string email, string userName);
     Task<Result<Unit,Err>> UpdateSettingsProfile(UserSettingsProfile userSettingsProfile);
     Task<Result<Entity.UserSettingsProfile?,Err>> GetSettingsProfile(string userName);
-    Task<Result<Unit, Err>> UpdateTotalFollows(int id);
+    Task<Result<Unit, Err>> UpdateTotalFollows(int id,int userFollowId);
     Task<Result<Unit, Err>> Follows(int userId, int userFollowId);
 
 

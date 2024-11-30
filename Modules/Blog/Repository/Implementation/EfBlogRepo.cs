@@ -363,7 +363,7 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
         }
     }
 
-    private async Task<Result<int?, Err>> GetTotalLikes( int blogId)
+    public async Task<Result<int?, Err>> GetTotalLikes( int blogId)
     {
         try
         {

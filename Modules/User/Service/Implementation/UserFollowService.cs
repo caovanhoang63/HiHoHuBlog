@@ -8,9 +8,9 @@ public class UserFollowService(IUserRepository userRepository):IUserFollowServic
 {
     private readonly IUserRepository _userRepository = userRepository;
     private IUserFollowService _userFollowServiceImplementation;
-    public async Task<Result<Unit, Err>> UpdateTotalFollows(int id)
+    public async Task<Result<Unit, Err>> UpdateTotalFollows(int id,int userFollowId)
     {
-        var _totalFollow = await _userRepository.UpdateTotalFollows(id);
+        var _totalFollow = await _userRepository.UpdateTotalFollows(id,userFollowId);
         if (!_totalFollow.IsOk)
         {
             return Result<Unit, Err>.Err(_totalFollow.Error);
@@ -26,7 +26,7 @@ public class UserFollowService(IUserRepository userRepository):IUserFollowServic
         {
             return Result<Unit, Err>.Ok(new Unit());
         }
-        var updateFollow = await UpdateTotalFollows(userFollowingId);
+        var updateFollow = await UpdateTotalFollows(userId,userFollowingId);
         if (!updateFollow.IsOk)
         {
             return Result<Unit, Err>.Err(updateFollow.Error);

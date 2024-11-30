@@ -154,6 +154,16 @@ public class BlogUpdateService(IBlogRepository blogRepo) : IBlogUpdateService
         return Result<Unit, Err>.Ok(new Unit());
     }
 
+    public async Task<Result<int?, Err>> GetTotalLikes(int blogId)
+    {
+        var totalLikes = await _blogRepo.GetTotalLikes(blogId);
+        if (!totalLikes.IsOk)
+        {
+            return Result<int?, Err>.Err(totalLikes.Error);
+        }
+        return Result<int?, Err>.Ok(totalLikes.Value);
+    }
+
     public async Task<Result<Unit, Err>> LikeBlog(int userId,int blogId)
     {
         var likeBLog = await _blogRepo.LikeBlog(userId, blogId);

@@ -222,14 +222,17 @@ public class EfRepo  : IUserRepository
         }
         
     }
-    public async Task<Result<Unit, Err>> UpdateTotalFollows(int id)
+    public async Task<Result<Unit, Err>> UpdateTotalFollows(int id,int userFollowId)
     {
         try
         {
-            var totalFollowsResult = await GetTotalFollows(id);
-            var updateTotalFollows = await _dbSet.Where(u=>u.Id==id)
-                .ExecuteUpdateAsync(
-                    b => b.SetProperty(u => u.TotalFollower, totalFollowsResult.Value));
+            var totalFollowsResult = await GetTotalFollows(userFollowId);
+            var updateTotalFollowing = await _dbSet.Where(u => u.Id == id)
+                .ExecuteUpdateAsync(b => b
+                    .SetProperty(u => u.TotalFollowing, totalFollowsResult.Value));
+            var updateTotalFollows = await _dbSet.Where(u => u.Id == userFollowId)
+                .ExecuteUpdateAsync(b => b
+                    .SetProperty(u => u.TotalFollower, totalFollowsResult.Value));
             return Result<Unit, Err>.Ok(new Unit());
         }
         catch (Exception e)
