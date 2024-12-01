@@ -1,13 +1,10 @@
 ﻿@page "/users"
-@using HiHoHuBlog.Components.Layout
-@using HiHoHuBlog.Modules.Admin.Entity
-@using HiHoHuBlog.Modules.Admin.Service.Interface
-@using HiHoHuBlog.Modules.Tag.Entity
-@using HiHoHuBlog.Modules.Tag.Service.Interface
-@using HiHoHuBlog.Utils
 @using HiHoHuBlog.Components.Components
+@using HiHoHuBlog.Components.Layout
+@using HiHoHuBlog.Modules.Tag.Service.Interface
 @using HiHoHuBlog.Modules.User.Entity
 @using HiHoHuBlog.Modules.User.Service.Interface
+@using HiHoHuBlog.Utils
 @layout AdminLayout
 @attribute [Authorize(Roles = "admin, mod")]
 @inject ITagService TagService
@@ -39,8 +36,8 @@
         
         <dialog id="delete_modal" class="modal">
             <div class="modal-box">
-                <h3 class="text-lg font-bold py-4">Delete Tag</h3>
-                <p>Are you sure you want to delete tag "@_selectedTag?.Name"</p>
+                <h3 class="text-lg font-bold py-4">Delete User</h3>
+                <p>Are you sure you want to delete "@_selectedUser?.Email"</p>
                 <div class="modal-action">
                     <button @onclick="OnDelete" class="btn btn-warning">Delete</button>
                     <form method="dialog">
@@ -206,7 +203,6 @@
     private readonly Paging _paging = new Paging(1,20);
     private string? _newRole = "";
     private bool _isLoading = false;
-    private Tag? _selectedTag = null;
     private UserList? _selectedUser = null;
     private readonly UserFilter _filter = new UserFilter()
     {
