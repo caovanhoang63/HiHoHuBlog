@@ -1,6 +1,6 @@
 ﻿@using HiHoHuBlog.Components.Layout.Components
 @inherits LayoutComponentBase
-
+@inject IToastService ToastService
 
 <div class="min-h-screen bg-white relative flex flex-col">
     <header class="sticky top-0 left-0 right-0 bg-white z-10">
@@ -13,3 +13,17 @@
     <footer>
     </footer>
 </div>
+
+@code
+{
+    
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            ToastService.ShowWarning("Trang web chỉ mang mục đích học tập. Không bao gồm bất kỳ mục đích thương mại nào.");
+            ToastService.ShowWarning(" Mọi thắc mắc xin liên hệ email: caovanhoang204@gmail.com");
+            StateHasChanged();
+        }
+    }
+}
