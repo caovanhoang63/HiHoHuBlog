@@ -44,7 +44,7 @@
                     }
                     else if (i == 2 || i == Paging.TotalPages - 1)
                     {
-                    <button class="join-item btn btn-ghost btn-disabled">...</button>
+                    <button class="join-item btn btn-ghost btn-sm btn-disabled">...</button>
                     }
                     }
 
@@ -82,24 +82,6 @@
                             <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">@tag.Name</div>
                         }
                     }
-                    @*<div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live</div>
-                    <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live Streaming</div>
-                    <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Liverpool</div>
-                    <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live Music</div>
-                    <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Livestream</div>
-                    <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live Casino</div>
-                    <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live</div>
-                    <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live Streaming</div>
-                    <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Liverpool</div>
-                    <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live Music</div>
-                    <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Livestream</div>
-                    <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live Casino</div>
-                    <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live</div>
-                    <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live Streaming</div>
-                    <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Liverpool</div>
-                    <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live Music</div>
-                    <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Livestream</div>
-                    <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live Casino</div>*@
                 </div>
             </div>
         </div>
@@ -109,25 +91,28 @@
         <div class="flex flex-col space-y-2">
             <span class="text-gray-600 mb-6">Topics matching @SearchTerm</span>
             <div class="flex flex-wrap ">
-                <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live</div>
-                <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live Streaming</div>
-                <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Liverpool</div>
-                <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live Music</div>
-                <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Livestream</div>
-                <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Live Casino</div>
+                @if(_searchTagMatching is not null)
+                {
+                    foreach (var tagMatching in _searchTagMatching)
+                    {
+                        <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">@tagMatching.Name</div>
+                    }
+                }
             </div>
-            @*
-            <a  class="text-green-500 hover:underline mb-2"  @onclick="() => ChangeTab(2,'people')">See all</a>
-            *@
             <div class="divider mt-9 mb-0"></div>
-            <span class="text-gray-600 mb-6">Topics matching @SearchTerm</span>
-            <div >
-                <MatchingPeopleSmallCard></MatchingPeopleSmallCard>
-                <MatchingPeopleSmallCard></MatchingPeopleSmallCard>
-            </div>
-            @*
-            <a class="text-green-500 hover:underline mb-2 " @onclick="() => ChangeTab(1)">See all</a>
-            *@
+            @if(_searchUser is not null)
+            {
+                <span class="text-gray-600 mb-6">Topics matching @SearchTerm</span>
+                <div >
+                        @foreach (var user in _searchUser)
+                        {
+                            <MatchingPeopleSmallCard User="user"/>
+                        }    
+                    @*<MatchingPeopleSmallCard ></MatchingPeopleSmallCard>
+                <MatchingPeopleSmallCard></MatchingPeopleSmallCard>*@
+                </div>
+            }
+            
 
         </div>
     </div>
@@ -141,23 +126,31 @@
     private int activeTab = 0;
     private Paging Paging = new Paging(1, 3);
     private Paging PagingTopic = new Paging(1, 10);
+    private Paging PagingTopicMatching = new Paging(1, 4);
+
     private IEnumerable<BlogSearchDoc>? _searchDocs = new List<BlogSearchDoc>();
     private IEnumerable<TagSearchDoc>? _searchTag = new List<TagSearchDoc>();
-    private IEnumerable<UserSearchDoc>? _searchUser = new List<UserSearchDoc>();
+    private IEnumerable<TagSearchDoc>? _searchTagMatching = new List<TagSearchDoc>();
+    private IEnumerable<UserSearchDoc>? _searchUser;
     
     private async Task GetSearchTags()
     {
         var result = await SearchTagService.SearchTags(SearchTerm, PagingTopic);
         if (result.IsOk)
         {
-
-
             var totalResult = result.Value.Count();
             _searchTag = result.Value;
+            
         }
         else
         {
             _searchTag = new List<TagSearchDoc>();
+        }
+        
+        var searchTagMatching = await SearchTagService.SearchTags(SearchTerm, PagingTopicMatching);
+        if (searchTagMatching.IsOk)
+        {
+            _searchTagMatching = searchTagMatching.Value;
         }
     }
     
@@ -226,6 +219,10 @@
         if (result.IsOk)
         {
             _searchUser = result.Value;
+            foreach (var r in _searchUser)
+            {
+                Console.WriteLine(r.FirstName);
+            }
 
         }
     }

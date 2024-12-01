@@ -17,6 +17,7 @@ public class ApplicationDbContext : DbContext
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options):base(options){}
     
+    public DbSet<UserLikeBlog> UserLikeBlogs { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<UserDetails> UserDetails { get; set; }
     public DbSet<Blog> Blogs { get; set; }
@@ -24,6 +25,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<BlogTag> BlogTags { get; set; }
     public DbSet<BlogBlocked> BlogBlocked { get; set; }
     public DbSet<ReasonBlogBlock> ReasonBlogBlock { get; set; }
+    public DbSet<UserCommentBlog> UserCommentBlogs { get; set; }
+    public DbSet<UserFollow> UserFollows { get; set; }
     public DbSet<UserReadBlog> userReadBlog { get; set; }
     public DbSet<EmailTemplate> emailTemplate { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -37,6 +40,11 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<UserDetails>().ToTable("user_details");
         modelBuilder.Entity<BlogBlocked>().ToTable("blog_blocked");
         modelBuilder.Entity<ReasonBlogBlock>().ToTable("reason_blog_block");
+        modelBuilder.Entity<UserLikeBlog>().ToTable("user_like_blog");
+        modelBuilder.Entity<UserFollow>().ToTable("user_follow");
+        modelBuilder.Entity<UserCommentBlog>().ToTable("comments");
+
+
         modelBuilder.Entity<UserReadBlog>().ToTable("user_read_blogs");
         modelBuilder.Entity<EmailTemplate>().ToTable("email_template");
         modelBuilder.Entity<User>()
@@ -50,13 +58,23 @@ public class ApplicationDbContext : DbContext
                 v => JsonConvert.DeserializeObject<Image?>(v) 
             );
         
+        modelBuilder.Entity<BlogTag>()
+            .HasKey(bt => new { bt.BlogId, bt.TagId }); // Khóa chính của BlogTag là BlogId và TagId
+        
+        modelBuilder.Entity<Blog>().HasMany(e=>e.Tags).WithMany(t => t.Blogs).UsingEntity<BlogTag>();;
+        
         modelBuilder.Entity<User>()
             .Property(b => b.Avatar)
             .HasConversion<string>(
                 v => JsonConvert.SerializeObject(v),       
                 v => JsonConvert.DeserializeObject<Image?>(v) 
             );
-        
+        modelBuilder.Entity<UserLikeBlog>()
+            .HasKey(ulb=> new {ulb.BlogId, ulb.UserId});
+        modelBuilder.Entity<UserCommentBlog>()
+            .HasKey(ulb => new {ulb.Id});
+        modelBuilder.Entity<UserFollow>()
+            .HasKey(ulb=> new {ulb.UserId, ulb.UserFollowing});
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
         {
             foreach (var property in entity.GetProperties())

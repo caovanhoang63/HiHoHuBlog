@@ -1,0 +1,110 @@
+﻿@using HiHoHuBlog.Modules.Blog.Entity
+@using HiHoHuBlog.Modules.Blog.Service.Interface
+@using HiHoHuBlog.Utils
+@using HiHoHuBlog.Modules.Blog.Presentation.Components.TextEditor
+@inject IBlogUpdateService BlogUpdateService
+@inject NavigationManager NavigationManager
+<div class=" fixed flex inset-0 items-start mx-auto justify-end bg-gray-900 bg-opacity-50 rounded-lg z-[999999]  @(IsOpen ? " " : "hidden") "
+     @onclick="OnClose">
+    <div class=" bg-white h-full p-4  h-screen overflow-y-scroll" @onclick:stopPropagation="true ">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-xl font-semibold">Responses (@comments.Count)</h1>    
+            <div class="flex items-center gap-2">
+                <button class="btn btn-ghost btn-circle" @onclick="OnClose">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Response Input -->
+        <div class="bg-base-200 rounded-lg p-4 mb-6">
+            <div class="flex items-center justify-between">
+                <input type="text"
+                       @bind="commentText"
+                       @bind:event="oninput"
+                       placeholder="What are your thoughts?"
+                       class="input input-ghost w-full max-w-xs"/>
+                <button class="btn btn-primary" @onclick="OnSubmitComment">Respond</button>
+            </div>
+        </div>
+
+        <!-- Response List -->
+        <div class="space-y-4">
+            @foreach (var comment in comments)
+            {
+                <CommentContent UserCommentBlog="comment"></CommentContent>
+            }
+            
+        </div>
+        
+    </div>      
+   
+</div>
+
+@code {
+    [Parameter] public BlogDetail? Blog { get; set; }
+    [Parameter] public IRequester? Requester { get; set; }
+    /*
+    [Parameter] public int?  BlogId { get; set; }
+    */
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    private string commentText = string.Empty;
+    [Parameter] public List<UserCommentBlog> comments { get; set; }
+
+
+    /*protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (Blog != null)
+            {
+                var result = await BlogUpdateService.GetCommentsById(Blog.Id);
+                if (result.IsOk)
+                {
+                    if (result.Value != null)
+                    {
+                        comments = result.Value.ToList();
+                        Console.WriteLine("Comments: " + comments.Count);
+                    }
+
+                }
+            }
+        }
+    }*/
+
+    private async void OnSubmitComment()
+    {
+
+        if (Requester != null && !string.IsNullOrWhiteSpace(commentText) && Blog != null)
+        {
+
+            var response = await BlogUpdateService.Comments(Requester.GetId(), Blog.Id, commentText);
+            if (response.IsOk)
+            {
+                commentText = string.Empty;
+                var result = await BlogUpdateService.GetCommentsById(Blog.Id);
+                if (result.IsOk)
+                {
+                    if (result.Value != null)
+                        comments = result.Value.ToList();
+                }
+            }
+
+            // Clear input after successful submission
+            if (response.IsOk) // Adjust condition based on your API response
+            {
+                commentText = string.Empty;
+            }
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/login");
+        }
+        StateHasChanged();
+    }
+
+}

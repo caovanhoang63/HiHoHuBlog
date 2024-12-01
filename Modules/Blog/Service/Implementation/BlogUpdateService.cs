@@ -1,7 +1,10 @@
+using HiHoHuBlog.Modules.Blog.Entity;
 using HiHoHuBlog.Modules.Blog.Repository;
 using HiHoHuBlog.Modules.Blog.Service.Interface;
 using HiHoHuBlog.Utils;
 using HtmlAgilityPack;
+using Nest;
+using Err = HiHoHuBlog.Utils.Err;
 
 namespace HiHoHuBlog.Modules.Blog.Service.Implementation;
 
@@ -138,5 +141,93 @@ public class BlogUpdateService(IBlogRepository blogRepo) : IBlogUpdateService
             return Result<Unit, Err>.Err(r.Error);
         }
         return Result<Unit, Err>.Ok(new Unit());
+    }
+
+    public async Task<Result<Unit, Err>> UpdateTotalLikes(int id)
+    {
+        var _totalLikes = await _blogRepo.UpdateTotalLikes(id);
+        if (!_totalLikes.IsOk)
+        {
+            return Result<Unit, Err>.Err(_totalLikes.Error);
+        }
+
+        return Result<Unit, Err>.Ok(new Unit());
+    }
+
+    public async Task<Result<int?, Err>> GetTotalLikes(int blogId)
+    {
+        var totalLikes = await _blogRepo.GetTotalLikes(blogId);
+        if (!totalLikes.IsOk)
+        {
+            return Result<int?, Err>.Err(totalLikes.Error);
+        }
+        return Result<int?, Err>.Ok(totalLikes.Value);
+    }
+
+    public async Task<Result<Unit, Err>> LikeBlog(int userId,int blogId)
+    {
+        var likeBLog = await _blogRepo.LikeBlog(userId, blogId);
+        if (!likeBLog.IsOk)
+        {
+            return Result<Unit, Err>.Err(likeBLog.Error);
+        }
+        return Result<Unit, Err>.Ok(new Unit());
+    }
+
+    public async Task<Result<Unit, Err>> DisikeBlog(int userId, int blogId)
+    {
+        var disLikeBLog = await _blogRepo.DislikeBlog(userId, blogId);
+        if (!disLikeBLog.IsOk)
+        {
+            return Result<Unit, Err>.Err(disLikeBLog.Error);
+        }
+        return Result<Unit, Err>.Ok(new Unit());
+    }
+
+    public async Task<Result<bool, Err>> IsLiked(int userId, int blogId)
+    {
+        var isLiked = await _blogRepo.IsLiked(userId, blogId);
+        if (!isLiked.IsOk)
+        {
+            return Result<bool, Err>.Err(isLiked.Error);
+        }
+
+        return Result<bool,Err>.Ok(isLiked.Value);
+    }
+
+    public async Task<Result<Unit, Err>> UpdateTotalComments(int id)
+    {
+        var _totalComments = await _blogRepo.UpdateTotalComments(id);
+        if (!_totalComments.IsOk)
+        {
+            return Result<Unit, Err>.Err(_totalComments.Error);
+        }
+
+        return Result<Unit, Err>.Ok(new Unit());
+    }
+
+    public async Task<Result<Unit, Err>> Comments(int userId, int blogId,string content)
+    {
+        var comment = await _blogRepo.Comment(userId, blogId,content);
+        if (!comment.IsOk)
+        {
+            return Result<Unit, Err>.Err(comment.Error);
+        }
+        var updateTotalComments = await UpdateTotalComments(blogId);
+        if (!updateTotalComments.IsOk)
+        {
+            return Result<Unit, Err>.Err(updateTotalComments.Error);
+        }
+        return Result<Unit, Err>.Ok(new Unit());
+    }
+
+    public async Task<Result<IEnumerable<UserCommentBlog>?, Err>> GetCommentsById(int blogId)
+    {
+        var listComments = await blogRepo.GetCommentsById(blogId);
+        if (!listComments.IsOk)
+        {
+            return Result<IEnumerable<UserCommentBlog>?, Err>.Err(listComments.Error);
+        }
+        return Result<IEnumerable<UserCommentBlog>?, Err>.Ok(listComments.Value);
     }
 }

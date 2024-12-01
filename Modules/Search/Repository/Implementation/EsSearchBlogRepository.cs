@@ -166,7 +166,7 @@ public class EsSearchBlogRepository(EsClient client, IUserBlogActionRepository u
     {
         var history = await _userBlogRepo.ListReadHistory(requester.GetId(),new Paging(1, 2));
 
-        if (!history.IsOk || history.Value is null )
+        if (!history.IsOk || history.Value is null || !history.Value.Any() )
         {
             return await RandomBlog(seed,paging);
         }
@@ -272,6 +272,26 @@ public class EsSearchBlogRepository(EsClient client, IUserBlogActionRepository u
                     )))
         );
 
+        if (docs.IsValid && docs.Documents.Any())
+        {
+            paging.Total = (int)docs.Total;
+            return Result<IEnumerable<BlogSearchDoc>?, Err>.Ok(docs.Documents);
+        }
+
+        return Result<IEnumerable<BlogSearchDoc>?, Err>.Err(UtilErrors.InternalServerError(docs.OriginalException));
+    }
+
+    public async Task<Result<IEnumerable<BlogSearchDoc>?, Err>> RecommendSearchBlogOfUser(int userId, Paging paging)
+    {
+        
+        var docs = await client.Client.SearchAsync<BlogSearchDoc>(s => s
+            .Size(paging.PageSize)
+            .From(paging.GetOffSet())
+            .Query(q => q
+                .Match(m => m.Field(ff => ff.UserId == userId)))
+        );
+        
+        
         if (docs.IsValid && docs.Documents.Any())
         {
             paging.Total = (int)docs.Total;

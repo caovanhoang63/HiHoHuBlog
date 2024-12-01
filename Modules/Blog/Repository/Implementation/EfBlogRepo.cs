@@ -10,7 +10,6 @@ namespace HiHoHuBlog.Modules.Blog.Repository.Implementation;
 public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRepository
 {
     private readonly DbSet<Entity.Blog> _dbSet = context.Set<Entity.Blog>();
-
     public async Task<Result<Unit, Err>> Create(BlogCreate blog)
     {
         try
@@ -106,7 +105,7 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
     {
         try
         {
-            var entity = await _dbSet.SingleOrDefaultAsync(b => b.Id == id);
+            var entity = await _dbSet.Include(b=>b.User).SingleOrDefaultAsync(b => b.Id == id);
             
             return Result<BlogDetail?, Err>.Ok(mapper.Map<Entity.Blog?,BlogDetail>(entity));
         }
@@ -210,6 +209,7 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
             {
                 var result = await queryable
                     .Include(b => b.User)
+                    .Include(b => b.Tags)
                     .Select(b => b).ToListAsync();
                 return Result<IEnumerable<Entity.Blog>?, Err>.Ok(result);
             }
@@ -294,6 +294,152 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
         catch (Exception ex)
         {
             return Result<Unit, Err>.Err(UtilErrors.InternalServerError(ex));
+        }
+    }
+
+    public async Task<Result<Unit, Err>> UpdateTotalLikes(int id)
+    {
+        try
+        {
+            var totalLikesResult = await GetTotalLikes(id);
+            var updateTotalLikes = await _dbSet.Where(u=>u.Id==id)
+                .ExecuteUpdateAsync(
+                    b => b.SetProperty(u => u.TotalLike, totalLikesResult.Value));
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception e)
+        {
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+    }
+
+    public async Task<Result<Unit, Err>> LikeBlog(int userId, int blogId)
+    {
+        try
+        {
+            await context.UserLikeBlogs.AddAsync(new UserLikeBlog
+            {
+                BlogId = blogId,
+                UserId = userId
+            });
+            await context.SaveChangesAsync();
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception e)
+        {
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+         
+    }
+
+    public async Task<Result<Unit, Err>> DislikeBlog(int userId, int blogId)
+    {
+        try
+        {
+            var entity = await context.UserLikeBlogs
+                .FirstOrDefaultAsync(ulb => ulb.UserId == userId && ulb.BlogId == blogId);
+            if (entity != null) context.UserLikeBlogs.Remove(entity);
+            await context.SaveChangesAsync();
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception e)
+        {
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+    }
+
+    public async Task<Result<bool, Err>> IsLiked(int userId, int blogId)
+    {
+        try
+        {
+            var isLiked = await context.Set<UserLikeBlog>().AnyAsync(ulb => ulb.BlogId == blogId && ulb.UserId == userId);
+            return Result<bool, Err>.Ok(isLiked);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return Result<bool, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+    }
+
+    public async Task<Result<int?, Err>> GetTotalLikes( int blogId)
+    {
+        try
+        {
+            int totalLikes = await context.UserLikeBlogs.CountAsync(ulb => ulb.BlogId == blogId);
+            return Result<int?, Err>.Ok(totalLikes);
+        }
+        catch (Exception e)
+        {
+            return Result<int?, Err>.Err(UtilErrors.InternalServerError(e));
+
+        }
+    }
+    public async Task<Result<Unit, Err>> UpdateTotalComments(int id)
+    {
+        try
+        {
+            var totalCommentsResult = await GetTotalComments(id);
+            var updateTotalComments = await _dbSet.Where(u=>u.Id==id)
+                .ExecuteUpdateAsync(
+                    b => b.SetProperty(u => u.TotalComment, totalCommentsResult.Value));
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception e)
+        {
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+    }
+
+    public async Task<Result<Unit, Err>> Comment(int userId, int blogId, string content)
+    {
+        try
+        {            
+
+            await context.UserCommentBlogs.AddAsync(new UserCommentBlog
+            {
+                BlogId = blogId,
+                UserId = userId,
+                Content = content
+            });
+            await context.SaveChangesAsync();
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+    }
+
+    public async Task<Result<IEnumerable<UserCommentBlog>?, Err>> GetCommentsById(int blogId)
+    {
+        try
+        {
+            var comments = await context.UserCommentBlogs
+                .Where(ulb => ulb.BlogId == blogId)
+                .Include(ulb => ulb.User)
+                .Select(ulb => ulb)
+                .ToListAsync();
+            return Result<IEnumerable<UserCommentBlog>?, Err>.Ok(comments);
+        }
+        catch (Exception e)
+        {
+            return Result<IEnumerable<UserCommentBlog>?, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+    }
+
+    private async Task<Result<int?, Err>> GetTotalComments( int blogId)
+    {
+        try
+        {
+            int totalComments = await context.UserCommentBlogs.CountAsync(ulb => ulb.BlogId == blogId);
+            return Result<int?, Err>.Ok(totalComments);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return Result<int?, Err>.Err(UtilErrors.InternalServerError(e));
         }
     }
 }

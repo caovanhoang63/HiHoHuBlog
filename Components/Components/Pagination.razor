@@ -1,0 +1,62 @@
+﻿@using HiHoHuBlog.Utils
+@* Paging *@
+<div class="join mt-5 flex justify-center">
+    <button @onclick="OnPrevious" class="join-item btn btn-ghost btn-sm" disabled="@(Paging.Page == 1)">«</button>
+
+    @for (int i = 1; i <= Paging.TotalPages; i++)
+    {
+        if (ShouldDisplayPage(i))
+        {
+            var i1 = i;
+            <button @onclick="() => OnPageClick(i1)"
+                    class="join-item btn btn-sm @(Paging.Page == i ? "btn-active" : "btn-ghost")">
+                @i
+            </button>
+        }
+        else if (i == 2 || i == Paging.TotalPages - 1)
+        {
+            <button class="join-item btn btn-ghost btn-sm btn-disabled">...</button>
+        }
+    }
+
+    <button @onclick="OnNext" class="join-item btn btn-ghost btn-sm" disabled="@(Paging.Page == Paging.TotalPages)">»</button>
+</div>
+@code {
+    [Parameter] public Paging Paging { get; set; } = new Paging(1, 1);
+    [Parameter] public EventCallback FetchDataAsync { get; set; }
+    private bool ShouldDisplayPage(int page)
+    {
+        // Hiển thị trang đầu, cuối, trang hiện tại, và các trang xung quanh
+        return page == 1 || page == Paging.TotalPages || 
+               Math.Abs(page - Paging.Page) <= 2;
+    }
+
+    private async void OnPageClick(int page)
+    {
+        if (page != Paging.Page)
+        {
+            Paging.Page = page;
+            await FetchDataAsync.InvokeAsync();
+        }
+        StateHasChanged();
+
+    }
+
+    private async void OnPrevious()
+    {
+        if (Paging.Page > 1)
+        {
+            Paging.Page--;
+            await FetchDataAsync.InvokeAsync();
+        }
+    }
+
+    private async void OnNext()
+    {
+        if (Paging.Page < Paging.TotalPages)
+        {
+            Paging.Page++;
+            await FetchDataAsync.InvokeAsync();
+        }
+    }
+}

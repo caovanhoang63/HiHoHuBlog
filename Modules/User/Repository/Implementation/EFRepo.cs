@@ -222,6 +222,19 @@ public class EfRepo  : IUserRepository
         }    
     }
 
+
+    public async Task<Result<Entity.User?, Err>> FindById(int id)
+    {
+        try
+        {
+            var user = await _dbSet.Where(u => u.Id == id ).FirstOrDefaultAsync();
+            return Result<Entity.User?, Err>.Ok(user);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return Result<Entity.User?, Err>.Err(UtilErrors.InternalServerError(e));
+
     public async Task<Result<IEnumerable<UserList>?, Err>> GetUserLists(UserFilter? userFilter, Paging? paging)
     {
         var r =  await ListUsers(userFilter, paging);
@@ -272,6 +285,7 @@ public class EfRepo  : IUserRepository
         catch (Exception ex)
         {
             return Result<Unit, Err>.Err(UtilErrors.InternalServerError(ex));
+
         }
     }
 
@@ -289,6 +303,100 @@ public class EfRepo  : IUserRepository
             return Result<UserProfile?, Err>.Err(UtilErrors.InternalServerError(e));
         }
         
+    }
+    public async Task<Result<Unit, Err>> UpdateTotalFollows(int id,int userFollowId)
+    {
+        try
+        {
+            var totalFollowsResult = await GetTotalFollows(id);
+            var totalFollowingResult = await GetTotalFollowing(userFollowId);
+            var updateTotalFollowing = await _dbSet.Where(u => u.Id == id)
+                .ExecuteUpdateAsync(b => b
+                    .SetProperty(u => u.TotalFollowing, totalFollowsResult.Value));
+            var updateTotalFollower = await _dbSet.Where(u => u.Id == userFollowId)
+                .ExecuteUpdateAsync(b => b
+                    .SetProperty(u => u.TotalFollower, totalFollowingResult.Value));
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception e)
+        {
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+    }
+
+    public async Task<Result<Unit, Err>> Follows(int userId, int userFollowId)
+    {
+        try
+        {
+            await _dbContext.UserFollows.AddAsync(new UserFollow
+            {
+                UserId = userId,
+                UserFollowing = userFollowId
+            });
+            await _dbContext.SaveChangesAsync();
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception e)
+        {
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+         
+    }
+
+    public async Task<Result<Unit, Err>> UnFollow(int userId, int userFollowId)
+    {
+        try
+        {
+            var entity = await _dbContext.UserFollows
+                .FirstOrDefaultAsync(ulb => ulb.UserId == userId && ulb.UserFollowing == userFollowId);
+            if (entity != null) _dbContext.UserFollows.Remove(entity);
+            await _dbContext.SaveChangesAsync();
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception e)
+        {
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+    }
+
+    public async Task<Result<bool, Err>> IsFollowed(int userId, int userFollowId)
+    {
+        try
+        {
+            var isFollowed = await _dbContext.UserFollows.AnyAsync(uf => uf.UserId == userId && uf.UserFollowing == userFollowId);
+            return Result<bool, Err>.Ok(isFollowed);
+        }
+        catch (Exception e)
+        {
+            return Result<bool, Err>.Err(UtilErrors.InternalServerError(e));
+
+        }
+    }
+    private async Task<Result<int?, Err>> GetTotalFollows(int id)
+    {
+        try
+        {
+            int totalFollows = await _dbContext.UserFollows.CountAsync(ulb => ulb.UserId == id);
+            return Result<int?, Err>.Ok(totalFollows);
+        }
+        catch (Exception e)
+        {
+            return Result<int?, Err>.Err(UtilErrors.InternalServerError(e));
+
+        }
+    }
+    private async Task<Result<int?, Err>> GetTotalFollowing(int id)
+    {
+        try
+        {
+            int totalFollows = await _dbContext.UserFollows.CountAsync(ulb => ulb.UserFollowing == id);
+            return Result<int?, Err>.Ok(totalFollows);
+        }
+        catch (Exception e)
+        {
+            return Result<int?, Err>.Err(UtilErrors.InternalServerError(e));
+
+        }
     }
     
     

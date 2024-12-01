@@ -1,16 +1,22 @@
-﻿<div class="card w-full bg-base-100 mr-5">
+﻿@using HiHoHuBlog.Modules.Search.Entity
+@using HiHoHuBlog.Components.Components
+<div class="card w-full bg-base-100 mr-5">
     <div class="card-body p-0 mb-8 flex-row items-center justify-between space-x-2">
         <div class="avatar">
             <div class="size-8 rounded-full">
-                <img src="https://miro.medium.com/v2/resize:fill:40:40/1*VjC-Q9tXNMOzJVOoG-DEGg.png"/>
+                <img src="@User?.Avatar?.Url"/>
             </div>
         </div>
         <div class="flex-col">
-            <h2 class="card-title text-base	 line-clamp-2">Emotion Live</h2>
-            <p class="line-clamp-2">I like to read and write some emotional short stories  </p>
+            <h2 class="card-title text-base	 line-clamp-2">@User?.FirstName @User?.LastName</h2>
+            <p class="line-clamp-2">@User?.UserDetails?.Bio</p>
         </div>
-        <div class="card-actions grow">
+        @*<FollowButton User="User"/>*@
+        @*<div class="card-actions grow">
             <a class="btn rounded-3xl bg-transparent border border-black">Follow</a>
-        </div>
+        </div>*@
     </div>
 </div>
+@code{
+    [Parameter] public UserSearchDoc? User { get; set; }
+}

@@ -4,6 +4,7 @@
 @using HiHoHuBlog.Modules.Search.Entity
 @using HiHoHuBlog.Modules.Search.Service.Interface
 @using HiHoHuBlog.Utils
+@using HiHoHuBlog.Modules.Search.Presentation.Components
 @inject ISearchBlogService BlogSearch
 @inject IToastService ToastService
 @inject IJSRuntime JSRuntime
@@ -20,8 +21,8 @@
 
 
 <Container ContainerClass="flex justify-between space-x-10 max-w-7xl relative">
-    <div class="grow max-w-4xl py-10">
-        <div role="tablist" class="tabs tabs-bordered">
+    <div class="grow max-w-4xl pb-10">
+        @*<div role="tablist" class="tabs tabs-bordered">
             <button class="tab">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
@@ -31,7 +32,7 @@
             <a role="tab" class="tab tab-active">Tab 2</a>
             <a role="tab" class="tab">Tab 3</a>
             <a role="tab" class="tab">Tab 4</a>
-        </div>
+        </div>*@
         <ul >
             @foreach (var blog in _blogs)
             {
@@ -44,12 +45,23 @@
             <p class="@(_isLoading ? " " : "hidden" )">Loading...</p>
         </div>
     </div>
-    <div class="border-l-[1px]  p-10 pt-20 max-w-sm max-h-screen sticky top-0">
+    <div class="border-l-[1px]  p-10 max-w-sm max-h-screen sticky top-0">
         <div class="flex flex-col space-y-2">
-            <span class="text-black">Staff pick</span>
-            <TinyBlogCard/>
-            <TinyBlogCard/>
-            <TinyBlogCard/>
+            <span class="text-gray-600 mb-6">Recommended Topics</span>
+            <div class="flex flex-wrap ">
+                <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Java</div>
+                <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Java</div>
+                <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Java</div>
+                <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Java</div>
+                <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Java</div>
+            </div>
+            <div class="divider mt-9 mb-0"></div>
+            <span class="text-gray-600 mb-6">Who to follow</span>
+            <div >
+                <MatchingPeopleSmallCard></MatchingPeopleSmallCard>
+                <MatchingPeopleSmallCard></MatchingPeopleSmallCard>
+            </div>
+
         </div>
     </div>
 </Container>

@@ -91,6 +91,10 @@ CREATE TABLE `blogs` (
                          KEY `status` (`status`) USING BTREE
 )ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
 
+ALTER TABLE blogs
+    ADD COLUMN `total_comment`
+        INT NOT NULL AFTER `total_mark`;
+
 DROP TABLE IF EXISTS `categories`;
 CREATE TABLE  `categories` (
                                `id` INT NOT NULL AUTO_INCREMENT,
@@ -140,12 +144,14 @@ CREATE TABLE  `user_read_blogs` (
 
 DROP TABLE IF EXISTS `comments`;
 CREATE TABLE `comments` (
+                            `id` INT NOT NULL AUTO_INCREMENT,
                             `user_id` INT,
                             `blog_id` INT,
                             `content` text,
                             `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                            PRIMARY KEY (`user_id`,`blog_id`)
+                            PRIMARY KEY (`id`)
 )ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
+
 
 
 DROP TABLE IF EXISTS `blog_blocked`;

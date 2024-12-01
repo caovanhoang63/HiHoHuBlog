@@ -1,0 +1,28 @@
+﻿@using HiHoHuBlog.Modules.Blog.Entity
+    <div class="flex gap-4">
+        <!-- Avatar -->
+        <div class="avatar">
+            <div class="size-10 rounded-full">
+                <img src="@UserCommentBlog?.User?.Avatar?.Url" />
+            </div>
+        </div>
+
+        <!-- Comment Content -->
+        <div class="flex-1">
+            <div class="flex items-center gap-2 mb-1">
+                <span class="font-semibold">@UserCommentBlog?.User?.FirstName @UserCommentBlog?.User?.LastName</span>
+                <div class="flex-1"></div>
+                <button class="btn btn-ghost btn-circle btn-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+                    </svg>
+                </button>
+            </div>
+            <p class="mb-2">@UserCommentBlog?.Content</p>
+        </div>
+
+    </div>
+
+@code {
+    [Parameter] public UserCommentBlog? UserCommentBlog { get; set; }
+}

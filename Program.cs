@@ -120,6 +120,7 @@ builder.Services.AddScoped<IBlogDeleteService, BlogDeleteService>();
 builder.Services.AddScoped<IMigrationSearchDataService,MigrationSearchDataService>();
 builder.Services.AddScoped<ISearchBlogService, SearchBlogService>();
 builder.Services.AddScoped<ISearchTagService, SearchTagService>();
+builder.Services.AddScoped<IUserFollowService, UserFollowService>();
 builder.Services.AddScoped<IBlogTagService, BlogTagService>();
 builder.Services.AddScoped<IResetPasswordService, ResetPasswordService>();
 
