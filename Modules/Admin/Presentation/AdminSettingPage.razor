@@ -2,9 +2,10 @@
 @using HiHoHuBlog.Components.Layout
 @using HiHoHuBlog.Modules.Admin.Entity
 @using HiHoHuBlog.Modules.Admin.Service.Interface
+@using HiHoHuBlog.Modules.Email.Comp.MailSender
+@using HiHoHuBlog.Modules.Email.Entity
 @using HiHoHuBlog.Modules.Search.Service.Interface
 @using HiHoHuBlog.Utils
-@using HiHoHuBlog.Utils.MailSender
 @layout AdminLayout
 @inject IReasonBlogBlockService Service
 @rendermode InteractiveServer
@@ -21,9 +22,9 @@
                 <div class="py-10 space-x-5">
                     <input @bind="Reason" type="text" placeholder="Reason" class="input input-bordered w-80 max-w-xs "/>
                     <button @onclick="OnNewReason" class="btn ">
-                    <span>
-                        New block reason
-                    </span>
+                        <span>
+                            New block reason
+                        </span>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
                         </svg>

@@ -1,4 +1,4 @@
-namespace HiHoHuBlog.Utils.MailSender;
+namespace HiHoHuBlog.Modules.Email.Entity;
 
 public class MailRequest
 {

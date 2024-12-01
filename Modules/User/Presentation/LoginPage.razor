@@ -44,12 +44,15 @@
             </svg>
             <InputText @bind-Value="@User.Password" type="password" class="grow" placeholder="Password"/>
         </label>
+
         @if (!string.IsNullOrEmpty(_loginErrorMessage))
         {
         <div class="text-error">@_loginErrorMessage</div>
         }
         <ValidationMessage class="text-error" For="() => User.Password"></ValidationMessage>
-        <a class="link">Forgot password?</a>
+
+        <a href="/forgot-password" class="link">Forgot password?</a>
+
         <input type="submit" class="btn" value="Login"/>
         <a href="/signup" class="link text-center">Do not an account?</a>
     </EditForm>

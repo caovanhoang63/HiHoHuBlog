@@ -11,7 +11,7 @@
 @inject ITagService TagService
 @inject IToastService toastService
 @inject NavigationManager NavigationManager
-
+@attribute [Authorize]
 <AuthorizeView Roles="admin, mod">
     <Authorized>
         <FullScreenSpinner IsLoading="_isLoading"></FullScreenSpinner>

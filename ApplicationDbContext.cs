@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using HiHoHuBlog.Modules.Admin.Entity;
 using HiHoHuBlog.Modules.Blog.Entity;
+using HiHoHuBlog.Modules.Email.Entity;
 using HiHoHuBlog.Modules.Tag.Entity;
 using HiHoHuBlog.Modules.User.Entity;
 using HiHoHuBlog.Utils;
@@ -24,6 +25,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<BlogBlocked> BlogBlocked { get; set; }
     public DbSet<ReasonBlogBlock> ReasonBlogBlock { get; set; }
     public DbSet<UserReadBlog> userReadBlog { get; set; }
+    public DbSet<EmailTemplate> emailTemplate { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>().ToTable("users");
@@ -36,6 +38,7 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<BlogBlocked>().ToTable("blog_blocked");
         modelBuilder.Entity<ReasonBlogBlock>().ToTable("reason_blog_block");
         modelBuilder.Entity<UserReadBlog>().ToTable("user_read_blogs");
+        modelBuilder.Entity<EmailTemplate>().ToTable("email_template");
         modelBuilder.Entity<User>()
             .HasOne(u => u.UserDetails)       
             .WithOne()                        
