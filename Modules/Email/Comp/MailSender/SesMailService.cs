@@ -1,8 +1,9 @@
 using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
-using Microsoft.Extensions.Options;
+using HiHoHuBlog.Modules.Email.Entity;
+using HiHoHuBlog.Utils;
 
-namespace HiHoHuBlog.Utils.MailSender;
+namespace HiHoHuBlog.Modules.Email.Comp.MailSender;
 
 public class SesMailService : IMailSender
 {

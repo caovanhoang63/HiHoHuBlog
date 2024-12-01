@@ -1,4 +1,5 @@
-using HiHoHuBlog.Utils.MailSender;
+using HiHoHuBlog.Modules.Email.Comp.MailSender;
+using HiHoHuBlog.Modules.Email.Entity;
 using Newtonsoft.Json;
 
 namespace HiHoHuBlog.Utils;
@@ -26,8 +27,18 @@ public static class UtilErrors
         return new Err("You do not have permission to access this resource");
     }
 
+    public static Err ErrEntityAlreadyExists(string entityName)
+    {
+        return new Err($"{entityName} already exists");
+    }
+
     public static Err ErrFailToSendEmail(MailRequest mailRequest, Exception ex)
     {
         return new Err($"Got an Error when send email: {JsonConvert.SerializeObject(mailRequest)}",ex,500);
     }
+
+    public static Err ErrTokenExpired()
+    {
+        return new Err("Token expired");
+    }  
 }

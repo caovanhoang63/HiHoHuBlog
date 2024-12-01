@@ -16,6 +16,10 @@ using HiHoHuBlog.Modules.Blog.Repository;
 using HiHoHuBlog.Modules.Blog.Repository.Implementation;
 using HiHoHuBlog.Modules.Blog.Service.Implementation;
 using HiHoHuBlog.Modules.Blog.Service.Interface;
+using HiHoHuBlog.Modules.Email;
+using HiHoHuBlog.Modules.Email.Comp.MailSender;
+using HiHoHuBlog.Modules.Email.Repository;
+using HiHoHuBlog.Modules.Email.Service;
 using HiHoHuBlog.Modules.Search;
 using HiHoHuBlog.Modules.Search.Repository.Implementation;
 using HiHoHuBlog.Modules.Search.Repository.Interface;
@@ -32,7 +36,6 @@ using HiHoHuBlog.Modules.User.Repository.Implementation;
 using HiHoHuBlog.Modules.User.Service.Implementation;
 using HiHoHuBlog.Modules.User.Service.Interface;
 using HiHoHuBlog.Utils;
-using HiHoHuBlog.Utils.MailSender;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
@@ -94,6 +97,8 @@ builder.Services.AddScoped<IMigrationRepository, EsMigrationRepository>();
 builder.Services.AddScoped<ISearchTagRepository, EsSearchTagRepository>();
 builder.Services.AddScoped<IUserBlogActionRepository, EfUserBlogActionRepo>();
 builder.Services.AddScoped<ISearchUserRepository, EsSearchUserRepository>();
+builder.Services.AddScoped<IEmailRepository,EfEmailRepository>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddScoped<IUserSignUpService, UserSignUpService>();
 builder.Services.AddScoped<IUserLoginService, UserLoginService>();
@@ -105,6 +110,7 @@ builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 builder.Services.AddScoped<IUserBlogActionService, UserBlogActionService>();
 builder.Services.AddScoped<IUserSettingsService, UserSettingsService>();
 builder.Services.AddScoped<ISearchUserService, SearchUserService>();
+builder.Services.AddScoped<IEmailService,EmailService>();
 
 builder.Services.AddScoped<ICreateBlogService,CreateBlogService>();
 builder.Services.AddScoped<IBlogUpdateService, BlogUpdateService>();
@@ -115,12 +121,14 @@ builder.Services.AddScoped<ISearchBlogService, SearchBlogService>();
 builder.Services.AddScoped<ISearchTagService, SearchTagService>();
 builder.Services.AddScoped<IUserFollowService, UserFollowService>();
 builder.Services.AddScoped<IBlogTagService, BlogTagService>();
+builder.Services.AddScoped<IResetPasswordService, ResetPasswordService>();
+
 
 builder.Services.AddAutoMapper(typeof(UserMappingProfile));
 builder.Services.AddAutoMapper(typeof(BlogMappingProfile));
 builder.Services.AddAutoMapper(typeof(AdminMappingProfile));
 builder.Services.AddAutoMapper(typeof(SearchMappingProfile));
-
+builder.Services.AddAutoMapper(typeof(EmailMappingProfile));
 
 builder.Services.AddSignalR(e => {
     e.MaximumReceiveMessageSize = 102400000;
