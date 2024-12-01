@@ -58,6 +58,11 @@ public class ApplicationDbContext : DbContext
                 v => JsonConvert.DeserializeObject<Image?>(v) 
             );
         
+        modelBuilder.Entity<BlogTag>()
+            .HasKey(bt => new { bt.BlogId, bt.TagId }); // Khóa chính của BlogTag là BlogId và TagId
+        
+        modelBuilder.Entity<Blog>().HasMany(e=>e.Tags).WithMany(t => t.Blogs).UsingEntity<BlogTag>();;
+        
         modelBuilder.Entity<User>()
             .Property(b => b.Avatar)
             .HasConversion<string>(

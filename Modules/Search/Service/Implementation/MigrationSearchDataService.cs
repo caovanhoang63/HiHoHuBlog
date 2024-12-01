@@ -10,6 +10,7 @@ using HiHoHuBlog.Modules.User.Entity;
 using HiHoHuBlog.Modules.User.Repository;
 using HiHoHuBlog.Utils;
 using HtmlAgilityPack;
+using Newtonsoft.Json;
 
 namespace HiHoHuBlog.Modules.Search.Service.Implementation;
 
@@ -46,7 +47,7 @@ public class MigrationSearchDataService(IBlogRepository blogRepository, IMapper 
             Console.WriteLine("No need to migrate blog data");
             return Result<Unit, Err>.Ok(new Unit());
         }
-
+        
         var blogs = _mapper.Map<IEnumerable<BlogSearchDoc>>(r.Value);
         var blogSearchDocs = blogs as BlogSearchDoc[] ?? blogs.ToArray();
         foreach (var blog in blogSearchDocs)

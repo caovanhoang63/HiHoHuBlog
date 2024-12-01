@@ -209,6 +209,7 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
             {
                 var result = await queryable
                     .Include(b => b.User)
+                    .Include(b => b.Tags)
                     .Select(b => b).ToListAsync();
                 return Result<IEnumerable<Entity.Blog>?, Err>.Ok(result);
             }
