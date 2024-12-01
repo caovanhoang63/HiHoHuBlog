@@ -4,22 +4,25 @@ namespace HiHoHuBlog.Utils;
 
 public static class GetThumbnail
 {
-    public static async Task<Image?> GetThumbnailFromHtml(string htmlContent)
+    public static async Task<Image?> GetThumbnailFromHtml(string? htmlContent)
     {
-        var doc = new HtmlDocument();
-        doc.LoadHtml(htmlContent);
-
-        var imgNode = doc.DocumentNode.SelectSingleNode("//img");
-        if (imgNode != null)
+        if (htmlContent != null)
         {
-            var thumbnailUrl = imgNode.GetAttributeValue("src", null);
-            if (!string.IsNullOrEmpty(thumbnailUrl))
+            var doc = new HtmlDocument();
+            doc.LoadHtml(htmlContent);
+
+            var imgNode = doc.DocumentNode.SelectSingleNode("//img");
+            if (imgNode != null)
             {
-                return new Image
+                var thumbnailUrl = imgNode.GetAttributeValue("src", null);
+                if (!string.IsNullOrEmpty(thumbnailUrl))
                 {
-                    Url = thumbnailUrl,
-                    // Set other Image properties as needed
-                };
+                    return new Image
+                    {
+                        Url = thumbnailUrl,
+                        // Set other Image properties as needed
+                    };
+                }
             }
         }
         return null;

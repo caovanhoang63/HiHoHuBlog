@@ -39,6 +39,12 @@
             {
                 return null;
             }
+
+            if (HttpContext.Request.Path.StartsWithSegments("/p") ||
+                HttpContext.Request.Path.StartsWithSegments("/censor"))
+                return new InteractiveServerRenderMode(prerender: false);
+            
+            
             return new InteractiveServerRenderMode();
         }
     }

@@ -211,7 +211,7 @@ public class EsSearchBlogRepository(EsClient client, IUserBlogActionRepository u
             )
             .Sort(ss => ss.Descending(SortSpecialField.Score))
         );
-        if (docs.IsValid && docs.Documents.Any())
+        if (docs.IsValid )
         {
             paging.Total = (int)docs.Total;
             return Result<IEnumerable<BlogSearchDoc>?, Err>.Ok(docs.Documents);

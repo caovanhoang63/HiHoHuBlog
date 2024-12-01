@@ -49,11 +49,11 @@ public class EfUserBlogActionRepo(ApplicationDbContext context, IMapper mapper) 
                 .Where(b => b.UserId == userId)
                 .Where(b => b.Blog.IsPublished == true)
                 .Where(b => b.Blog.Status == 1)
+                .OrderByDescending(b  => b.UpdatedAt)
                 .Take(paging.PageSize)
                 .Skip(paging.GetOffSet())
                 .Include(b => b.Blog)
                 .ThenInclude(b => b.User)
-                .OrderByDescending(b  => b.UpdatedAt)
                 .Select(b => _mapper.Map<UserReadBlogList>(b)).ToListAsync();
 
             

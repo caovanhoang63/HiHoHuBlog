@@ -9,6 +9,8 @@
 @using HiHoHuBlog.Modules.Blog.Entity
 @using HiHoHuBlog.Modules.Blog.Presentation.Components.TextEditor
 @using HiHoHuBlog.Modules.Blog.Service.Interface
+@using HiHoHuBlog.Modules.Search.Entity
+@using HiHoHuBlog.Modules.Search.Service.Interface
 @using HiHoHuBlog.Modules.User.Entity
 @using HiHoHuBlog.Utils
 @using Toolbar = HiHoHuBlog.Modules.Blog.Presentation.Components.TextEditor.Toolbar
@@ -19,8 +21,8 @@
 @inject IBlogUpdateService BlogUpdateService
 @inject IBlogGetService BlogGetService
 @inject IToastService ToastService
-
-
+@inject ISearchTagService SearchTagService
+@inject IBlogTagService BlogTagService
 @attribute [Authorize]
 <AuthorizeView Roles="admin, user, mod">
     <Authorized>
@@ -37,13 +39,13 @@
                                     <div class="bg-gray-100 h-52 flex items-center text-center">
                                         @if (FirstImage is not null)
                                         {
-                                            <img src="@FirstImage.Url"
-                                                 alt="Tailwind CSS Navbar component"/>
+                                        <img src="@FirstImage.Url"
+                                             alt="Tailwind CSS Navbar component"/>
                                         }
                                         else
                                         {
-                                            <p class="text-base font-medium mx-12 text-gray-500">Include a high-quality
-                                                image in your story to make it more inviting to readers.</p>
+                                        <p class="text-base font-medium mx-12 text-gray-500">Include a high-quality
+                                            image in your story to make it more inviting to readers.</p>
                                         }
                                     </div>
                                     <input value="@_blog.Title" type="text" placeholder="Tag name" 
@@ -58,8 +60,43 @@
                                     <h3 class="text-lg font-bold pt-4">Publishing to: @_requester.GetUsername()</h3>
                                     <h3 class="text-sm font-medium">Add or change topics (up to 5) 
                                         so readers know what your story is about</h3>
-                                    <input  type="text" placeholder="Add a topic..."
-                                           class="input input-bordered w-full"/>
+                                    <label class=" flex border-black border p-2 border-opacity-25 gap-2  flex-wrap" for="tag_input" >
+                                        @foreach (var tag in _selectedTags)
+                                        {
+                                        <span class="flex badge p-3 badge-outline h-[1.75rem] gap-1">
+                                            @tag.Name
+                                            <button @onclick="@(() => RemoveTagFromSelected(tag))" class="ml-auto btn btn-sm size-4 btn-circle btn-ghost">✕</button>
+                                        </span>
+                                        }
+                                        <input id="tag_input" @bind="SearchQuery" @oninput="OnTagQueryInput" type="text" placeholder="Add a topic..."
+                                               class="focus:ring-0 border-transparent 
+                                                    focus:border-transparent px-0 !outline-none flex-1"/>
+                                    </label>
+
+                                    <div>
+                                        @if (IsSearching)
+                                        {
+                                        <p>Searching...</p>
+                                        }
+                                        else if (_searchTag?.Any() == true)
+                                        {
+                                        <ul class="rounded divide-y divide-gray-700 divide-opacity-25
+                                                text-gray-800">
+                                            @foreach (var result in _searchTag)
+                                            {
+                                            <li class="cursor-pointer bg-gray-100 hover:bg-gray-300 rounded-md px-4 py-2"
+                                                @onclick="() => {AddTagToSelected(result);}"
+                                            >
+                                                @result.Name
+                                            </li>
+                                            }
+                                        </ul>
+                                        }
+                                        else
+                                        {
+                                        @*<p>No results found</p>*@
+                                        }
+                                    </div>
                                 </div>
                             </div>
                             <div class="modal-action">
@@ -259,6 +296,22 @@
                 });
 
             });
+
+            _tagSubscription = _tagSubject
+                .Throttle(TimeSpan.FromMilliseconds(500))
+                .Subscribe(async tag =>
+                {
+                    await InvokeAsync(
+                        async () =>
+                        {
+                            IsSearching = true;
+                            SearchQuery = tag;
+                            await GetSearchTags();
+                            IsSearching = false;
+                            StateHasChanged();
+                        });
+                });
+            
     }
 
     private async void OnPublish()
@@ -269,6 +322,20 @@
             ToastService.ShowError(r.Error.Message);
             return;
         }
+
+        foreach (var blogTagCreate in _selectedTags.Select(tag => new BlogTagCreate()
+                 {
+                     BlogId = _blog.Id,
+                     TagId = tag.Id,
+                 }))
+        {
+            var aR = await BlogTagService.AddTagBlog(blogTagCreate);
+            if (!aR.IsOk)
+            {
+                //ToastService.ShowError(aR.Error.Message);
+            }
+        }
+        
         ToastService.ShowSuccess("Publish success!");
          NavigationManager.NavigateTo($"blog/{_blog.Id}");
     }
@@ -277,6 +344,7 @@
     {
         _titleSubscription?.Dispose();
         _contentSubscription?.Dispose();
+        _tagSubscription?.Dispose();
     }
     void ChangeUrl(string url){
         // You can also change it to any url you want
@@ -290,6 +358,67 @@
         await InvokeAsync(StateHasChanged);
     }
 
+    private string? SearchQuery { get; set; } = string.Empty;
+    private bool IsSearching { get; set; }
+    private IDisposable? _tagSubscription;
+    private readonly Subject<string?> _tagSubject = new();
+    private Paging PagingTopic = new Paging(1, 10);
+    private IEnumerable<TagSearchDoc>? _searchTag = new List<TagSearchDoc>();
+    private List<TagSearchDoc> _selectedTags = new List<TagSearchDoc>();
+
+    private async Task GetSearchTags()
+    {
+        if (SearchQuery is not null && SearchQuery.Length !=0)
+        {
+            var result = await SearchTagService.SearchTagsForPublish(SearchQuery, PagingTopic);
+            if (result.IsOk)
+            {
+                var totalResult = result.Value.Count();
+                _searchTag = result.Value;
+                _searchTag = _searchTag.Except(_selectedTags);
+            }
+            else
+            {
+                _searchTag = new List<TagSearchDoc>();
+            }
+        }
+        else
+        {
+            _searchTag = new List<TagSearchDoc>();
+
+        }
+    }
+    
+    private  void OnTagQueryInput(ChangeEventArgs args)
+    {
+        IsSearching = true;
+        var tag = args.Value?.ToString();
+        _tagSubject.OnNext(tag?.Trim());
+        IsSearching = false;
+
+    }
+    private void AddTagToSelected(TagSearchDoc tag)
+    {
+        if (_selectedTags.Count < 5 && !_selectedTags.Contains(tag))
+        {
+            bool duplicate = false;
+            _selectedTags.ForEach(e =>
+            {
+                if (e.Id == tag.Id) duplicate = true;
+            });
+            if (duplicate)
+            {
+                return;
+            };
+            _selectedTags.Add(tag);
+            _searchTag = null;
+            SearchQuery = string.Empty;
+        }
+    }
+    private void RemoveTagFromSelected(TagSearchDoc tag)
+    {
+        _selectedTags.Remove(tag);
+    }
 }
 
 <script>
