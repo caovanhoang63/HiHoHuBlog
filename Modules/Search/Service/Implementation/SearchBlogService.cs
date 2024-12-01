@@ -1,3 +1,4 @@
+using HiHoHuBlog.Modules.Blog.Entity;
 using HiHoHuBlog.Modules.Search.Entity;
 using HiHoHuBlog.Modules.Search.Repository.Interface;
 using HiHoHuBlog.Modules.Search.Service.Interface;
@@ -59,9 +60,9 @@ public class SearchBlogService(ISearchBlogRepository searchBlogRepository) : ISe
         return r;
     }
 
-    public async Task<Result<IEnumerable<BlogSearchDoc>?, Err>> RandomBlog(int seed, Paging paging)
+    public async Task<Result<IEnumerable<BlogSearchDoc>?, Err>> RandomBlog(int seed, Paging paging,BlogFilter blogFilter = null )
     {
-        var r= await  _searchBlogRepository.RandomBlog(seed, paging);
+        var r= await  _searchBlogRepository.RandomBlog(seed, paging, blogFilter);
         if (!r.IsOk)
         {
             return Result<IEnumerable<BlogSearchDoc>?, Err>.Err(r.Error);

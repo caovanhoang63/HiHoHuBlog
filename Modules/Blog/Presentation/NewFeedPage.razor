@@ -1,5 +1,6 @@
 @page "/"
 @using HiHoHuBlog.Components.Components
+@using HiHoHuBlog.Modules.Blog.Entity
 @using HiHoHuBlog.Modules.Blog.Presentation.Components
 @using HiHoHuBlog.Modules.Search.Entity
 @using HiHoHuBlog.Modules.Search.Service.Interface
@@ -82,7 +83,7 @@
         _seed = Guid.NewGuid().GetHashCode();
         
         var r = _requester is null ? 
-            await BlogSearch.RandomBlog(_seed, _paging) : 
+            await BlogSearch.RandomBlog(_seed, _paging): 
             await BlogSearch.RecommendSearchBlogByUser(_requester, _seed, _paging);
 
         if (r is { IsOk: true, Value: not null })
