@@ -129,7 +129,7 @@ public class EsSearchBlogRepository(EsClient client, IUserBlogActionRepository u
     {
         var history = await _userBlogRepo.ListReadHistory(requester.GetId(), new Paging(1, 2));
 
-        if (!history.IsOk || history.Value is null || !history.Value.Any())
+        if (!history.IsOk || history.Value is null || history.Value.Count() == 0)
         {
             return await RandomBlog(seed, paging);
         }
@@ -253,9 +253,10 @@ public class EsSearchBlogRepository(EsClient client, IUserBlogActionRepository u
             .Size(paging.PageSize)
             .From(paging.GetOffSet())
             .Query(q => q
-                .Match(m => m.Field(ff => ff.UserId == userId)))
+                .Term(t => t
+                    .Field(ff => ff.UserId)
+                    .Value(userId)))
         );
-
 
         if (docs.IsValid && docs.Documents.Any())
         {
@@ -265,6 +266,7 @@ public class EsSearchBlogRepository(EsClient client, IUserBlogActionRepository u
 
         return Result<IEnumerable<BlogSearchDoc>?, Err>.Err(UtilErrors.InternalServerError(docs.OriginalException));
     }
+
 
     private List<Func<QueryContainerDescriptor<BlogSearchDoc>, QueryContainer>> FilterBuild(BlogFilter? filter)
     {
