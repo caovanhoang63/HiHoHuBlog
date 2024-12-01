@@ -62,10 +62,11 @@ public class EsSearchBlogRepository(EsClient client, IUserBlogActionRepository u
                                 .Fields(f => f
                                     .Field("title^2")
                                     .Field("content")
+                                    .Field("tags.name")
                                 )
                                 .Operator(Operator.Or)
                                 .Type(TextQueryType.PhrasePrefix)
-                                .Boost(2.0)
+                                .Boost(4.0)
                             )
                     )
                     .Filter(f => f
@@ -127,13 +128,16 @@ public class EsSearchBlogRepository(EsClient client, IUserBlogActionRepository u
     public async Task<Result<IEnumerable<BlogSearchDoc>?, Err>> RecommendSearchBlogByUser(IRequester requester,
         int seed, Paging paging)
     {
-        var history = await _userBlogRepo.ListReadHistory(requester.GetId(), new Paging(1, 2));
+        var history = await _userBlogRepo.ListReadHistory(requester.GetId(), new Paging(1, 3));
 
-        if (!history.IsOk || history.Value is null || history.Value.Count() == 0)
+        if (!history.IsOk || history.Value is null || !history.Value.Any())
         {
             return await RandomBlog(seed, paging);
         }
-
+        foreach (var u in history.Value)
+        {
+            Console.WriteLine(u.BlogId);
+        }
         var docs = await client.Client.SearchAsync<BlogSearchDoc>(s => s
             .Size(paging.PageSize)
             .From(paging.GetOffSet())
@@ -143,14 +147,13 @@ public class EsSearchBlogRepository(EsClient client, IUserBlogActionRepository u
                         qq => qq.FunctionScore(f => f
                             .Query(mlt => mlt
                                 .MoreLikeThis(m => m
-                                    .Fields(ff => ff.Field("title").Field("content"))
-                                    .Like(l =>
+                                    .Fields(ff => ff.Field("title").Field("content").Field("tags"))
+                                    .Like(l => 
                                     {
                                         foreach (var u in history.Value)
                                         {
                                             l.Document(d => d.Id(u?.Blog?.Id));
                                         }
-
                                         return l;
                                     })
                                     .MinTermFrequency(1)
@@ -194,7 +197,7 @@ public class EsSearchBlogRepository(EsClient client, IUserBlogActionRepository u
                 .Bool(b => b
                     .Must(sh => sh
                         .MoreLikeThis(m => m
-                            .Fields(f => f.Field("title").Field("content"))
+                            .Fields(f => f.Field("title").Field("content").Field("tags"))
                             .Like(l => l
                                 .Document(d => d
                                     .Id(id)))
