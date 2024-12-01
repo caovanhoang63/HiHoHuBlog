@@ -100,11 +100,19 @@
                 }
             </div>
             <div class="divider mt-9 mb-0"></div>
-            <span class="text-gray-600 mb-6">Topics matching @SearchTerm</span>
-            <div >
-                <MatchingPeopleSmallCard></MatchingPeopleSmallCard>
-                <MatchingPeopleSmallCard></MatchingPeopleSmallCard>
-            </div>
+            @if(_searchUser is not null)
+            {
+                <span class="text-gray-600 mb-6">Topics matching @SearchTerm</span>
+                <div >
+                        @foreach (var user in _searchUser)
+                        {
+                            <MatchingPeopleSmallCard User="user"/>
+                        }    
+                    @*<MatchingPeopleSmallCard ></MatchingPeopleSmallCard>
+                <MatchingPeopleSmallCard></MatchingPeopleSmallCard>*@
+                </div>
+            }
+            
 
         </div>
     </div>
@@ -123,7 +131,7 @@
     private IEnumerable<BlogSearchDoc>? _searchDocs = new List<BlogSearchDoc>();
     private IEnumerable<TagSearchDoc>? _searchTag = new List<TagSearchDoc>();
     private IEnumerable<TagSearchDoc>? _searchTagMatching = new List<TagSearchDoc>();
-    private IEnumerable<UserSearchDoc>? _searchUser = new List<UserSearchDoc>();
+    private IEnumerable<UserSearchDoc>? _searchUser;
     
     private async Task GetSearchTags()
     {
@@ -211,6 +219,10 @@
         if (result.IsOk)
         {
             _searchUser = result.Value;
+            foreach (var r in _searchUser)
+            {
+                Console.WriteLine(r.FirstName);
+            }
 
         }
     }

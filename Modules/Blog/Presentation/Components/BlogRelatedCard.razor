@@ -15,10 +15,10 @@ else
             <div class="flex gap-2 mt-5 items-center">
                 <div class="avatar">
                     <div class="h-6 rounded-full">
-                        <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+                        <img src="@(Blog?.User?.Avatar?.Url is null ? "https://placehold.co/600x400?text=Hihohublog" :Blog?.User?.Avatar?.Url)" />
                     </div>
                 </div>
-                <span>@Blog?.User?.UserName</span>
+                <span>@Blog?.User?.FirstName @Blog?.User?.LastName</span>
             </div>
             <h2 class="card-title line-clamp-2">@Blog?.Title</h2>
             <p class="line-clamp-2 text-gray-600">@Blog?.ShortContent</p>
@@ -34,8 +34,8 @@ else
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#737373" class="size-6">
                     <path fill-rule="evenodd" d="M5.337 21.718a6.707 6.707 0 0 1-.533-.074.75.75 0 0 1-.44-1.223 3.73 3.73 0 0 0 .814-1.686c.023-.115-.022-.317-.254-.543C3.274 16.587 2.25 14.41 2.25 12c0-5.03 4.428-9 9.75-9s9.75 3.97 9.75 9c0 5.03-4.428 9-9.75 9-.833 0-1.643-.097-2.417-.279a6.721 6.721 0 0 1-4.246.997Z" clip-rule="evenodd" />
                 </svg>
-                <span class="ml-1">@Blog?.TotalLike</span>
-                <div class="flex-grow ">
+                <span class="ml-1">@Blog?.TotalComment</span>
+                @*<div class="flex-grow ">
                     <button class="btn btn-circle btn-ghost">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
@@ -46,7 +46,7 @@ else
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                         </svg>
                     </button>
-                </div>
+                </div>*@
             </div>
         </div>
     </div>

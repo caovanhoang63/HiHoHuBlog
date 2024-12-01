@@ -22,14 +22,14 @@
 <Container>
     <CommentSection IsOpen="_isOpen" comments="_comments" OnClose='() => _isOpen = false' Blog="_blog" Requester="_requester"></CommentSection>
     <FullScreenSpinner IsLoading="_isLoading"></FullScreenSpinner>
-    <div class="container mx-auto px-4 pb-8">
+    <div class="container mx-auto px-4 py-8">
         <!-- Header Section -->
         <div class="mb-8">
             <h1 class="text-4xl font-bold mb-4">@_blog?.Title</h1>
             <div class="flex items-center gap-4 mb-4">
                 <div class="avatar">
                     <div class="h-11 rounded-full">
-                        <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"/>
+                        <img src="@(_blog?.User?.Avatar?.Url is null ? "https://placehold.co/600x400?text=Hihohublog" : _blog?.User?.Avatar?.Url)"/>
                     </div>
                 </div>
                 <div>
