@@ -247,18 +247,16 @@
     {
         if (_requester is not null)
         {
-            if (!_isFollowed)
-            {
-                await UserFollowService.Follows(_requester.GetId(), _blog.User!.Id);
-                _isFollowed = !_isFollowed;
-                
-            }
-            else
-            {
+            var r = !_isFollowed ?
+                await UserFollowService.Follows(_requester.GetId(), _blog.User!.Id) :
                 await UserFollowService.UnFollow(_requester.GetId(), _blog.User!.Id);
-                _isFollowed = !_isFollowed;
-
+            if (!r.IsOk)
+            {
+                Console.WriteLine(r.Error);
+                ToastService.ShowError(r.Error.Message);
+                return;
             }
+            _isFollowed = !_isFollowed;
         }
         else
         {
