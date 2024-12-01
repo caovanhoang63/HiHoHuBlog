@@ -21,7 +21,6 @@ public interface IUserRepository
 
     Task<Result<Entity.User?, Err>> FindById(int id);
 
-    Task<Result<Unit,Err>> UpdatePassword(string email, string password);
     Task<Result<IEnumerable<UserList>?,Err>> GetUserLists(UserFilter? userFilter,Paging? paging);
     Task<Result<Unit, Err>> DeleteUser(int id);
     Task<Result<Unit, Err>> ReActiveUser(int id);

@@ -227,13 +227,15 @@ public class EfRepo  : IUserRepository
     {
         try
         {
-            var user = await _dbSet.Where(u => u.Id == id ).FirstOrDefaultAsync();
+            var user = await _dbSet.Where(u => u.Id == id).FirstOrDefaultAsync();
             return Result<Entity.User?, Err>.Ok(user);
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
             return Result<Entity.User?, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+    }
 
     public async Task<Result<IEnumerable<UserList>?, Err>> GetUserLists(UserFilter? userFilter, Paging? paging)
     {
