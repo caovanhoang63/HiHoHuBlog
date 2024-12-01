@@ -1,0 +1,359 @@
+﻿@page "/users"
+@using HiHoHuBlog.Components.Layout
+@using HiHoHuBlog.Modules.Admin.Entity
+@using HiHoHuBlog.Modules.Admin.Service.Interface
+@using HiHoHuBlog.Modules.Tag.Entity
+@using HiHoHuBlog.Modules.Tag.Service.Interface
+@using HiHoHuBlog.Utils
+@using HiHoHuBlog.Components.Components
+@using HiHoHuBlog.Modules.User.Entity
+@using HiHoHuBlog.Modules.User.Service.Interface
+@layout AdminLayout
+@attribute [Authorize(Roles = "admin, mod")]
+@inject ITagService TagService
+@inject IToastService toastService
+@inject NavigationManager NavigationManager
+@inject IUsersService UsersService
+<AuthorizeView Roles="admin, mod">
+    <Authorized>
+        <FullScreenSpinner IsLoading="_isLoading"></FullScreenSpinner>
+        <!-- You can open the modal using ID.showModal() method -->
+        <dialog id="update_modal" class="modal">
+            <div class="modal-box">
+                <h3 class="text-lg font-bold py-4">Role</h3>
+                @*<input @bind="_newRole" type="text" placeholder="" class="input input-bordered w-full "/>*@
+                <select @bind="_newRole" class="select select-bordered w-full ">
+                    <option value="admin" >Admin</option>
+                    <option value="mod">Mod</option>
+                    <option value="user">User</option>
+                </select>
+                <div class="modal-action">
+                    <form method="dialog">
+                        <!-- if there is a button, it will close the modal -->
+                        <button @onclick="OnUpdate" class="btn btn-warning">Update</button>
+                        <button @onclick='() => _newRole = ""' class="btn">Close</button>
+                    </form>
+                </div>
+            </div>
+        </dialog>
+        
+        <dialog id="delete_modal" class="modal">
+            <div class="modal-box">
+                <h3 class="text-lg font-bold py-4">Delete Tag</h3>
+                <p>Are you sure you want to delete tag "@_selectedTag?.Name"</p>
+                <div class="modal-action">
+                    <button @onclick="OnDelete" class="btn btn-warning">Delete</button>
+                    <form method="dialog">
+                        <!-- if there is a button, it will close the modal -->
+                        <button class="btn">Close</button>
+                    </form>
+                </div>
+            </div>
+        </dialog>
+        <dialog id="reactive_modal" class="modal">
+            <div class="modal-box">
+                <h3 class="text-lg font-bold py-4"></h3>
+                <div class="modal-action">
+                    <button  class="btn btn-warning">Create</button>
+                    <form method="dialog">
+                        <button class="btn">Close</button>
+                    </form>
+                </div>
+            </div>
+        </dialog>
+        
+        <div class="flex flex-col h-full overflow-y-hidden p-5">
+            @* content *@
+            <div class="flex flex-col max-h-full">
+                @* Search bar *@
+                <div class="flex mb-5 flex-row-reverse align-middle space-x-5">
+                    <div>
+                        <label class="input w-80 ml-5 input-bordered input-sm flex items-center gap-2 bg-white">
+                            <input type="text" class="grow " placeholder="Search"/>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 16 16"
+                                fill="currentColor"
+                                class="h-3 w-3 opacity-70">
+                                <path
+                                    fill-rule="evenodd"
+                                    d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+                                    clip-rule="evenodd"/>
+                            </svg>
+                        </label>
+                    </div>
+                    <div tabindex="0" role="button" class="btn btn-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M12 17.25h8.25"/>
+                        </svg>
+                    </div>
+                    
+                    <div class="flex w-full">
+                        <label class="label cursor-pointer space-x-2">
+                            <input @onclick="() => OnCheck(1)" type="checkbox"  checked='@(_filter?.Status?.Contains(1))'  class="checkbox checkbox-sm"/>
+                            <span class="label-text text-success">Active</span>
+                        </label>
+                        <label class="label cursor-pointer space-x-2">
+                            <input  @onclick="() => OnCheck(0)"  type="checkbox" checked='@(_filter?.Status?.Contains(0))'  class="checkbox checkbox-sm"/>
+                            <span class="label-text text-error">Deleted</span>
+                        </label>
+                    </div>
+                    
+                </div>
+                @* Table *@
+                <div class="overflow-y-scroll">
+                    <table class="table table-xs text-center">
+                        <thead class="sticky top-0 z-50 bg-white">
+                        <tr class="font-bold">
+                            <th>Id</th>
+                            <th>Email</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Role</th>
+                            <th>Last Modified</th>
+                            <th>Created At</th>
+                            <th>Status</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody class="">
+                        @if (_users is not null)
+                        {
+                            @foreach (var user in _users)
+                            {
+                                if (_filter.Status.Contains(user.Status))
+                                {
+                                    <tr>
+                                    <th>@user.Id</th>
+                                    <th>@user.Email</th>
+                                    <td>@user.FirstName</td>
+                                    <td>@user.LastName</td>
+                                    <td>@user.Role</td>
+                                    <td>@user.UpdatedAt</td>
+                                    <td>@user.CreatedAt</td>
+                                    <td class="w-20">
+                                        @switch (user.Status)
+                                        {
+                                            case 0:
+                                                <span class="text-error">Deleted</span>
+                                                break;
+                                            case 1:
+                                                <span class="text-success">Active</span>
+                                                break;
+                                            case 2:
+                                                <span class="text-warning">Banned</span>
+                                                break;
+                                            default:
+                                                <span class="text-warning">Unknown</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td class="w-20 relative">
+                                        <div @onclick:stopPropagation="true" class="dropdown dropdown-hover dropdown-bottom dropdown-end">
+                                            <a tabindex="0" role="button">
+                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                     fill="none" viewBox="0 0 24 24"
+                                                     stroke-width="1.5"
+                                                     stroke="currentColor"
+                                                     class="size-5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"/>
+                                                </svg>
+                                            </a>
+                                            <ul tabindex="0" class="absolute dropdown-content menu bg-base-100 rounded-box z-50 w-40 p-2 shadow">
+                                                @*@if (user.Status != (int)Status.Active)
+                                                {
+                                                    <li @onclick="() => OnClickReactive(user)" class="text-success">
+                                                        <a>ReActive</a>
+                                                    </li>
+                                                }*@
+                                                <li @onclick="()=> OnClickUpdate(user)" class="text-amber-400">
+                                                    <a>Update</a>
+                                                </li>
+                                                <li  @onclick="() => OnClickDelete(user)" class="text-error">
+                                                    <a>Delete</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                }
+                            }
+                        }
+                        </tbody>
+                    </table>
+                </div>
+                @* Paging *@
+                <div class="join mt-5 flex justify-end">
+                    <button @onclick="OnPrev" class="join-item btn btn-ghost btn-sm">«</button>
+                    <button class="join-item btn btn-ghost btn-sm">1</button>
+                    <button class="join-item btn btn-ghost btn-sm">2</button>
+                    <button class="join-item btn btn-ghost btn-disabled btn-sm">...</button>
+                    <button class="join-item btn btn-ghost btn-sm">99</button>
+                    <button class="join-item btn btn-ghost btn-sm">100</button>
+                    <button @onclick="OnNext" class="join-item btn btn-ghost btn-sm">»</button>
+                </div>
+            </div>
+        </div>
+    </Authorized>
+</AuthorizeView>
+@code {
+    [CascadingParameter]
+    Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+    [Parameter] public string Reason { get; set; } = "";
+    private IRequester? _requester = null;
+    private IEnumerable<UserList>? _users;
+    private readonly Paging _paging = new Paging(1,20);
+    private string? _newRole = "";
+    private bool _isLoading = false;
+    private Tag? _selectedTag = null;
+    private UserList? _selectedUser = null;
+    private readonly UserFilter _filter = new UserFilter()
+    {
+        Status = new int[]
+        {
+            1
+        }
+    };
+
+    private async void OnClickReactive(UserList user)
+    {
+        _selectedUser = user;
+    }
+    private async void OnClickDelete(UserList user)
+    {
+        _selectedUser = user;
+        await JSRuntime.InvokeVoidAsync("openModal", "delete_modal");
+    }
+    private async void OnClickUpdate(UserList user)
+    {
+        _selectedUser = user;
+        _newRole = user.Role;
+        await JSRuntime.InvokeVoidAsync("openModal", "update_modal");
+    }
+
+    
+    
+    private async void OnCheck(int status)
+    {
+        if (_filter.Status!.Contains(status))
+        {
+            _filter.Status = _filter.Status!.Where(val => val != status).ToArray();
+        }
+        else
+        {
+            _filter.Status =  _filter.Status!.Append(status).ToArray();
+        }
+        await GetUsers();
+    }
+    
+    private async void OnPrev()
+    {
+        if ( _paging.Page == 1 ) return;
+        _paging.Page--;
+        await GetUsers();
+    }
+
+    private async void OnNext()
+    {
+        if ( _paging.IsLastPage()) return;
+        _paging.Page++;
+        await GetUsers();
+    }
+
+    private async Task GetUsers()
+    {
+        _isLoading = true;
+        var resultGetUsers = await UsersService.GetUsers(_filter, _paging);
+        if (!resultGetUsers.IsOk)
+        {
+            toastService.ShowError(resultGetUsers.Error.Message);
+        }
+        else
+        {
+            _users = resultGetUsers.Value;
+        }
+        _isLoading = false;
+        await InvokeAsync(StateHasChanged);
+    }
+    
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        if (AuthenticationStateTask is null)
+        {
+            NavigationManager.NavigateTo("/error");
+            return;
+        }
+        _requester = await AuthUtils.GetInfo(AuthenticationStateTask);
+        await GetUsers();
+    }
+
+    private async Task OnDelete()
+    {
+        if (_selectedUser is null)
+        {
+            toastService.ShowError("User not exist");
+        }
+        else
+        {
+            var result = await UsersService.DeleteUser(_requester!, _selectedUser.Id);
+            if (!result.IsOk)
+            {
+                toastService.ShowError(result.Error.Message);
+            }
+            else
+            {
+                toastService.ShowSuccess("Delete success");
+                _selectedUser.Status = 0;
+            }
+        }
+
+        _selectedUser = null;
+        await JSRuntime.InvokeVoidAsync("closeModal", "delete_modal");
+        await InvokeAsync(StateHasChanged);
+    }
+    
+    private async Task OnUpdate()
+    {
+        if (_selectedUser is null)
+        {
+            toastService.ShowError("User not exist");
+        }
+        else
+        {
+            if (_selectedUser.Email != null && _newRole!=null && _requester!=null)
+            {
+                var result = await UsersService.UpdateRoleUser(_requester, _selectedUser.Email,_newRole);
+                if (!result.IsOk)
+                {
+                    toastService.ShowError(result.Error.Message);
+                }
+                else
+                {
+                    toastService.ShowSuccess("Update success");
+                    _selectedUser.Role = _newRole;
+                }
+            }
+        }
+        _selectedUser = null;
+       // await JSRuntime.InvokeVoidAsync("closeModal", "update_modal");
+        await InvokeAsync(StateHasChanged);
+    }
+}
+
+<script>
+    function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.close();
+        }
+    }
+    function openModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.showModal();
+        }
+    }
+</script>

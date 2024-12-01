@@ -13,4 +13,9 @@ public interface IUserRepository
     Task<Result<Unit,Err>> UpdateSettingsProfile(UserSettingsProfile userSettingsProfile);
     Task<Result<Entity.UserSettingsProfile?,Err>> GetSettingsProfile(string userName);
     Task<Result<Unit,Err>> UpdatePassword(string email, string password);
+    Task<Result<IEnumerable<UserList>?,Err>> GetUserLists(UserFilter? userFilter,Paging? paging);
+    Task<Result<Unit, Err>> DeleteUser(int id);
+    Task<Result<Unit, Err>> ReActiveUser(int id);
+    Task<Result<Unit,Err>> UpdateRole(string email ,string role);
+
 }
