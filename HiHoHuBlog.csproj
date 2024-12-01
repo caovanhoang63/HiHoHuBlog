@@ -198,6 +198,8 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Folder Include="Modules\Email\Comp\" />
+        <Folder Include="Modules\Search\CronJobs\" />
         <Folder Include="Modules\Tag\Presentation\" />
         <Folder Include="wwwroot\lib\" />
     </ItemGroup>
@@ -221,6 +223,7 @@
       <PackageReference Include="Quartz" Version="3.13.1" />
       <PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.13.1" />
       <PackageReference Include="Quartz.Extensions.Hosting" Version="3.13.1" />
+      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.2.1" />
       <PackageReference Include="System.Reactive" Version="6.0.1" />
       <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.10" />
       <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.10" />

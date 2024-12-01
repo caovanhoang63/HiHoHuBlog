@@ -5,7 +5,6 @@ using HiHoHuBlog.Utils;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
-
 namespace HiHoHuBlog.Modules.User.Service.Implementation;
 
 public class AuthenticateService : IAuthenticateService
@@ -27,9 +26,9 @@ public class AuthenticateService : IAuthenticateService
         
         var identity = new ClaimsIdentity(claims, AuthConstant.Scheme);
         var principal = new ClaimsPrincipal(identity);
-
+        
+        
         await context.SignInAsync(principal);
         return Result<Unit, Err>.Ok(new Unit());
     }
-    
 }

@@ -132,7 +132,6 @@ public class EfRepo  : IUserRepository
                 if (userUpdateResult > 0&& userDetailsUpdateResult>0)
                 {
                     await transaction.CommitAsync();
-                    Console.WriteLine("Cap nhap thanh cong 2");
                     return Result<Unit, Err>.Ok(new Unit());
                 }
                 else
@@ -154,7 +153,6 @@ public class EfRepo  : IUserRepository
 
                 if (saveResult > 0)
                 {
-                    Console.WriteLine("Cap nhap thanh cong 2");
                     await transaction.CommitAsync();
                     return Result<Unit, Err>.Ok(new Unit());
                 }
@@ -201,10 +199,25 @@ public class EfRepo  : IUserRepository
         }
         catch (Exception e)
         {
-            Console.WriteLine("loi cmnr");
             Console.WriteLine(e.Message);
             return Result<UserSettingsProfile?, Err>.Err(UtilErrors.InternalServerError(e));
         }
+    }
+
+    public async Task<Result<Unit, Err>> UpdatePassword(string email, string password)
+    {
+        try
+        {
+            await _dbSet.Where(u => u.Email == email)
+                .ExecuteUpdateAsync(
+                    b => b.SetProperty(i => i.Password, password)
+                );
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception ex)
+        {
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(ex));
+        }    
     }
 
     public async Task<Result<UserProfile?, Err>> GetProfile(string userName)
