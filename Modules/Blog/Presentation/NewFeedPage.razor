@@ -9,6 +9,7 @@
 @inject ISearchBlogService BlogSearch
 @inject IToastService ToastService
 @inject IJSRuntime JSRuntime
+@inject ISearchTagService TagService
 
 @attribute [Authorize]
 @attribute [AllowAnonymous]
@@ -50,11 +51,10 @@
         <div class="flex flex-col space-y-2">
             <span class="text-gray-600 mb-6">Recommended Topics</span>
             <div class="flex flex-wrap ">
-                <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Java</div>
-                <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Java</div>
-                <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Java</div>
-                <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Java</div>
-                <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">Java</div>
+                @foreach (var tag in _recommendedTags)
+                {
+                    <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">@tag.Name</div>
+                }
             </div>
             <div class="divider mt-9 mb-0"></div>
             <span class="text-gray-600 mb-6">Who to follow</span>
@@ -73,7 +73,8 @@
     private bool _isLoading = false;
     private readonly Paging _paging = new Paging(1, 4);
     private int _seed = 0;
-
+    private readonly List<TagSearchDoc> _recommendedTags = new List<TagSearchDoc>();
+    
     [CascadingParameter]
     Task<AuthenticationState> authenticationStateTask { get; set; }
 
@@ -92,8 +93,13 @@
         }
         else
         {
-            Console.WriteLine(123);
             ToastService.ShowError(r.Error.Message);
+        }
+
+        var tR = await TagService.RandomSearchTags(_seed, new Paging(1,5));
+        if (tR.IsOk)
+        {
+            _recommendedTags.AddRange(tR.Value.ToList());
         }
     }
 

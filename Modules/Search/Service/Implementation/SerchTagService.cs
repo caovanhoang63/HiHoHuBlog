@@ -43,4 +43,16 @@ public class SearchTagService(ISearchTagRepository searchTagRepository) : ISearc
 
         return r;
     }
+
+    public async Task<Result<IEnumerable<TagSearchDoc>?, Err>> RandomSearchTags(int seed, Paging paging)
+    {
+        var r = await  _searchTagRepository.RandomSearchTags(seed, paging);
+        if (!r.IsOk)
+        {
+            return Result<IEnumerable<TagSearchDoc>?, Err>.Err(r.Error);
+            
+        }
+        return r;
+
+    }
 }

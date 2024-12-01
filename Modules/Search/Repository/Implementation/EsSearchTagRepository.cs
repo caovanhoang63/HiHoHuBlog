@@ -87,4 +87,31 @@ public class EsSearchTagRepository(EsClient client) : ISearchTagRepository
     
         return Result<IEnumerable<TagSearchDoc>?, Err>.Err(UtilErrors.InternalServerError(searchResponse.OriginalException));
     }
+
+    public async Task<Result<IEnumerable<TagSearchDoc>?, Err>> RandomSearchTags(int seed, Paging paging)
+    {
+        var docs = await client.Client.SearchAsync<TagSearchDoc>(s => s
+            .Size(paging.PageSize)
+            .From(paging.GetOffSet())
+            .Query(q => q
+                .Bool(b => b
+                    .Must(mm => mm
+                        .FunctionScore(f => f
+                            .Functions(ff => ff
+                                .RandomScore(ss => ss
+                                    .Seed(seed)))))
+                    .Filter(
+                        f => f
+                            .Term(t => t.Field("status").Value(1))
+                    )))
+        );
+
+        if (docs.IsValid && docs.Documents.Any())
+        {
+            paging.Total = (int)docs.Total;
+            return Result<IEnumerable<TagSearchDoc>?, Err>.Ok(docs.Documents);
+        }
+
+        return Result<IEnumerable<TagSearchDoc>?, Err>.Err(UtilErrors.InternalServerError(docs.OriginalException));
+    }
 }

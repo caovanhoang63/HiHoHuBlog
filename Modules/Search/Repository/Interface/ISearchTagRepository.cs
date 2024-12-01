@@ -7,4 +7,5 @@ public interface ISearchTagRepository
 {
     Task<Result<IEnumerable<TagSearchDoc>?,Err>> SearchTags(string agrs, Paging paging);
     Task<Result<IEnumerable<TagSearchDoc>?,Err>> SearchTagsForPublish(string agrs, Paging paging);
+    Task<Result<IEnumerable<TagSearchDoc>?,Err>> RandomSearchTags(int seed, Paging paging);
 }
