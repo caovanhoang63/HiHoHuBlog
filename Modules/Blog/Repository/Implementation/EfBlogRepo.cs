@@ -347,7 +347,6 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
             return Result<Unit, Err>.Err(UtilErrors.InternalServerError(e));
         }
     }
-
     public async Task<Result<bool, Err>> IsLiked(int userId, int blogId)
     {
         try
