@@ -153,6 +153,7 @@ builder.Services.AddAuthentication(AuthConstant.Scheme)
         options.Cookie.Name = AuthConstant.CookieName;
         options.LoginPath = "/login";
         options.LogoutPath = "/logout";
+        options.AccessDeniedPath = "/notfound";
         options.Cookie.HttpOnly = true;
         options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;

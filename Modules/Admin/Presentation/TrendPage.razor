@@ -1,6 +1,8 @@
 @page "/trend"
 @using HiHoHuBlog.Components.Layout
 @layout AdminLayout
+@attribute [Authorize(Roles="admin, mod")]
+
 <h3>TrendPage</h3>
 
 @code {
