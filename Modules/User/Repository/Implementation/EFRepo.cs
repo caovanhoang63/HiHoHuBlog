@@ -207,6 +207,59 @@ public class EfRepo  : IUserRepository
         }
     }
 
+    public async Task<Result<IEnumerable<UserList>?, Err>> GetUserLists(UserFilter? userFilter, Paging? paging)
+    {
+        var r =  await ListUsers(userFilter, paging);
+        if (!r.IsOk)
+        {
+            return Result<IEnumerable<UserList>?, Err>.Err(r.Error);
+        }
+        return Result<IEnumerable<UserList>?, Err>.Ok(_mapper.Map<IEnumerable<UserList>>(r.Value));    }
+
+    public async Task<Result<Unit, Err>> DeleteUser(int id)
+    {
+        try
+        { 
+            await _dbSet.
+                Where(x => x.Id == id).
+                ExecuteUpdateAsync( t => t.SetProperty(u => u.Status,0));
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception ex)
+        {
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(ex));
+        }
+    }
+
+    public async Task<Result<Unit, Err>> ReActiveUser(int id)
+    {
+        try
+        { 
+            await _dbSet.
+                Where(x => x.Id == id).
+                ExecuteUpdateAsync( t => t.SetProperty(u => u.Status,1));
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception ex)
+        {
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(ex));
+        }    }
+
+    public async Task<Result<Unit, Err>> UpdateRole(string email, string role)
+    {
+        try
+        {
+            await _dbSet.Where(b => b.Email == email)
+                .ExecuteUpdateAsync(
+                    b => b.SetProperty(u => u.Role, role));
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception ex)
+        {
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(ex));
+        }
+    }
+
     public async Task<Result<UserProfile?, Err>> GetProfile(string userName)
     {
         try
