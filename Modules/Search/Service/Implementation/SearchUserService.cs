@@ -24,4 +24,20 @@ public class SearchUserService(ISearchUserRepository repo) : ISearchUserService
 
         return r;
     }
+
+    public async Task<Result<IEnumerable<UserSearchDoc>?, Err>> RandomUsers(int seed, Paging paging)
+    {
+        
+        var r = await repo.RandomUsers(seed, paging);
+        if (!r.IsOk)
+        {
+            return Result<IEnumerable<UserSearchDoc>?, Err>.Err(r.Error);
+        }
+        return r;
+    }
+
+    public Task<Result<IEnumerable<UserSearchDoc>?, Err>> RecommendUsers(IRequester requester, Paging paging)
+    {
+        throw new NotImplementedException();
+    }
 }
