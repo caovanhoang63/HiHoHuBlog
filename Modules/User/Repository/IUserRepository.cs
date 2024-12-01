@@ -25,6 +25,5 @@ public interface IUserRepository
     Task<Result<Unit, Err>> DeleteUser(int id);
     Task<Result<Unit, Err>> ReActiveUser(int id);
     Task<Result<Unit,Err>> UpdateRole(string email ,string role);
-
-
+    Task<Result<bool[],Err>> CheckBulkFollow(int userId,List<int> userFollowId);
 }

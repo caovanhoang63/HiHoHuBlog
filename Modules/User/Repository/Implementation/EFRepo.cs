@@ -291,6 +291,25 @@ public class EfRepo  : IUserRepository
         }
     }
 
+    public async Task<Result<bool[], Err>> CheckBulkFollow(int userId, List<int> userFollowIds)
+    {
+        try
+        {
+            var followedIds = await _dbContext.UserFollows
+                .Where(uf => uf.UserId == userId && userFollowIds.Contains(uf.UserFollowing))
+                .Select(uf => uf.UserFollowing)
+                .ToListAsync();
+
+            var result = userFollowIds.Select(id => followedIds.Contains(id)).ToArray();
+            return Result<bool[], Err>.Ok(result);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return Result<bool[], Err>.Err(UtilErrors.InternalServerError(e));
+        }
+    }
+
     public async Task<Result<UserProfile?, Err>> GetProfile(string userName)
     {
         try
