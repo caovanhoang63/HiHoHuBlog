@@ -335,11 +335,9 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
     {
         try
         {
-            context.UserLikeBlogs.Remove(new UserLikeBlog
-            {
-                BlogId = blogId,
-                UserId = userId
-            });
+            var entity = await context.UserLikeBlogs
+                .FirstOrDefaultAsync(ulb => ulb.UserId == userId && ulb.BlogId == blogId);
+            if (entity != null) context.UserLikeBlogs.Remove(entity);
             await context.SaveChangesAsync();
             return Result<Unit, Err>.Ok(new Unit());
         }

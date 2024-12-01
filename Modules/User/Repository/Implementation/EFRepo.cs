@@ -278,11 +278,9 @@ public class EfRepo  : IUserRepository
     {
         try
         {
-            _dbContext.UserFollows.Remove(new UserFollow
-            {
-                UserId = userId,
-                UserFollowing = userFollowId
-            });
+            var entity = await _dbContext.UserFollows
+                .FirstOrDefaultAsync(ulb => ulb.UserId == userId && ulb.UserFollowing == userFollowId);
+            if (entity != null) _dbContext.UserFollows.Remove(entity);
             await _dbContext.SaveChangesAsync();
             return Result<Unit, Err>.Ok(new Unit());
         }
