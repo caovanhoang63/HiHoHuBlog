@@ -110,6 +110,7 @@ builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 builder.Services.AddScoped<IUserBlogActionService, UserBlogActionService>();
 builder.Services.AddScoped<IUserSettingsService, UserSettingsService>();
 builder.Services.AddScoped<ISearchUserService, SearchUserService>();
+builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IEmailService,EmailService>();
 
 builder.Services.AddScoped<ICreateBlogService,CreateBlogService>();
@@ -154,6 +155,7 @@ builder.Services.AddAuthentication(AuthConstant.Scheme)
         options.Cookie.Name = AuthConstant.CookieName;
         options.LoginPath = "/login";
         options.LogoutPath = "/logout";
+        options.AccessDeniedPath = "/notfound";
         options.Cookie.HttpOnly = true;
         options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;

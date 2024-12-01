@@ -20,7 +20,7 @@
 @inject IReasonBlogBlockService ReasonBlogBlockService
 @inject IBlogBlockedService BlogBlockedService
 @inject ISearchBlogRepository SearchBlogRepo
-@attribute [Authorize]
+@attribute [Authorize(Roles="admin, mod")]
 
 <AuthorizeView Roles="admin, mod">
     <Authorized>

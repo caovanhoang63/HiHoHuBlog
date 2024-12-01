@@ -1,38 +1,43 @@
-@page "/tags"
-@using HiHoHuBlog.Components.Layout
-@using HiHoHuBlog.Modules.Admin.Entity
-@using HiHoHuBlog.Modules.Admin.Service.Interface
-@using HiHoHuBlog.Modules.Tag.Entity
-@using HiHoHuBlog.Modules.Tag.Service.Interface
-@using HiHoHuBlog.Utils
+﻿@page "/users"
 @using HiHoHuBlog.Components.Components
+@using HiHoHuBlog.Components.Layout
+@using HiHoHuBlog.Modules.Tag.Service.Interface
+@using HiHoHuBlog.Modules.User.Entity
+@using HiHoHuBlog.Modules.User.Service.Interface
+@using HiHoHuBlog.Utils
 @layout AdminLayout
-@attribute [Authorize(Roles="admin, mod")]
+@attribute [Authorize(Roles = "admin, mod")]
 @inject ITagService TagService
 @inject IToastService toastService
 @inject NavigationManager NavigationManager
-@attribute [Authorize]
+@inject IUsersService UsersService
 <AuthorizeView Roles="admin, mod">
     <Authorized>
         <FullScreenSpinner IsLoading="_isLoading"></FullScreenSpinner>
         <!-- You can open the modal using ID.showModal() method -->
-        <dialog id="create_modal" class="modal">
+        <dialog id="update_modal" class="modal">
             <div class="modal-box">
-                <h3 class="text-lg font-bold py-4">New Tag</h3>
-                <input @bind="_newTagName" type="text" placeholder="Tag name" class="input input-bordered w-full "/>
+                <h3 class="text-lg font-bold py-4">Role</h3>
+                @*<input @bind="_newRole" type="text" placeholder="" class="input input-bordered w-full "/>*@
+                <select @bind="_newRole" class="select select-bordered w-full ">
+                    <option value="admin" >Admin</option>
+                    <option value="mod">Mod</option>
+                    <option value="user">User</option>
+                </select>
                 <div class="modal-action">
-                    <button @onclick="OnCreate" class="btn btn-warning">Create</button>
                     <form method="dialog">
                         <!-- if there is a button, it will close the modal -->
-                        <button @onclick='() => _newTagName = ""' class="btn">Close</button>
+                        <button @onclick="OnUpdate" class="btn btn-warning">Update</button>
+                        <button @onclick='() => _newRole = ""' class="btn">Close</button>
                     </form>
                 </div>
             </div>
         </dialog>
+        
         <dialog id="delete_modal" class="modal">
             <div class="modal-box">
-                <h3 class="text-lg font-bold py-4">Delete Tag</h3>
-                <p>Are you sure you want to delete tag "@_selectedTag?.Name"</p>
+                <h3 class="text-lg font-bold py-4">Delete User</h3>
+                <p>Are you sure you want to delete "@_selectedUser?.Email"</p>
                 <div class="modal-action">
                     <button @onclick="OnDelete" class="btn btn-warning">Delete</button>
                     <form method="dialog">
@@ -46,7 +51,7 @@
             <div class="modal-box">
                 <h3 class="text-lg font-bold py-4"></h3>
                 <div class="modal-action">
-                    <button @onclick="OnCreate" class="btn btn-warning">Create</button>
+                    <button  class="btn btn-warning">Create</button>
                     <form method="dialog">
                         <button class="btn">Close</button>
                     </form>
@@ -79,7 +84,6 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M12 17.25h8.25"/>
                         </svg>
                     </div>
-                    <button class="btn btn-sm btn-warning" onclick="create_modal.showModal()">New Tag</button>
                     
                     <div class="flex w-full">
                         <label class="label cursor-pointer space-x-2">
@@ -99,8 +103,10 @@
                         <thead class="sticky top-0 z-50 bg-white">
                         <tr class="font-bold">
                             <th>Id</th>
-                            <th>Name</th>
-                            <th>Total Blog</th>
+                            <th>Email</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Role</th>
                             <th>Last Modified</th>
                             <th>Created At</th>
                             <th>Status</th>
@@ -109,20 +115,22 @@
                         </tr>
                         </thead>
                         <tbody class="">
-                        @if (_tags is not null)
+                        @if (_users is not null)
                         {
-                            @foreach (var tag in _tags)
+                            @foreach (var user in _users)
                             {
-                                if (_filter.Status.Contains(tag.Status))
+                                if (_filter.Status.Contains(user.Status))
                                 {
                                     <tr>
-                                    <th>@tag.Id</th>
-                                    <td>@tag.Name</td>
-                                    <td>@tag.TotalBlog</td>
-                                    <td>@tag.UpdatedAt</td>
-                                    <td>@tag.CreatedAt</td>
+                                    <th>@user.Id</th>
+                                    <th>@user.Email</th>
+                                    <td>@user.FirstName</td>
+                                    <td>@user.LastName</td>
+                                    <td>@user.Role</td>
+                                    <td>@user.UpdatedAt</td>
+                                    <td>@user.CreatedAt</td>
                                     <td class="w-20">
-                                        @switch (tag.Status)
+                                        @switch (user.Status)
                                         {
                                             case 0:
                                                 <span class="text-error">Deleted</span>
@@ -150,13 +158,16 @@
                                                 </svg>
                                             </a>
                                             <ul tabindex="0" class="absolute dropdown-content menu bg-base-100 rounded-box z-50 w-40 p-2 shadow">
-                                                @if (tag.Status != (int)Status.Active)
+                                                @*@if (user.Status != (int)Status.Active)
                                                 {
-                                                    <li @onclick="() => OnClickReactive(tag)" class="text-success">
+                                                    <li @onclick="() => OnClickReactive(user)" class="text-success">
                                                         <a>ReActive</a>
                                                     </li>
-                                                }
-                                                <li  @onclick="() => OnClickDelete(tag)" class="text-error">
+                                                }*@
+                                                <li @onclick="()=> OnClickUpdate(user)" class="text-amber-400">
+                                                    <a>Update</a>
+                                                </li>
+                                                <li  @onclick="() => OnClickDelete(user)" class="text-error">
                                                     <a>Delete</a>
                                                 </li>
                                             </ul>
@@ -170,7 +181,15 @@
                     </table>
                 </div>
                 @* Paging *@
-                <Pagination Paging="_paging" FetchDataAsync="GetTags"></Pagination>
+                <div class="join mt-5 flex justify-end">
+                    <button @onclick="OnPrev" class="join-item btn btn-ghost btn-sm">«</button>
+                    <button class="join-item btn btn-ghost btn-sm">1</button>
+                    <button class="join-item btn btn-ghost btn-sm">2</button>
+                    <button class="join-item btn btn-ghost btn-disabled btn-sm">...</button>
+                    <button class="join-item btn btn-ghost btn-sm">99</button>
+                    <button class="join-item btn btn-ghost btn-sm">100</button>
+                    <button @onclick="OnNext" class="join-item btn btn-ghost btn-sm">»</button>
+                </div>
             </div>
         </div>
     </Authorized>
@@ -180,12 +199,12 @@
     Task<AuthenticationState>? AuthenticationStateTask { get; set; }
     [Parameter] public string Reason { get; set; } = "";
     private IRequester? _requester = null;
-    private IEnumerable<Tag>? _tags;
+    private IEnumerable<UserList>? _users;
     private readonly Paging _paging = new Paging(1,20);
-    private string _newTagName = "";
+    private string? _newRole = "";
     private bool _isLoading = false;
-    private Tag? _selectedTag = null;
-    private readonly TagFilter _filter = new TagFilter
+    private UserList? _selectedUser = null;
+    private readonly UserFilter _filter = new UserFilter()
     {
         Status = new int[]
         {
@@ -193,16 +212,23 @@
         }
     };
 
-    private async void OnClickReactive(Tag tag)
+    private async void OnClickReactive(UserList user)
     {
-        _selectedTag = tag;
+        _selectedUser = user;
     }
-    private async void OnClickDelete(Tag tag)
+    private async void OnClickDelete(UserList user)
     {
-        _selectedTag = tag;
+        _selectedUser = user;
         await JSRuntime.InvokeVoidAsync("openModal", "delete_modal");
-
     }
+    private async void OnClickUpdate(UserList user)
+    {
+        _selectedUser = user;
+        _newRole = user.Role;
+        await JSRuntime.InvokeVoidAsync("openModal", "update_modal");
+    }
+
+    
     
     private async void OnCheck(int status)
     {
@@ -214,60 +240,35 @@
         {
             _filter.Status =  _filter.Status!.Append(status).ToArray();
         }
-        await GetTags();
+        await GetUsers();
     }
     
     private async void OnPrev()
     {
         if ( _paging.Page == 1 ) return;
         _paging.Page--;
-        await GetTags();
+        await GetUsers();
     }
 
     private async void OnNext()
     {
         if ( _paging.IsLastPage()) return;
         _paging.Page++;
-        await GetTags();
+        await GetUsers();
     }
 
-    private async void OnCreate()
-    {
-        var create = new TagCreate() { Name = _newTagName };
-        var r = await TagService.Create(_requester!, create);
-        if (r.IsOk)
-        {
-            toastService.ShowSuccess("Create success");
-            
-            await JSRuntime.InvokeVoidAsync("closeModal", "create_modal");
-            _tags = _tags!.Prepend(new Tag
-            {
-                Id = create.Id,
-                Name = create.Name,
-                TotalBlog = 0,
-                Status = 1,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            });
-        }
-        _newTagName = "";
-        await InvokeAsync(StateHasChanged);
-    }
-
-    private async Task GetTags()
+    private async Task GetUsers()
     {
         _isLoading = true;
-        var r  = await TagService.List(_requester!,_filter,_paging);
-
-        if (!r.IsOk)
+        var resultGetUsers = await UsersService.GetUsers(_filter, _paging);
+        if (!resultGetUsers.IsOk)
         {
-            toastService.ShowError(r.Error.Message);
+            toastService.ShowError(resultGetUsers.Error.Message);
         }
         else
         {
-            _tags = r.Value;
+            _users = resultGetUsers.Value;
         }
-
         _isLoading = false;
         await InvokeAsync(StateHasChanged);
     }
@@ -282,18 +283,18 @@
             return;
         }
         _requester = await AuthUtils.GetInfo(AuthenticationStateTask);
-        await GetTags();
+        await GetUsers();
     }
 
     private async Task OnDelete()
     {
-        if (_selectedTag is null)
+        if (_selectedUser is null)
         {
-            toastService.ShowError("Tag not exist");
+            toastService.ShowError("User not exist");
         }
         else
         {
-            var result = await TagService.Delete(_requester!, _selectedTag.Id);
+            var result = await UsersService.DeleteUser(_requester!, _selectedUser.Id);
             if (!result.IsOk)
             {
                 toastService.ShowError(result.Error.Message);
@@ -301,15 +302,41 @@
             else
             {
                 toastService.ShowSuccess("Delete success");
-                _selectedTag.Status = 0;
+                _selectedUser.Status = 0;
             }
         }
 
-        _selectedTag = null;
+        _selectedUser = null;
         await JSRuntime.InvokeVoidAsync("closeModal", "delete_modal");
         await InvokeAsync(StateHasChanged);
     }
-
+    
+    private async Task OnUpdate()
+    {
+        if (_selectedUser is null)
+        {
+            toastService.ShowError("User not exist");
+        }
+        else
+        {
+            if (_selectedUser.Email != null && _newRole!=null && _requester!=null)
+            {
+                var result = await UsersService.UpdateRoleUser(_requester, _selectedUser.Email,_newRole);
+                if (!result.IsOk)
+                {
+                    toastService.ShowError(result.Error.Message);
+                }
+                else
+                {
+                    toastService.ShowSuccess("Update success");
+                    _selectedUser.Role = _newRole;
+                }
+            }
+        }
+        _selectedUser = null;
+       // await JSRuntime.InvokeVoidAsync("closeModal", "update_modal");
+        await InvokeAsync(StateHasChanged);
+    }
 }
 
 <script>

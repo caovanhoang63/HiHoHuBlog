@@ -12,5 +12,6 @@ public class UserMappingProfile : Profile
         CreateMap<UserSignUp, Entity.User>();
         CreateMap< Entity.User,UserAuth>();
         CreateMap<Entity.User, UserProfile>();
+        CreateMap<Entity.User, UserList>();
     }
 }

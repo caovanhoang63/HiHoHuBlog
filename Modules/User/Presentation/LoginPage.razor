@@ -12,9 +12,11 @@
 @inject IAuthenticateService AuthenticateService
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 <div class="h-screen flex">
-    <EditForm FormName="LoginForm" Model="@User" OnSubmit="@OnSubmit" class="w-96 m-auto form-control gap-2 ">
+    <EditForm FormName="LoginForm" Model="@User" OnValidSubmit="@OnSubmit" class="w-96 m-auto form-control gap-2 ">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
         <input type="hidden" name="__RequestVerificationToken"
-               value="@Antiforgery.GetAndStoreTokens(Context).RequestToken" />
+               value="@Antiforgery.GetAndStoreTokens(Context).RequestToken"/>
+        
         <label class="input input-bordered flex items-center gap-2">
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -28,6 +30,7 @@
             </svg>
             <InputText @bind-Value="@User.Email" type="email" class="grow" placeholder="Email"/>
         </label>
+        <ValidationMessage class="text-error" For="() => User.Email"></ValidationMessage>
         <label class="input input-bordered flex items-center gap-2">
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -41,7 +44,15 @@
             </svg>
             <InputText @bind-Value="@User.Password" type="password" class="grow" placeholder="Password"/>
         </label>
+
+        @if (!string.IsNullOrEmpty(_loginErrorMessage))
+        {
+        <div class="text-error">@_loginErrorMessage</div>
+        }
+        <ValidationMessage class="text-error" For="() => User.Password"></ValidationMessage>
+
         <a href="/forgot-password" class="link">Forgot password?</a>
+
         <input type="submit" class="btn" value="Login"/>
         <a href="/signup" class="link text-center">Do not an account?</a>
     </EditForm>
@@ -54,7 +65,7 @@
 
     [SupplyParameterFromForm(FormName = "LoginForm")]
     private UserLogin? User { get; set; } = new UserLogin();
-
+    private string? _loginErrorMessage { get; set; }
     
     [SupplyParameterFromQuery] 
     public string ReturnUrl { get; set; } = "/";
@@ -66,7 +77,8 @@
             if (!r.IsOk)
             {
                 Console.WriteLine(r.Error.Message);
-                ToastService.ShowError(r.Error.Message);
+                _loginErrorMessage = r.Error.Message;
+               // ToastService.ShowError(r.Error.Message);
                 return;
             }
             
