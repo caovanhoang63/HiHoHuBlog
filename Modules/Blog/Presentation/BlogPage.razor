@@ -118,10 +118,10 @@
             <span class="font-bold text-2xl">More from Sylvain Tiset</span>
             <!-- Articles -->
             <div class="grid grid-cols-2 mt-8 gap-8">
-                <BlogRelatedCard/>
-                <BlogRelatedCard/>
-                <BlogRelatedCard/>
-                <BlogRelatedCard/>
+                @foreach (var blog in _authorBlogs)
+                {
+                    <BlogRelatedCard Blog="blog"/>
+                }
             </div>
             <div class="divider mt-14 "></div>
             <button class="btn btn-wide rounded-3xl bg-base-100 border-1 border-black ">See all from Sylvain Tiset</button>
@@ -149,8 +149,10 @@
     Task<AuthenticationState> authenticationStateTask { get; set; }
     private TextEditor? _textEditor;
     private bool _isLoading = true;
-    private IEnumerable<BlogSearchDoc>? _relatedBlog = new List<BlogSearchDoc>();
+    private IEnumerable<BlogSearchDoc> _relatedBlog = new List<BlogSearchDoc>();
+    private IEnumerable<BlogSearchDoc> _authorBlogs = new List<BlogSearchDoc>();
     private readonly Paging _relatedPaging = new Paging(1, 4);
+    private readonly Paging _authorPaging = new Paging(1, 4);
     private IRequester? _requester;
     private BlogDetail _blog { get; set; }
     private int? _totalLikes = 0;
@@ -158,6 +160,7 @@
     private bool _isLiked = false;
     private bool _isFollowed = false;
     private List<UserCommentBlog> _comments = new List<UserCommentBlog>();
+    
     
     private async Task OnOpenComment()
     {
@@ -203,16 +206,26 @@
         }
 
         _blog = r.Value;
-        
-        var result = await SearchBlogService.RecommendSearchBlogByBlog(null, _blog.Id, _relatedPaging);
-
-        if (result.IsOk)
-        {
-            _relatedBlog = result.Value;
-        }
-
         _isLoading = false;
         await InvokeAsync(StateHasChanged);
+        
+        var relatedBlog = await SearchBlogService.RecommendSearchBlogByBlog(null, _blog.Id, _relatedPaging);
+
+        if (relatedBlog.IsOk)
+        {
+            _relatedBlog = relatedBlog.Value;
+        }
+
+        var authorBlog = await SearchBlogService.RecommendSearchBlogOfUser(_blog.UserId, _authorPaging);
+
+        if (authorBlog.IsOk)
+        {
+            _authorBlogs = authorBlog.Value;
+        }
+        
+        await InvokeAsync(StateHasChanged);
+        
+        
 
         if (_requester != null)
         { 

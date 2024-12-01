@@ -70,4 +70,15 @@ public class SearchBlogService(ISearchBlogRepository searchBlogRepository) : ISe
         return r;
         
     }
+
+    public async Task<Result<IEnumerable<BlogSearchDoc>?, Err>> RecommendSearchBlogOfUser(int userId, Paging paging)
+    {
+        var r= await  _searchBlogRepository.RecommendSearchBlogOfUser(userId, paging);
+        if (!r.IsOk)
+        {
+            return Result<IEnumerable<BlogSearchDoc>?, Err>.Err(r.Error);
+            
+        }
+        return r;
+    }
 }
