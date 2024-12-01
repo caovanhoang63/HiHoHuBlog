@@ -220,6 +220,20 @@ public class EfRepo  : IUserRepository
         }    
     }
 
+    public async Task<Result<Entity.User?, Err>> FindById(int id)
+    {
+        try
+        {
+            var user = await _dbSet.Where(u => u.Id == id ).FirstOrDefaultAsync();
+            return Result<Entity.User?, Err>.Ok(user);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return Result<Entity.User?, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+    }
+
     public async Task<Result<UserProfile?, Err>> GetProfile(string userName)
     {
         try

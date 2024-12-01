@@ -14,10 +14,10 @@
 @inject ISearchBlogService SearchBlogService
 @inject IUserBlogActionService UserBlogAction 
 @inject IToastService ToastService
-@attribute [Authorize]
-@attribute [AllowAnonymous]
 @inject IBlogUpdateService BlogUpdateService
 @inject IUserFollowService UserFollowService
+@attribute [Authorize]
+@attribute [AllowAnonymous]
 <Container>
     <CommentSection IsOpen="_isOpen" comments="_comments" OnClose='() => _isOpen = false' Blog="_blog" Requester="_requester"></CommentSection>
     <FullScreenSpinner IsLoading="_isLoading"></FullScreenSpinner>

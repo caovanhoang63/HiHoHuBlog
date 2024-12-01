@@ -16,5 +16,7 @@ public interface IUserRepository
     Task<Result<Unit, Err>> Follows(int userId, int userFollowId);
     Task<Result<Unit, Err>> UnFollow(int userId,int userFollowId);
     Task<Result<bool,Err>> IsFollowed(int userId,int userFollowId);
-    Task<Result<Unit,Err>> UpdatePassword(string email, string password);
+    Task<Result<Unit, Err>> UpdatePassword(string email, string password);
+
+    Task<Result<Entity.User?, Err>> FindById(int id);
 }

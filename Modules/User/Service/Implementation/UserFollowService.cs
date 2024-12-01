@@ -22,6 +22,14 @@ public class UserFollowService(IUserRepository userRepository):IUserFollowServic
 
     public async Task<Result<Unit, Err>> Follows(int userId, int userFollowingId)
     {
+        if (userFollowingId  == userId) 
+            return Result<Unit, Err>.Err(new Err("Can't follow yourself"));
+
+        var user = await _userRepository.FindById( userFollowingId);
+
+        if (user.Value is null)
+            return UtilErrors.ErrEntityNotFound("user");
+        
         var follows = await _userRepository.Follows(userId, userFollowingId);
         if (!follows.IsOk)
         {
