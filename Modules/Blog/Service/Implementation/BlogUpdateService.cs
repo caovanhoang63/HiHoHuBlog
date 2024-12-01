@@ -171,11 +171,6 @@ public class BlogUpdateService(IBlogRepository blogRepo) : IBlogUpdateService
         {
             return Result<Unit, Err>.Err(likeBLog.Error);
         }
-        var updateLikeBlog = await UpdateTotalLikes(blogId);
-        if (!updateLikeBlog.IsOk)
-        {
-            return Result<Unit, Err>.Err(updateLikeBlog.Error);
-        }
         return Result<Unit, Err>.Ok(new Unit());
     }
 
@@ -185,11 +180,6 @@ public class BlogUpdateService(IBlogRepository blogRepo) : IBlogUpdateService
         if (!disLikeBLog.IsOk)
         {
             return Result<Unit, Err>.Err(disLikeBLog.Error);
-        }
-        var updateLikeBlog = await UpdateTotalLikes(blogId);
-        if (!updateLikeBlog.IsOk)
-        {
-            return Result<Unit, Err>.Err(updateLikeBlog.Error);
         }
         return Result<Unit, Err>.Ok(new Unit());
     }

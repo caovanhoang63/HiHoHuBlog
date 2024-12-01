@@ -7,14 +7,13 @@
 @using HiHoHuBlog.Modules.Search.Entity
 @using HiHoHuBlog.Modules.Search.Service.Interface
 @using HiHoHuBlog.Modules.User.Service.Interface
-@using Nest
 @using HiHoHuBlog.Utils
 @rendermode InteractiveServer
 @inject IBlogGetService BlogGetService
 @inject NavigationManager NavigationManager
 @inject ISearchBlogService SearchBlogService
 @inject IUserBlogActionService UserBlogAction 
-
+@inject IToastService ToastService
 @attribute [Authorize]
 @attribute [AllowAnonymous]
 @inject IBlogUpdateService BlogUpdateService
@@ -36,7 +35,7 @@
                     <div class="flex items-center gap-2">
                         <span class="font-medium">@_blog?.User?.FirstName @_blog?.User?.LastName</span>
                         @*<button class="btn btn-sm btn-outline btn-primary  @(_isFollowed? "bg-amber-300":   "") " @onclick="onFollowClick">Follow</button>*@
-                        <FollowButton IsFollow="_isFollowed" OnFollowClick="onFollowClick"></FollowButton>                    
+                        <FollowButton IsFollow="_isFollowed" OnFollowClick="OnFollowClick"></FollowButton>                    
                         </div>
                     <div class="text-sm text-gray-600">
                         <span>13 min read</span>
@@ -48,7 +47,7 @@
             <div class="divider m-0"></div>
             <div class="flex items-center gap-4">
                 <div class="flex items-center gap-2">
-                    <button class="btn btn-circle btn-ghost" @onclick="onLikeClick">
+                    <button class="btn btn-circle btn-ghost" @onclick="OnLikeClick">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 " fill="@(_isLiked ? "red" : "none")" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                         </svg>
@@ -56,7 +55,7 @@
                     <span>@_totalLikes</span>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button class="btn btn-circle btn-ghost" @onclick="onOpenComment">
+                    <button class="btn btn-circle btn-ghost" @onclick="OnOpenComment">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                         </svg>
@@ -148,7 +147,7 @@
     public string Slug { get; set; }
     [CascadingParameter]
     Task<AuthenticationState> authenticationStateTask { get; set; }
-    private TextEditor _textEditor;
+    private TextEditor? _textEditor;
     private bool _isLoading = true;
     private IEnumerable<BlogSearchDoc>? _relatedBlog = new List<BlogSearchDoc>();
     private readonly Paging _relatedPaging = new Paging(1, 4);
@@ -160,7 +159,7 @@
     private bool _isFollowed = false;
     private List<UserCommentBlog> _comments = new List<UserCommentBlog>();
     
-    private async Task onOpenComment()
+    private async Task OnOpenComment()
     {
         _isOpen = !_isOpen;
         var result = await BlogUpdateService.GetCommentsById(_blog.Id);
@@ -217,7 +216,7 @@
 
         if (_requester != null)
         { 
-            var _result =  await UserBlogAction.ReadBlog(_requester, _blog.Id);
+            var readBlogR =  await UserBlogAction.ReadBlog(_requester, _blog.Id);
             var totalLikes = await BlogUpdateService.GetTotalLikes(_blog.Id);
             if (totalLikes.IsOk)
             {
@@ -229,7 +228,6 @@
                 var isFollowed = await UserFollowService.IsFollowed(_requester.GetId(), _blog.User.Id);
                 if (isFollowed.IsOk)
                 {
-                     Console.WriteLine("isFollowed "+isFollowed.Value);
                     _isFollowed = isFollowed.Value;
                 }
             }
@@ -238,27 +236,26 @@
             var isLiked = await BlogUpdateService.IsLiked(_requester.GetId(), _blog.Id);
             if (!isLiked.IsOk)
             {
-                Console.WriteLine("12345  "+isLiked.Error);
+                Console.WriteLine(isLiked.Error);
             }
-            Console.WriteLine(isLiked.Value);
             _isLiked = isLiked.Value;
         }
     }
 
     
-    private async void onFollowClick()
+    private async Task OnFollowClick()
     {
         if (_requester is not null)
         {
             if (!_isFollowed)
             {
-                await UserFollowService.Follows(_requester.GetId(), _blog.User.Id);
+                await UserFollowService.Follows(_requester.GetId(), _blog.User!.Id);
                 _isFollowed = !_isFollowed;
                 
             }
             else
             {
-                await UserFollowService.UnFollow(_requester.GetId(), _blog.User.Id);
+                await UserFollowService.UnFollow(_requester.GetId(), _blog.User!.Id);
                 _isFollowed = !_isFollowed;
 
             }
@@ -271,33 +268,36 @@
         StateHasChanged();
     }
     
-    private async void onLikeClick()
+    private async Task OnLikeClick()
     {
         if (_requester is not null)
         {
             if (!_isLiked)
             {
-                Console.WriteLine("Like OK");
-                await BlogUpdateService.LikeBlog(_requester.GetId(), _blog.Id);
+                var r =  await BlogUpdateService.LikeBlog(_requester.GetId(), _blog.Id);
+                if (!r.IsOk)
+                {
+                    Console.WriteLine(r.Error);
+                    ToastService.ShowError(r.Error.Message);
+                }
                 _isLiked = !_isLiked;
-                var totalLikes = await BlogUpdateService.GetTotalLikes(_blog.Id);
-                if (totalLikes.Value != null) _totalLikes = totalLikes.Value;
-                Console.WriteLine("sau like"+_isLiked);
+                _totalLikes++;
             }
             else
             {
-                Console.WriteLine("UnLike OK");
-                await BlogUpdateService.DisikeBlog(_requester.GetId(), _blog.Id);
+                var r = await BlogUpdateService.DisikeBlog(_requester.GetId(), _blog.Id);
+                if (!r.IsOk)
+                {
+                    Console.WriteLine(r.Error);
+                    ToastService.ShowError(r.Error.Message);
+                }
                 _isLiked = !_isLiked;
-                var totalLikes = await BlogUpdateService.GetTotalLikes(_blog.Id);
-                if (totalLikes.Value != null) _totalLikes = totalLikes.Value;
-                Console.WriteLine("sau dislike "+_isLiked);
-
+                _totalLikes--;
             }
         }
         else
         {
-            NavigationManager.NavigateTo("/login");
+            NavigationManager.NavigateTo($"/login?ReturnUrl=%2Fblog/{Slug}");
         }
        
         StateHasChanged();
