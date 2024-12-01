@@ -166,7 +166,7 @@ public class EsSearchBlogRepository(EsClient client, IUserBlogActionRepository u
     {
         var history = await _userBlogRepo.ListReadHistory(requester.GetId(),new Paging(1, 2));
 
-        if (!history.IsOk || history.Value is null )
+        if (!history.IsOk || history.Value is null || !history.Value.Any() )
         {
             return await RandomBlog(seed,paging);
         }
