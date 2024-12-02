@@ -362,6 +362,54 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
         }
     }
 
+    public async Task<Result<Unit, Err>> BookmarkBlog(int userId, int blogId)
+    {
+        try
+        {
+            await context.UserBookmarkBlogs.AddAsync(new UserBookmarkBlog
+            {
+                BlogId = blogId,
+                UserId = userId
+            });
+            await context.SaveChangesAsync();
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception e)
+        {
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+    }
+
+    public async Task<Result<Unit, Err>> UnBookmarkBlog(int userId, int blogId)
+    {
+        try
+        {
+            var entity = await context.UserBookmarkBlogs
+                .FirstOrDefaultAsync(ulb => ulb.UserId == userId && ulb.BlogId == blogId);
+            if (entity != null) context.UserBookmarkBlogs.Remove(entity);
+            await context.SaveChangesAsync();
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception e)
+        {
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+    }
+
+    public async Task<Result<bool, Err>> IsBookmarked(int userId, int blogId)
+    {
+        try
+        {
+            var isBookmarked = await context.Set<UserBookmarkBlog>().AnyAsync(ulb => ulb.BlogId == blogId && ulb.UserId == userId);
+            return Result<bool, Err>.Ok(isBookmarked);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return Result<bool, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+    }
+
     public async Task<Result<int?, Err>> GetTotalLikes( int blogId)
     {
         try

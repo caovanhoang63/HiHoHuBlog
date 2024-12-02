@@ -29,6 +29,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<UserFollow> UserFollows { get; set; }
     public DbSet<UserReadBlog> userReadBlog { get; set; }
     public DbSet<EmailTemplate> emailTemplate { get; set; }
+    public DbSet<UserBookmarkBlog> UserBookmarkBlogs { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>().ToTable("users");
@@ -47,6 +48,8 @@ public class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<UserReadBlog>().ToTable("user_read_blogs");
         modelBuilder.Entity<EmailTemplate>().ToTable("email_template");
+        modelBuilder.Entity<UserBookmarkBlog>().ToTable("bookmarks");
+        
         modelBuilder.Entity<User>()
             .HasOne(u => u.UserDetails)       
             .WithOne()                        
@@ -75,6 +78,8 @@ public class ApplicationDbContext : DbContext
             .HasKey(ulb => new {ulb.Id});
         modelBuilder.Entity<UserFollow>()
             .HasKey(ulb=> new {ulb.UserId, ulb.UserFollowing});
+        modelBuilder.Entity<UserBookmarkBlog>()
+            .HasKey(ulb=> new {ulb.UserId, ulb.BlogId});
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
         {
             foreach (var property in entity.GetProperties())
