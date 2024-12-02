@@ -8,6 +8,7 @@
 @using HiHoHuBlog.Modules.Search.Service.Interface
 @using HiHoHuBlog.Modules.User.Service.Interface
 @using HiHoHuBlog.Utils
+@using HiHoHuBlog.Modules.Admin.Presentation.Components
 @rendermode InteractiveServer
 @inject IBlogGetService BlogGetService
 @inject NavigationManager NavigationManager
@@ -19,6 +20,9 @@
 @attribute [Authorize]
 @attribute [AllowAnonymous]
 <Container>
+    <ConfirmModal Open="OpenUnfollowModal" Title="Unfollow"
+                  Message="@_unfollowMessage" OnConfirm="OnConfirmUnFollow" OnDeny="OnDenyUnFollow">
+    </ConfirmModal>
     <CommentSection IsOpen="_isOpen" comments="_comments" OnClose='() => _isOpen = false' Blog="_blog" Requester="_requester"></CommentSection>
     <FullScreenSpinner IsLoading="_isLoading"></FullScreenSpinner>
     <div class="container mx-auto px-4 py-8">
@@ -53,7 +57,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                         </svg>
                     </button>
-                    <span>@_totalLikes</span>
+                    <span>@_blog?.TotalLike</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <button class="btn btn-circle btn-ghost" @onclick="OnOpenComment">
@@ -157,6 +161,10 @@
     private bool _isOpen = false;
     private bool _isLiked = false;
     private bool _isFollowed = false;
+    private string _unfollowMessage = "";
+    public bool OpenUnfollowModal { get; set; } = false;
+
+
     private List<UserCommentBlog> _comments = new List<UserCommentBlog>();
     
     
@@ -258,16 +266,22 @@
     {
         if (_requester is not null)
         {
-            var r = !_isFollowed ?
-                await UserFollowService.Follows(_requester.GetId(), _blog.User!.Id) :
-                await UserFollowService.UnFollow(_requester.GetId(), _blog.User!.Id);
-            if (!r.IsOk)
+            if (!_isFollowed)
             {
-                Console.WriteLine(r.Error);
-                ToastService.ShowError(r.Error.Message);
-                return;
+                var r = await UserFollowService.Follows(_requester.GetId(), _blog.User!.Id);
+                if (!r.IsOk)
+                {
+                    Console.WriteLine(r.Error);
+                    ToastService.ShowError(r.Error.Message);
+                }
+                _isFollowed = !_isFollowed;
             }
-            _isFollowed = !_isFollowed;
+            else
+            {
+                OpenUnfollowModal = true;
+                _unfollowMessage = $"Are you sure you want to unfollow {_blog.User?.FirstName} {_blog.User?.LastName}?";
+                
+            }
         }
         else
         {
@@ -310,6 +324,25 @@
         }
        
         StateHasChanged();
+    }
+    private async void OnConfirmUnFollow()
+    {
+        _isLoading = true;
+        var r = await UserFollowService.UnFollow(_requester.GetId(), _blog.User!.Id);
+        if (!r.IsOk)
+        {
+            ToastService.ShowError(r.Error.Message);
+            Console.WriteLine(r.Error);
+        }
+
+        _isLoading = false;
+        OpenUnfollowModal = false;
+
+       await InvokeAsync(StateHasChanged);
+    }
+    private void OnDenyUnFollow()
+    {
+        OpenUnfollowModal= false;
     }
     
     void ChangeUrl(string url){
