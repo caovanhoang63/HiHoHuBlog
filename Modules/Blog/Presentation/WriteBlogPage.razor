@@ -340,7 +340,7 @@
         }
         
         ToastService.ShowSuccess("Publish success!");
-         NavigationManager.NavigateTo($"blog/{_blog.Id}");
+        NavigationManager.NavigateTo($"blog/{_blog.Id}",true);
     }
     
     public void Dispose()

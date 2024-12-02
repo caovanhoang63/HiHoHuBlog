@@ -19,7 +19,6 @@
             <span class="text-gray-400">Result for </span>
             <span>@SearchTerm</span>
         </div>
-        @*<span class="text-2xl font-bold">Results for asdasd</span>*@
         <div role="tablist" class="tabs mt-10 tabs-bordered">
             <input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="Blogs" checked="@isActiveTab(0)"
                    @onchange="@(() => ChangeTab(0,"blogs"))"/>
@@ -81,7 +80,8 @@
                     {
                         foreach (var tag in _searchTag)
                         {
-                            <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">@tag.Name</div>
+                            <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer" 
+                                 @onclick='() => NavigationManager.NavigateTo($"/tag?t={tag.Id}")'>@tag.Name</div>
                         }
                     }
                 </div>
@@ -97,7 +97,8 @@
                 {
                     foreach (var tagMatching in _searchTagMatching)
                     {
-                        <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer">@tagMatching.Name</div>
+                        <div class="bg-gray-200 rounded-full px-4 py-2 mr-2 mb-2 cursor-pointer"
+                             @onclick='() => NavigationManager.NavigateTo($"/tag?t={tagMatching.Id}")'>@tagMatching.Name</div>
                     }
                 }
             </div>
