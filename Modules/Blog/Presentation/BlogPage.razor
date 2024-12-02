@@ -40,7 +40,10 @@
                         <span class="font-medium hover:underline"
                               @onclick='() => NavigationManager.NavigateTo($"/profile/{_blog?.User?.UserName}")'>@_blog?.User?.FirstName @_blog?.User?.LastName</span>
                         @*<button class="btn btn-sm btn-outline btn-primary  @(_isFollowed? "bg-amber-300":   "") " @onclick="onFollowClick">Follow</button>*@
-                        <FollowButton IsFollow="_isFollowed" OnFollowClick="OnFollowClick"></FollowButton>                    
+                        @if(_requester?.GetId() !=_blog?.User?.Id)
+                        {
+                            <FollowButton IsFollow="_isFollowed" OnFollowClick="OnFollowClick"></FollowButton>
+                        }
                         </div>
                     <div class="text-sm text-gray-600">
                         <span>@_blog?.MinToRead min read</span>
@@ -117,8 +120,11 @@
                         </div>
                     </div>
                 </div>
-                <FollowButton IsFollow="_isFollowed" OnFollowClick="OnFollowClick"></FollowButton>
-            </header>
+                @if(_requester?.GetId() !=_blog?.User?.Id)
+                {
+                    <FollowButton IsFollow="_isFollowed" OnFollowClick="OnFollowClick"></FollowButton>
+                }            
+                </header>
             @* More From this Author Section *@
             <span class="font-bold text-2xl">More from @_blog?.User?.FirstName @_blog?.User?.LastName</span>
             <!-- Articles -->
@@ -337,7 +343,7 @@
 
         _isLoading = false;
         OpenUnfollowModal = false;
-
+        _isFollowed = false;
        await InvokeAsync(StateHasChanged);
     }
     private void OnDenyUnFollow()
