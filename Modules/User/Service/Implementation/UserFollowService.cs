@@ -35,11 +35,11 @@ public class UserFollowService(IUserRepository userRepository):IUserFollowServic
         {
             return Result<Unit, Err>.Ok(new Unit());
         }
-        var updateFollow = await UpdateTotalFollows(userId,userFollowingId);
+        /*var updateFollow = await UpdateTotalFollows(userId,userFollowingId);
         if (!updateFollow.IsOk)
         {
             return Result<Unit, Err>.Err(updateFollow.Error);
-        }
+        }*/
         return Result<Unit, Err>.Ok(new Unit());
     }
 
@@ -50,11 +50,11 @@ public class UserFollowService(IUserRepository userRepository):IUserFollowServic
         {
             return Result<Unit, Err>.Ok(new Unit());
         }
-        var updateFollow = await UpdateTotalFollows(userId,userFollowingId);
+        /*var updateFollow = await UpdateTotalFollows(userId,userFollowingId);
         if (!updateFollow.IsOk)
         {
             return Result<Unit, Err>.Err(updateFollow.Error);
-        }
+        }*/
         return Result<Unit, Err>.Ok(new Unit());
     }
 
