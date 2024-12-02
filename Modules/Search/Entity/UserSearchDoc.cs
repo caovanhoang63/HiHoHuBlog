@@ -14,4 +14,5 @@ public class UserSearchDoc
     public int Status { get; set; } = 1;
     public int TotalFollower { get; set; } = 0;
     public int TotalMark { get; set; } = 0;
+    public bool IsFollow { get; set; }
 }

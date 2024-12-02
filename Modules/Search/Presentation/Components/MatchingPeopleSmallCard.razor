@@ -11,7 +11,7 @@
             <h2 class="card-title text-base	 line-clamp-2">@User?.FirstName @User?.LastName</h2>
             <p class="line-clamp-2">@User?.UserDetails?.Bio</p>
         </div>
-        @*<FollowButton User="User"/>*@
+        <FollowButton IsFollow="User.IsFollow"/>
         @*<div class="card-actions grow">
             <a class="btn rounded-3xl bg-transparent border border-black">Follow</a>
         </div>*@

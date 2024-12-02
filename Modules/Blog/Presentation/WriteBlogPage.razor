@@ -244,6 +244,9 @@
                 NavigationManager.NavigateTo("error");
                 return;
             }
+
+            await Task.Delay(1000);
+            
             await _textEditor.LoadHTMLContent(_blog.Content);
             _isLoading = false;
             StateHasChanged();

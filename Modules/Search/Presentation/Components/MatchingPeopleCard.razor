@@ -18,8 +18,9 @@ else
                 <h2 class="card-title line-clamp-2">@(User.FirstName + " " + User.LastName)</h2>
                 <p class="line-clamp-2">@User.UserDetails?.Bio</p>
             </div>
-            <div class="card-actions grow">
-                <a class="btn rounded-3xl bg-transparent border border-black">Follow</a>
+            <div class="card-actions grow" @onclick:stopPropagation="true"
+                 @onclick:preventDefault="true">
+                <a class="btn rounded-3xl bg-transparent border border-black">@(User is {IsFollow: true} ?  "Unfollow" : "Follow")</a>
             </div>
         </div>
     </div>
