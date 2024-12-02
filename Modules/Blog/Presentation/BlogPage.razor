@@ -291,7 +291,8 @@
         }
         else
         {
-            NavigationManager.NavigateTo("/login");
+            NavigationManager.NavigateTo($"/login?ReturnUrl=%2Fblog/{Slug}");
+            
         }
        
         StateHasChanged();
