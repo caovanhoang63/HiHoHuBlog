@@ -412,6 +412,16 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
         }
     }
 
+    public async Task<Result<IEnumerable<BlogListProfile>?, Err>> GetBlogListProfile(BlogFilter? filter, Paging paging)
+    {
+        var r =  await ListBlogs(filter, paging);
+        if (!r.IsOk)
+        {
+            return Result<IEnumerable<BlogListProfile>?, Err>.Err(r.Error);
+        }
+        return Result<IEnumerable<BlogListProfile>?, Err>.Ok(mapper.Map<IEnumerable<BlogListProfile>>(r.Value));
+    }
+
     public async Task<Result<IEnumerable<UserCommentBlog>?, Err>> GetCommentsById(int blogId)
     {
         try

@@ -9,6 +9,7 @@
 @using HiHoHuBlog.Modules.User.Service.Implementation
 @using HiHoHuBlog.Modules.User.Service.Interface
 @using HiHoHuBlog.Utils
+@using HiHoHuBlog.Modules.User.Presentation.components
 @layout MainLayout
 @inject IUserProfileService UserProfileService
 @inject IBlogGetService BlogGetService
@@ -39,7 +40,7 @@
                     {
                         @foreach (var blog in BlogList)
                         {
-                            <BlogCard/>
+                            <ProfileBlogCard BlogList="blog" />
                         }
                     }
                 </div>
@@ -53,15 +54,6 @@
                     <span class="font-medium font-sans text-sm"> Member since November 2024</span>
                 </div>
             </div>
-        </div>
-
-        <div class="grow max-w-4xl tab-content" role="tabpanel">
-            @*<BlogCard/>
-            <BlogCard/>
-            <BlogCard/>
-            <BlogCard/>
-            <BlogCard/>*@
-
         </div>
     </div>
     <div class="border-l-[1px] grow p-10 max-w-sm">
@@ -124,8 +116,6 @@
         </div>
     </div>
     }
-    
-
 </Container>
 @code {
     [Parameter]
@@ -134,7 +124,7 @@
     public UserProfile UserProfile { get; set; }
     private Paging Paging { get; set; } = new Paging(0, 20);
     private BlogFilter Filter { get; set; } 
-    [Parameter] public IEnumerable<BlogList>? BlogList { get; set; } = null;
+    [Parameter] public IEnumerable<BlogListProfile>? BlogList { get; set; } = null;
     [CascadingParameter] 
     Task<AuthenticationState> authenticationStateTask { get; set; }
     public IRequester? Requester;
@@ -167,8 +157,8 @@
         };
         
         
-        Name =UserProfile.LastName +" "+ UserProfile.FirstName ;
-        var i = await BlogGetService.GetBlogs(Filter, Paging);
+        Name =UserProfile.FirstName +" "+ UserProfile.LastName ;
+        var i = await BlogGetService.GetBlogProfiles(Filter, Paging);
         if (!r.IsOk)
         {
             return;
@@ -180,6 +170,4 @@
         Console.WriteLine(IsOwner);
         IsLoading = false;
     }
-    
-
 }
