@@ -30,7 +30,9 @@
             </div>
             <div class="flex flex-col justify-between space-y-10 px-8 mt-3 mb-4">
                 <div role="tablist" class="tabs tabs-bordered">
-                    <input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="Home" checked="checked"/>
+                    <input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="Home" checked="checked"
+                    @onclick="ChangeUrlHome"
+                           />
                     <div class="grow max-w-4xl tab-content" role="tabpanel">
                         @if (BlogList is not null)
                         {
@@ -40,7 +42,7 @@
                             }
                         }
                     </div>
-                    <input
+                    @*<input
                         type="radio"
                         name="my_tabs_1"
                         role="tab"
@@ -48,13 +50,14 @@
                         aria-label="About"/>
                     <div role="tabpanel" class="tab-content p-10 w-full h-lvh">
                         <span class="font-medium font-sans text-sm"></span>
-                    </div>
+                    </div>*@
                     <input
                         type="radio"
                         name="my_tabs_1"
                         role="tab"
                         class="tab"
-                        aria-label="Favorite"/>
+                        aria-label="Favorite"
+                        @onclick="ChangeUrlFavorite"/>
                     <div class="grow max-w-4xl tab-content" role="tabpanel">
                         @if (BlogListFavorite is not null)
                         {
@@ -64,7 +67,22 @@
                             }
                         }
                     </div>
-
+                    <input
+                        type="radio"
+                        name="my_tabs_1"
+                        role="tab"
+                        class="tab"
+                        aria-label="Bookmark"
+                        @onclick="ChangeUrlBookmark"/>
+                    <div class="grow max-w-4xl tab-content" role="tabpanel">
+                        @if (BlogListFavorite is not null)
+                        {
+                        @foreach (var blog in BlogListFavorite)
+                        {
+                            <ProfileBlogCard BlogList="blog"/>
+                        }
+                        }
+                    </div>
                 </div>
             </div>
         </div>
@@ -143,12 +161,25 @@
     private bool IsOwner { get; set; } = false;
     private const string BaseImage = "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp";
     public bool IsLoading { get; set; } = false;
-
     protected override async Task OnInitializedAsync()
     {
         Requester = await AuthUtils.GetInfo(authenticationStateTask);
     }
-
+    private void ChangeUrlHome()
+    {
+        var url = $"profile/{Username}";
+        ChangeUrl(url);
+    }
+    private void ChangeUrlFavorite()
+    {
+        var url = $"profile/{Username}/favorite";
+        ChangeUrl(url);
+    }
+    private void ChangeUrlBookmark()
+    {
+        var url = $"profile/{Username}/bookmark";
+        ChangeUrl(url);
+    }
     protected override async Task OnParametersSetAsync()
     {
         IsLoading = true;
@@ -191,5 +222,7 @@
         StateHasChanged();
         IsLoading = false;
     }
-
+    void ChangeUrl(string url){
+        JSRuntime.InvokeVoidAsync("ChangeUrl", url);
+    }
 }
