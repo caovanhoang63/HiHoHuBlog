@@ -63,4 +63,15 @@ public class BlogGetService(IBlogRepository blogRepo) : IBlogGetService
 
         return r;
     }
+
+    public async Task<Result<IEnumerable<BlogListProfile>?, Err>> GetBlogsFavorite(BlogFilter? filter, Paging paging)
+    {
+        var r = await blogRepo.GetBlogListFavorite(filter, paging);
+        if (!r.IsOk)
+        {
+            return Result<IEnumerable<BlogListProfile>?, Err>.Err(r.Error);
+        }
+
+        return r;
+    }
 }

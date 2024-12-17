@@ -15,7 +15,8 @@ public class Blog : BaseEntity
     public virtual User.Entity.User? User { get; set; }
     // public virtual UserLikeBlog? UserLikeBlog{ get; set; }
     public List<Tag.Entity.Tag>? Tags { get; set; }
-    
+    public virtual ICollection<UserLikeBlog>? UserLikeBlogs { get; set; }
+
     public string? Title { get; set; }
     public string? Content { get; set; }
     public bool IsPublished { get; set; }
