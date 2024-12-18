@@ -356,6 +356,7 @@ public class EfRepo  : IUserRepository
                 UserFollowing = userFollowId
             });
             await _dbContext.SaveChangesAsync();
+            await UpdateTotalFollows(userId,userFollowId);
             return Result<Unit, Err>.Ok(new Unit());
         }
         catch (Exception e)
@@ -373,6 +374,7 @@ public class EfRepo  : IUserRepository
                 .FirstOrDefaultAsync(ulb => ulb.UserId == userId && ulb.UserFollowing == userFollowId);
             if (entity != null) _dbContext.UserFollows.Remove(entity);
             await _dbContext.SaveChangesAsync();
+            await UpdateTotalFollows(userId,userFollowId);
             return Result<Unit, Err>.Ok(new Unit());
         }
         catch (Exception e)

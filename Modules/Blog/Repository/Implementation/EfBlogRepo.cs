@@ -324,6 +324,7 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
                 UserId = userId
             });
             await context.SaveChangesAsync();
+            await UpdateTotalLikes(blogId);
             return Result<Unit, Err>.Ok(new Unit());
         }
         catch (Exception e)
@@ -341,6 +342,7 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
                 .FirstOrDefaultAsync(ulb => ulb.UserId == userId && ulb.BlogId == blogId);
             if (entity != null) context.UserLikeBlogs.Remove(entity);
             await context.SaveChangesAsync();
+            await UpdateTotalLikes(blogId);
             return Result<Unit, Err>.Ok(new Unit());
         }
         catch (Exception e)
@@ -348,7 +350,6 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
             return Result<Unit, Err>.Err(UtilErrors.InternalServerError(e));
         }
     }
-
     public async Task<Result<bool, Err>> IsLiked(int userId, int blogId)
     {
         try
@@ -396,7 +397,6 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
     {
         try
         {            
-
             await context.UserCommentBlogs.AddAsync(new UserCommentBlog
             {
                 BlogId = blogId,
@@ -404,6 +404,7 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
                 Content = content
             });
             await context.SaveChangesAsync();
+            await UpdateTotalComments(blogId);
             return Result<Unit, Err>.Ok(new Unit());
         }
         catch (Exception e)
