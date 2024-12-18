@@ -23,7 +23,7 @@
     <ConfirmModal Open="OpenUnfollowModal" Title="Unfollow"
                   Message="@_unfollowMessage" OnConfirm="OnConfirmUnFollow" OnDeny="OnDenyUnFollow">
     </ConfirmModal>
-    <CommentSection IsOpen="_isOpen" comments="_comments" OnClose='() => _isOpen = false' Blog="_blog" Requester="_requester"></CommentSection>
+    <CommentSection TotalComments="_totalComments" IsOpen="_isOpen" comments="_comments" OnClose='() => _isOpen = false' Blog="_blog" Requester="_requester"></CommentSection>
     <FullScreenSpinner IsLoading="_isLoading"></FullScreenSpinner>
     <div class="container mx-auto px-4 py-8">
         <!-- Header Section -->
@@ -68,7 +68,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                         </svg>
                     </button>
-                    <span>@_blog?.TotalComment</span>
+                    <span>@_totalComments</span>
                 </div>
 
                 @*<div class="flex-grow"></div>
@@ -169,6 +169,7 @@
     private bool _isFollowed = false;
     private string _unfollowMessage = "";
     public bool OpenUnfollowModal { get; set; } = false;
+    private int? _totalComments = 0;
 
 
     private List<UserCommentBlog> _comments = new List<UserCommentBlog>();
@@ -184,6 +185,7 @@
             {
                  var comments = result.Value.ToList();
                 _comments = comments;
+                await InvokeAsync(StateHasChanged);
             }
                 
         }
@@ -219,6 +221,7 @@
 
         _blog = r.Value;
         _isLoading = false;
+        _totalComments = _blog.TotalComment;
         await InvokeAsync(StateHasChanged);
         
         var relatedBlog = await SearchBlogService.RecommendSearchBlogByBlog(null, _blog.Id, _relatedPaging);
