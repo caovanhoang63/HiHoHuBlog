@@ -244,11 +244,11 @@ public class BlogUpdateService(IBlogRepository blogRepo) : IBlogUpdateService
         {
             return Result<Unit, Err>.Err(comment.Error);
         }
-        var updateTotalComments = await UpdateTotalComments(blogId);
+        /*var updateTotalComments = await UpdateTotalComments(blogId);
         if (!updateTotalComments.IsOk)
         {
             return Result<Unit, Err>.Err(updateTotalComments.Error);
-        }
+        }*/
         return Result<Unit, Err>.Ok(new Unit());
     }
 

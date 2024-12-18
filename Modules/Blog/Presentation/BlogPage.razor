@@ -8,6 +8,7 @@
 @using HiHoHuBlog.Modules.Search.Service.Interface
 @using HiHoHuBlog.Modules.User.Service.Interface
 @using HiHoHuBlog.Utils
+@using HiHoHuBlog.Modules.Admin.Presentation.Components
 @rendermode InteractiveServer
 @inject IBlogGetService BlogGetService
 @inject NavigationManager NavigationManager
@@ -19,6 +20,9 @@
 @attribute [Authorize]
 @attribute [AllowAnonymous]
 <Container>
+    <ConfirmModal Open="OpenUnfollowModal" Title="Unfollow"
+                  Message="@_unfollowMessage" OnConfirm="OnConfirmUnFollow" OnDeny="OnDenyUnFollow">
+    </ConfirmModal>
     <CommentSection IsOpen="_isOpen" comments="_comments" OnClose='() => _isOpen = false' Blog="_blog" Requester="_requester"></CommentSection>
     <FullScreenSpinner IsLoading="_isLoading"></FullScreenSpinner>
     <div class="container mx-auto px-4 py-8">
@@ -26,19 +30,23 @@
         <div class="mb-8">
             <h1 class="text-4xl font-bold mb-4">@_blog?.Title</h1>
             <div class="flex items-center gap-4 mb-4">
-                <div class="avatar">
+                <div class="avatar" @onclick='() => NavigationManager.NavigateTo($"/profile/{_blog?.User?.UserName}")'>
                     <div class="h-11 rounded-full">
                         <img src="@(_blog?.User?.Avatar?.Url is null ? "https://placehold.co/600x400?text=Hihohublog" : _blog?.User?.Avatar?.Url)"/>
                     </div>
                 </div>
                 <div>
                     <div class="flex items-center gap-2">
-                        <span class="font-medium">@_blog?.User?.FirstName @_blog?.User?.LastName</span>
+                        <span class="font-medium hover:underline"
+                              @onclick='() => NavigationManager.NavigateTo($"/profile/{_blog?.User?.UserName}")'>@_blog?.User?.FirstName @_blog?.User?.LastName</span>
                         @*<button class="btn btn-sm btn-outline btn-primary  @(_isFollowed? "bg-amber-300":   "") " @onclick="onFollowClick">Follow</button>*@
-                        <FollowButton IsFollow="_isFollowed" OnFollowClick="OnFollowClick"></FollowButton>                    
+                        @if(_requester?.GetId() !=_blog?.User?.Id)
+                        {
+                            <FollowButton IsFollow="_isFollowed" OnFollowClick="OnFollowClick"></FollowButton>
+                        }
                         </div>
                     <div class="text-sm text-gray-600">
-                        <span>13 min read</span>
+                        <span>@_blog?.MinToRead min read</span>
                         <span class="mx-2">·</span>
                         <span>@_blog?.CreatedAt</span>
                     </div>
@@ -52,7 +60,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                         </svg>
                     </button>
-                    <span>@_totalLikes</span>
+                    <span>@_blog?.TotalLike</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <button class="btn btn-circle btn-ghost" @onclick="OnOpenComment">
@@ -60,7 +68,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                         </svg>
                     </button>
-                    <span>10</span>
+                    <span>@_blog?.TotalComment</span>
                 </div>
 
                 <div class="flex-grow"></div>
@@ -103,19 +111,22 @@
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
-                            <span class="font-medium">Written by Sylvain Tiset</span>
+                            <span class="font-bold text-2xl">Written by @_blog?.User?.FirstName @_blog?.User?.LastName</span>
                         </div>
                         <div class="text-sm text-gray-600">
-                            <span>222 Followers</span>
+                            <span>@_blog?.TotalFollowers Followers</span>
                             <span class="mx-2">·</span>
-                            <span>0 Following</span>
+                            <span>@_blog?.TotalFollowing Following</span>
                         </div>
                     </div>
                 </div>
-                <button class="btn h-2 rounded-3xl te bg-black text-white ">Follow</button>
-            </header>
+                @if(_requester?.GetId() !=_blog?.User?.Id)
+                {
+                    <FollowButton IsFollow="_isFollowed" OnFollowClick="OnFollowClick"></FollowButton>
+                }            
+                </header>
             @* More From this Author Section *@
-            <span class="font-bold text-2xl">More from Sylvain Tiset</span>
+            <span class="font-bold text-2xl">More from @_blog?.User?.FirstName @_blog?.User?.LastName</span>
             <!-- Articles -->
             <div class="grid grid-cols-2 mt-8 gap-8">
                 @foreach (var blog in _authorBlogs)
@@ -123,8 +134,8 @@
                     <BlogRelatedCard Blog="blog"/>
                 }
             </div>
-            <div class="divider mt-14 "></div>
-            <button class="btn btn-wide rounded-3xl bg-base-100 border-1 border-black ">See all from Sylvain Tiset</button>
+           
+            
             @*Recommended from Medium Section*@
             <div class="divider mt-24 mb-20 w-screen relative left-1/2 -translate-x-1/2 m-0"></div>
             <span class="font-bold text-2xl">Recommended from Medium</span>
@@ -135,9 +146,6 @@
                     <BlogRelatedCard Blog="blog"/>
                 }
             </div>
-            <div class="divider mt-14 "></div>
-            <button class="btn btn-wide rounded-3xl bg-base-100 border-1 border-black ">See more recommendations</button>
-
         </div>
     </div>
 </Container>
@@ -160,6 +168,8 @@
     private bool _isLiked = false;
     private bool _isFollowed = false;
     private bool _isBookmarked = false;
+    private string _unfollowMessage = "";
+    public bool OpenUnfollowModal { get; set; } = false;
     private List<UserCommentBlog> _comments = new List<UserCommentBlog>();
     
     
@@ -299,20 +309,27 @@
     {
         if (_requester is not null)
         {
-            var r = !_isFollowed ?
-                await UserFollowService.Follows(_requester.GetId(), _blog.User!.Id) :
-                await UserFollowService.UnFollow(_requester.GetId(), _blog.User!.Id);
-            if (!r.IsOk)
+            if (!_isFollowed)
             {
-                Console.WriteLine(r.Error);
-                ToastService.ShowError(r.Error.Message);
-                return;
+                var r = await UserFollowService.Follows(_requester.GetId(), _blog.User!.Id);
+                if (!r.IsOk)
+                {
+                    Console.WriteLine(r.Error);
+                    ToastService.ShowError(r.Error.Message);
+                }
+                _isFollowed = !_isFollowed;
             }
-            _isFollowed = !_isFollowed;
+            else
+            {
+                OpenUnfollowModal = true;
+                _unfollowMessage = $"Are you sure you want to unfollow {_blog.User?.FirstName} {_blog.User?.LastName}?";
+                
+            }
         }
         else
         {
-            NavigationManager.NavigateTo("/login");
+            NavigationManager.NavigateTo($"/login?ReturnUrl=%2Fblog/{Slug}");
+            
         }
        
         StateHasChanged();
@@ -351,6 +368,25 @@
         }
        
         StateHasChanged();
+    }
+    private async void OnConfirmUnFollow()
+    {
+        _isLoading = true;
+        var r = await UserFollowService.UnFollow(_requester.GetId(), _blog.User!.Id);
+        if (!r.IsOk)
+        {
+            ToastService.ShowError(r.Error.Message);
+            Console.WriteLine(r.Error);
+        }
+
+        _isLoading = false;
+        OpenUnfollowModal = false;
+        _isFollowed = false;
+       await InvokeAsync(StateHasChanged);
+    }
+    private void OnDenyUnFollow()
+    {
+        OpenUnfollowModal= false;
     }
     
     void ChangeUrl(string url){
