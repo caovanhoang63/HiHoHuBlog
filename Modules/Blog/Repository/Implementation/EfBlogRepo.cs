@@ -362,6 +362,34 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
         }
     }
 
+    private async Task<Result<int?, Err>> GetTotalBookmarks(int blogId)
+    {
+        try
+        {
+            int totalBookmarks = await context.UserBookmarkBlogs.CountAsync(ulb => ulb.BlogId == blogId);
+            return Result<int?, Err>.Ok(totalBookmarks);
+        }
+        catch (Exception e)
+        {
+            return Result<int?, Err>.Err(UtilErrors.InternalServerError(e));
+
+        }
+    }
+    public async Task<Result<Unit, Err>> UpdateTotalBookmarks(int blogId)
+    {
+        try
+        {
+            var totalBookmarksResult = await GetTotalBookmarks(blogId);
+            var updateBookMarks = await _dbSet.Where(u=>u.Id==blogId)
+                .ExecuteUpdateAsync(
+                    b => b.SetProperty(u => u.TotalMark, totalBookmarksResult.Value));
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception e)
+        {
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(e));
+        }    }
+
     public async Task<Result<Unit, Err>> BookmarkBlog(int userId, int blogId)
     {
         try
@@ -372,6 +400,7 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
                 UserId = userId
             });
             await context.SaveChangesAsync();
+            await UpdateTotalBookmarks(blogId);
             return Result<Unit, Err>.Ok(new Unit());
         }
         catch (Exception e)
