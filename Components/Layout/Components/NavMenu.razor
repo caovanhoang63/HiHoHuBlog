@@ -5,9 +5,22 @@
 <div class="navbar border-b-[1px]">
     <div class="flex-1">
         <a @onclick='() => { NavigationManager.NavigateTo("/"); }' class="btn btn-ghost  text-xl">Hihohu</a>
+
         @if (!NavigationManager.Uri.Contains("admin"))
         {
-            <form @onsubmit="OnSubmitSearch">
+            <button @onclick='() => NavigationManager.NavigateTo("/search")' class="sm:hidden block btn btn-ghost sm">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 16 16"
+                    fill="currentColor"
+                    class="h-4 w-4 opacity-70">
+                    <path
+                        fill-rule="evenodd"
+                        d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+                        clip-rule="evenodd"/>
+                </svg>
+            </button>
+            <form class="sm:block hidden" @onsubmit="OnSubmitSearch">
                 <label class="input input-bordered flex items-center gap-2 bg-white relative">
                     <input type="text" class="grow " placeholder="Search"
                            @bind="_searchQuery"
@@ -49,11 +62,9 @@
                         </ul>
                     }
                 </label>
-                </form>
+            </form>
         }
 
-       
-        
     </div>
 
     <div class="flex-none gap-2">
@@ -64,7 +75,7 @@
         {
             <AuthorizeView Roles="admin, mod">
                 <Authorized>
-                    <button @onclick="OnManage" class="btn btn-ghost sm">
+                    <button @onclick="OnManage" class="sm:block hidden btn btn-ghost sm">
                         <span>
                             Manage
                         </span>
@@ -130,7 +141,6 @@
     private List<string> _searchHistory = new();
     private bool _isRemovingItem = false;
 
-    
     private IRequester _requester;
     [CascadingParameter] 
     Task<AuthenticationState> authenticationStateTask { get; set; }

@@ -28,17 +28,6 @@
 
 <Container ContainerClass="flex justify-between space-x-10 max-w-7xl relative">
     <div class="grow max-w-4xl pb-10">
-        @*<div role="tablist" class="tabs tabs-bordered">
-            <button class="tab">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-                </svg>
-            </button>
-            <a role="tab" class="tab">Tab 1</a>
-            <a role="tab" class="tab tab-active">Tab 2</a>
-            <a role="tab" class="tab">Tab 3</a>
-            <a role="tab" class="tab">Tab 4</a>
-        </div>*@
         <ul >
             @foreach (var blog in _blogs)
             {
@@ -51,7 +40,7 @@
             <p class="@(_isLoading ? " " : "hidden" )">Loading...</p>
         </div>
     </div>
-    <div class="border-l-[1px]  p-10 max-w-sm max-h-screen sticky top-0">
+    <div class="hidden sm:block border-l-[1px]  p-10 max-w-sm max-h-screen sticky top-0">
         <div class="flex flex-col space-y-2">
             <span class="text-gray-600 mb-6">Recommended Topics</span>
             <div class="flex flex-wrap ">
