@@ -64,22 +64,27 @@
                             }
                         }
                     </div>
-                    <input
-                        type="radio"
-                        name="my_tabs_1"
-                        role="tab"
-                        class="tab"
-                        aria-label="Bookmark"
-                        @onclick="ChangeUrlBookmark"/>
-                    <div class="grow max-w-4xl tab-content" role="tabpanel">
-                        @if (BlogListBookmark is not null)
+                    @{
+                        if (IsOwner)
                         {
-                        @foreach (var blog in BlogListBookmark)
-                        {
-                            <ProfileBlogCard BlogList="blog"/>
-                        }
-                        }
-                    </div>
+                            <input
+                                type="radio"
+                                name="my_tabs_1"
+                                role="tab"
+                                class="tab"
+                                aria-label="Bookmark"
+                                @onclick="ChangeUrlBookmark"/>
+                            <div class="grow max-w-4xl tab-content" role="tabpanel">
+                                @if (BlogListBookmark is not null)
+                                {
+                                    @foreach (var blog in BlogListBookmark)
+                                    {
+                                        <ProfileBlogCard BlogList="blog"/>
+                                    }
+                                }
+                            </div>
+                        }}
+                    
                 </div>
             </div>
         </div>
