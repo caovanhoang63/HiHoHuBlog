@@ -223,7 +223,7 @@
         }
         BlogList = i.Value;
         BlogListFavorite = f.Value;
-        if (Requester.GetUsername() == Username) IsOwner = true;
+        if (Requester?.GetUsername() == Username) IsOwner = true;
         StateHasChanged();
         IsLoading = false;
 
