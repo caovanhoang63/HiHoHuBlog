@@ -1,21 +1,25 @@
 ﻿@using HiHoHuBlog.Modules.Search.Entity
 @using HiHoHuBlog.Components.Components
-<div class="card w-full bg-base-100 mr-5">
-    <div class="card-body p-0 mb-8 flex-row items-center justify-between space-x-2">
-        <div class="avatar">
-            <div class="size-8 rounded-full">
-                <img src="@User?.Avatar?.Url"/>
+<div class="card w-full bg-base-100 mr-5 ">
+    <div class="card-body p-0 mb-8 flex-row items-center justify-between">
+        <div class="flex space-x-4 items-center ">
+            <div class="avatar">
+                <div class="size-8 rounded-full">
+                    <img src="@User?.Avatar?.Url"/>
+                </div>
+            </div>
+            <div class="flex-col">
+                <h2 class="card-title text-base	line-clamp-1">@User?.FirstName @User?.LastName</h2>
+                @* <p class="line-clamp-2">@User?.UserDetails?.Bio</p> *@
             </div>
         </div>
-        <div class="flex-col">
-            <h2 class="card-title text-base	 line-clamp-2">@User?.FirstName @User?.LastName</h2>
-            <p class="line-clamp-2">@User?.UserDetails?.Bio</p>
-        </div>
-        <FollowButton IsFollow="User.IsFollow"/>
+
         @*<div class="card-actions grow">
             <a class="btn rounded-3xl bg-transparent border border-black">Follow</a>
         </div>*@
+        <FollowButton IsFollow="User.IsFollow"/>
     </div>
+
 </div>
 @code{
     [Parameter] public UserSearchDoc? User { get; set; }
