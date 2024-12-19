@@ -23,7 +23,7 @@
     <ConfirmModal Open="OpenUnfollowModal" Title="Unfollow"
                   Message="@_unfollowMessage" OnConfirm="OnConfirmUnFollow" OnDeny="OnDenyUnFollow">
     </ConfirmModal>
-    <CommentSection TotalComments="_totalComments" IsOpen="_isOpen" comments="_comments" OnClose='() => _isOpen = false' Blog="_blog" Requester="_requester"></CommentSection>
+    <CommentSection TotalComments="_totalComments" SlugComment="@_slug" IsOpen="_isOpen" comments="_comments" OnClose='() => _isOpen = false' Blog="_blog" Requester="_requester"></CommentSection>
     <FullScreenSpinner IsLoading="_isLoading"></FullScreenSpinner>
     <div class="container mx-auto px-4 py-8">
         <!-- Header Section -->
@@ -170,7 +170,8 @@
     private bool _isBookmarked = false;
     private string _unfollowMessage = "";
     public bool OpenUnfollowModal { get; set; } = false;
-    private int? _totalComments = 0;
+    private int? _totalComments { get; set; } = 0;
+    private string _slug = "";
 
 
 
@@ -179,7 +180,6 @@
     
     private async Task OnOpenComment()
     {
-        _isOpen = !_isOpen;
         var result = await BlogUpdateService.GetCommentsById(_blog.Id);
         if (result.IsOk)
         {
@@ -191,6 +191,7 @@
             }
                 
         }
+        _isOpen = !_isOpen;
     }
     
     protected override async Task OnInitializedAsync()
@@ -201,6 +202,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        _slug = Slug;
         var request = Slug.Split('-'); 
         string idString = request[^1];
         _isLoading = true;

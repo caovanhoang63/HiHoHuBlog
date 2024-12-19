@@ -55,6 +55,7 @@
     private string commentText = string.Empty;
     [Parameter] public List<UserCommentBlog> comments { get; set; }
     [Parameter] public int? TotalComments { get; set; }
+    [Parameter] public string? SlugComment { get; set; }
 
     /*protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -107,7 +108,7 @@
         }
         else
         {
-            NavigationManager.NavigateTo("/login");
+            NavigationManager.NavigateTo($"/login?ReturnUrl=%2Fblog/{SlugComment}");
         }
         StateHasChanged();
     }
