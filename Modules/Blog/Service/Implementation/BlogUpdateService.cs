@@ -195,6 +195,37 @@ public class BlogUpdateService(IBlogRepository blogRepo) : IBlogUpdateService
         return Result<bool,Err>.Ok(isLiked.Value);
     }
 
+    public async Task<Result<Unit, Err>> BookmarkBlog(int userId, int blogId)
+    {
+        var bookmarkBLog = await _blogRepo.BookmarkBlog(userId, blogId);
+        if (!bookmarkBLog.IsOk)
+        {
+            return Result<Unit, Err>.Err(bookmarkBLog.Error);
+        }
+        return Result<Unit, Err>.Ok(new Unit());
+    }
+
+    public async Task<Result<Unit, Err>> UnBookmarkBlog(int userId, int blogId)
+    {
+        var unBookmarkBLog = await _blogRepo.UnBookmarkBlog(userId, blogId);
+        if (!unBookmarkBLog.IsOk)
+        {
+            return Result<Unit, Err>.Err(unBookmarkBLog.Error);
+        }
+        return Result<Unit, Err>.Ok(new Unit());
+    }
+
+    public async Task<Result<bool, Err>> IsBookmarked(int userId, int blogId)
+    {
+        var isBookmarked = await _blogRepo.IsBookmarked(userId, blogId);
+        if (!isBookmarked.IsOk)
+        {
+            return Result<bool, Err>.Err(isBookmarked.Error);
+        }
+
+        return Result<bool,Err>.Ok(isBookmarked.Value);
+    }
+
     public async Task<Result<Unit, Err>> UpdateTotalComments(int id)
     {
         var _totalComments = await _blogRepo.UpdateTotalComments(id);

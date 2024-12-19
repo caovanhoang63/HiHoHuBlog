@@ -18,6 +18,9 @@ public interface IBlogUpdateService
     Task<Result<Unit,Err>> DisikeBlog(int userId,int blogId);
     Task<Result<bool,Err>> IsLiked(int userId,int blogId);
     
+    Task<Result<Unit,Err>> BookmarkBlog(int userId,int blogId);
+    Task<Result<Unit,Err>> UnBookmarkBlog(int userId,int blogId);
+    Task<Result<bool,Err>> IsBookmarked(int userId,int blogId);
     
     Task<Result<Unit,Err>> UpdateTotalComments(int id);
     
