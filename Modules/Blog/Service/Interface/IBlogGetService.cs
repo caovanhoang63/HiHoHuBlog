@@ -10,4 +10,5 @@ public interface IBlogGetService
     Task<Result<IEnumerable<BlogList>?, Err>> GetBlogs(BlogFilter? filter, Paging paging);
     Task<Result<IEnumerable<BlogListProfile>?, Err>> GetBlogProfiles(BlogFilter? filter, Paging paging);
     Task<Result<IEnumerable<BlogListProfile>?, Err>> GetBlogsFavorite(BlogFilter? filter, Paging paging);
+    Task<Result<IEnumerable<BlogListProfile>?, Err>> GetBlogsBookmark(BlogFilter? filter, Paging paging);
 }

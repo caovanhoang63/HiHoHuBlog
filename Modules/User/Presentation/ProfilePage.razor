@@ -72,9 +72,9 @@
                         aria-label="Bookmark"
                         @onclick="ChangeUrlBookmark"/>
                     <div class="grow max-w-4xl tab-content" role="tabpanel">
-                        @if (BlogListFavorite is not null)
+                        @if (BlogListBookmark is not null)
                         {
-                        @foreach (var blog in BlogListFavorite)
+                        @foreach (var blog in BlogListBookmark)
                         {
                             <ProfileBlogCard BlogList="blog"/>
                         }
@@ -161,6 +161,7 @@
 
     [Parameter] public IEnumerable<BlogListProfile>? BlogList { get; set; } = null;
     [Parameter] public IEnumerable<BlogListProfile>? BlogListFavorite { get; set; } = null;
+    [Parameter] public IEnumerable<BlogListProfile>? BlogListBookmark { get; set; } = null;
     [CascadingParameter] Task<AuthenticationState> authenticationStateTask { get; set; }
     public IRequester? Requester;
     private bool IsOwner { get; set; } = false;
@@ -210,19 +211,15 @@
         };
         Name = UserProfile.FirstName + " " + UserProfile.LastName;
         var i = await BlogGetService.GetBlogProfiles(Filter, Paging);
-        if (!r.IsOk)
-        {
-            return;
-        }
+        
 
         var f = await BlogGetService.GetBlogsFavorite(FilterFavorite, Paging);
-        if (!f.IsOk)
-        {
-            Console.WriteLine("loi "+ f.Error.Message );
-            return;
-        }
+        
+        var b = await BlogGetService.GetBlogsBookmark(FilterFavorite, Paging);
+        
         BlogList = i.Value;
         BlogListFavorite = f.Value;
+        BlogListBookmark = b.Value;
         if (Requester.GetUsername() == Username) IsOwner = true;
         StateHasChanged();
         IsLoading = false;

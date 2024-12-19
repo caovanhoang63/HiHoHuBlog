@@ -21,6 +21,7 @@ public class User : BaseEntity
     public string? Phone { get; set; }
     
     public virtual ICollection<UserLikeBlog>? UserLikeBlogs { get; set; }
+    public virtual ICollection<UserBookmarkBlog>? UserBookmarkBlogs { get; set; }
 
     public virtual UserDetails? UserDetails { get; set; }
     public string Role { get; set; } = "user";  // Enum type in MySQL can be represented as string in C#
