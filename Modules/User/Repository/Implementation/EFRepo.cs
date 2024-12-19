@@ -129,10 +129,9 @@ public class EfRepo  : IUserRepository
                             .SetProperty(i => i.Status, 1)
                     );
                 
-                if (userUpdateResult > 0&& userDetailsUpdateResult>0)
+                if (userUpdateResult > 0 && userDetailsUpdateResult>0)
                 {
                     await transaction.CommitAsync();
-                    Console.WriteLine("Cap nhap thanh cong 2");
                     return Result<Unit, Err>.Ok(new Unit());
                 }
                 else
@@ -145,7 +144,7 @@ public class EfRepo  : IUserRepository
             {
                 var newUserDetails = new UserDetails
                 {
-                    Id = userSettingsProfile.Id,
+                    UserId = userSettingsProfile.Id,
                     Bio = userSettingsProfile.ShortBio,
                 };
                 await _dbDetailsSet.AddAsync(newUserDetails);
@@ -154,7 +153,6 @@ public class EfRepo  : IUserRepository
 
                 if (saveResult > 0)
                 {
-                    Console.WriteLine("Cap nhap thanh cong 2");
                     await transaction.CommitAsync();
                     return Result<Unit, Err>.Ok(new Unit());
                 }
@@ -314,7 +312,10 @@ public class EfRepo  : IUserRepository
     {
         try
         {
-            var user = await _dbSet.Where(u => u.UserName == userName).FirstOrDefaultAsync();
+
+            var user = await _dbSet.Where(u => u.UserName == userName)
+                .Include(d=>d.UserDetails)
+                .FirstOrDefaultAsync();
             var userProfile = _mapper.Map<UserProfile>(user);
             return Result<UserProfile?, Err>.Ok(userProfile);
         }

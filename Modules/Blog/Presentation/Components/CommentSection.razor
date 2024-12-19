@@ -54,7 +54,7 @@
     [Parameter] public EventCallback OnClose { get; set; }
     private string commentText = string.Empty;
     [Parameter] public List<UserCommentBlog> comments { get; set; }
-
+    [Parameter] public int? TotalComments { get; set; }
 
     /*protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -89,8 +89,13 @@
                 var result = await BlogUpdateService.GetCommentsById(Blog.Id);
                 if (result.IsOk)
                 {
+                    
                     if (result.Value != null)
+                    {
+                        TotalComments = result.Value.ToList().Count;
                         comments = result.Value.ToList();
+                        StateHasChanged();
+                    }
                 }
             }
 

@@ -78,6 +78,15 @@ public class ApplicationDbContext : DbContext
             .HasKey(ulb => new {ulb.Id});
         modelBuilder.Entity<UserFollow>()
             .HasKey(ulb=> new {ulb.UserId, ulb.UserFollowing});
+        modelBuilder.Entity<UserLikeBlog>()
+            .HasOne(ulb => ulb.User)
+            .WithMany(u => u.UserLikeBlogs)
+            .HasForeignKey(ulb => ulb.UserId);
+
+        modelBuilder.Entity<UserLikeBlog>()
+            .HasOne(ulb => ulb.Blog)
+            .WithMany(b => b.UserLikeBlogs)
+            .HasForeignKey(ulb => ulb.BlogId);
         modelBuilder.Entity<UserBookmarkBlog>()
             .HasKey(ulb=> new {ulb.UserId, ulb.BlogId});
         foreach (var entity in modelBuilder.Model.GetEntityTypes())

@@ -9,6 +9,7 @@
 @using HiHoHuBlog.Modules.User.Service.Implementation
 @using HiHoHuBlog.Modules.User.Service.Interface
 @using HiHoHuBlog.Utils
+@using HiHoHuBlog.Modules.User.Presentation.components
 @layout MainLayout
 @inject IUserProfileService UserProfileService
 @inject IBlogGetService BlogGetService
@@ -17,136 +18,168 @@
     @if (!IsLoading)
     {
         <div class="max-w-4xl py-10 w-full">
-        <div class="flex flex-col justify-between space-y-10 px-8 mt-3 mb-4">
-            <div class="flex justify-between">
-                <span class="font-medium font-sans text-5xl">@Name</span>
-                <button class="btn bg-white border-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
-                    </svg>
-                </button>
-            </div>
-            @*<div role="tablist" class="tabs tabs-bordered max-w-9">
-                <a role="tab" class="tab tab-active">Home</a>
-                <a role="tab" class="tab ">About</a>
-            </div>*@
-        </div>
-        <div class="flex flex-col justify-between space-y-10 px-8 mt-3 mb-4">
-            <div role="tablist" class="tabs tabs-bordered">
-                <input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="Home" checked="checked"/>
-                <div class="grow max-w-4xl tab-content" role="tabpanel">
-                    @if (BlogList is not null)
-                    {
-                        @foreach (var blog in BlogList)
-                        {
-                            <BlogCard/>
-                        }
-                    }
-                </div>
-                <input
-                    type="radio"
-                    name="my_tabs_1"
-                    role="tab"
-                    class="tab"
-                    aria-label="About"/>
-                <div role="tabpanel" class="tab-content p-10 w-full h-lvh">
-                    <span class="font-medium font-sans text-sm"> Member since November 2024</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="grow max-w-4xl tab-content" role="tabpanel">
-            @*<BlogCard/>
-            <BlogCard/>
-            <BlogCard/>
-            <BlogCard/>
-            <BlogCard/>*@
-
-        </div>
-    </div>
-    <div class="border-l-[1px] grow p-10 max-w-sm">
-        <div class="flex flex-col sticky top-20">
-            <div class="avatar">
-                <div class="w-24 rounded-full">
-                    <img src=" @(UserProfile?.Avatar?.Url is not null ? UserProfile.Avatar.Url : BaseImage)"
-                         alt="Tailwind CSS Navbar component"/>
-                </div>
-            </div>
-            <div class="mt-4">
-                <span class="font-medium font-sans text-base">@Name</span>
-            </div>
-            <div class="mt-2">
-                <span class="font-medium font-sans text-base text-gray-500"> @UserProfile?.TotalFollower Followers</span>
-            </div>
-            <div class="mt-2">
-                <span class="font-medium font-sans text-sm text-gray-500">I'm Tiset, a CS/Physics student at Brown
-                    University. I write about science and technology here and on my blog harysdalvi.com</span>
-            </div>
-
-            @if (!IsOwner)
-            {
-                <div class="mt-6 mb-10 flex justify-start space-x-2">
-                    <button class="btn text-white bg-emerald-600 hover:bg-emerald-700/90 rounded-full">Follow</button>
-                    <button class="btn btn-circle text-white bg-emerald-600 hover:bg-emerald-700/90">
+            <div class="flex flex-col justify-between space-y-10 px-8 mt-3 mb-4">
+                <div class="flex justify-between">
+                    <span class="font-medium font-sans text-5xl">@Name</span>
+                    <button class="btn bg-white border-0">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                  d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
                         </svg>
                     </button>
                 </div>
-            }
+            </div>
+            <div class="flex flex-col justify-between space-y-10 px-8 mt-3 mb-4">
+                <div role="tablist" class="tabs tabs-bordered">
+                    <input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="Home" checked="checked"
+                    @onclick="ChangeUrlHome"
+                           />
+                    <div class="grow max-w-4xl tab-content" role="tabpanel">
+                        @if (BlogList is not null)
+                        {
+                            @foreach (var blog in BlogList)
+                            {
+                                <ProfileBlogCard BlogList="blog"/>
+                            }
+                        }
+                    </div>
+                    @*<input
+                        type="radio"
+                        name="my_tabs_1"
+                        role="tab"
+                        class="tab"
+                        aria-label="About"/>
+                    <div role="tabpanel" class="tab-content p-10 w-full h-lvh">
+                        <span class="font-medium font-sans text-sm"></span>
+                    </div>*@
+                    <input
+                        type="radio"
+                        name="my_tabs_1"
+                        role="tab"
+                        class="tab"
+                        aria-label="Favorite"
+                        @onclick="ChangeUrlFavorite"/>
+                    <div class="grow max-w-4xl tab-content" role="tabpanel">
+                        @if (BlogListFavorite is not null)
+                        {
+                            @foreach (var blog in BlogListFavorite)
+                            {
+                                <ProfileBlogCard BlogList="blog"/>
+                            }
+                        }
+                    </div>
+                    <input
+                        type="radio"
+                        name="my_tabs_1"
+                        role="tab"
+                        class="tab"
+                        aria-label="Bookmark"
+                        @onclick="ChangeUrlBookmark"/>
+                    <div class="grow max-w-4xl tab-content" role="tabpanel">
+                        @if (BlogListFavorite is not null)
+                        {
+                        @foreach (var blog in BlogListFavorite)
+                        {
+                            <ProfileBlogCard BlogList="blog"/>
+                        }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="border-l-[1px] grow p-10 max-w-sm">
+            <div class="flex flex-col sticky top-20">
+                <div class="avatar">
+                    <div class="w-24 rounded-full">
+                        <img src=" @(UserProfile?.Avatar?.Url is not null ? UserProfile.Avatar.Url : BaseImage)"
+                             alt="Tailwind CSS Navbar component"/>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <span class="font-medium font-sans text-base">@Name</span>
+                </div>
+                <div class="mt-2">
+                    <span class="font-medium font-sans text-base text-gray-500"> @UserProfile?.TotalFollower Followers</span>
+                </div>
+                <div class="mt-2">
+                    <span class="font-medium font-sans text-sm text-gray-500">@UserProfile?.UserDetails?.Bio</span>
+                </div>
 
-            <div>
-                <span class="font-medium font-sans text-base ">Following</span>
-                <ul class="mt-5">
-                    <li class="flex justify-between items-center">
-                        <a class="cursor-pointer link-hover" href="">
-                            <div class="flex justify-between space-x-2">
-                                <div class="avatar pr-3">
-                                    <div class="w-5 rounded-full">
-                                        <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-                                             alt="Tailwind CSS Navbar component"/>
-                                    </div>
-                                </div>
-                                <span class="font-medium font-sans text-sm ">Sylvain Tiset</span>
-                            </div>
-                        </a>
-
-                        <button class="btn bg-white btn-sm border-0 px-0">
+                @if (!IsOwner)
+                {
+                    <div class="mt-6 mb-10 flex justify-start space-x-2">
+                        <button class="btn text-white bg-emerald-600 hover:bg-emerald-700/90 rounded-full">Follow</button>
+                        <button class="btn btn-circle text-white bg-emerald-600 hover:bg-emerald-700/90">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/>
                             </svg>
                         </button>
-                    </li>
-                </ul>
+                    </div>
+                }
+
+                <div class="mt-6">
+                    <span class=" font-medium font-sans text-base ">Following</span>
+                    <ul class="mt-2">
+                        <li class="flex justify-between items-center">
+                            <a class="cursor-pointer link-hover" href="">
+                                <div class="flex justify-between space-x-2">
+                                    <div class="avatar pr-3">
+                                        <div class="w-5 rounded-full">
+                                            <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                                                 alt="Tailwind CSS Navbar component"/>
+                                        </div>
+                                    </div>
+                                    <span class="font-medium font-sans text-sm ">Sylvain Tiset</span>
+                                </div>
+                            </a>
+
+                            <button class="btn bg-white btn-sm border-0 px-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
+                                </svg>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
             </div>
-
         </div>
-    </div>
     }
-    
-
 </Container>
+
 @code {
-    [Parameter]
-    public string Username { get; set; }
+    [Parameter] public string Username { get; set; }
     public string Name { get; set; }
     public UserProfile UserProfile { get; set; }
-    private Paging Paging { get; set; } = new Paging(0, 20);
-    private BlogFilter Filter { get; set; } 
-    [Parameter] public IEnumerable<BlogList>? BlogList { get; set; } = null;
-    [CascadingParameter] 
-    Task<AuthenticationState> authenticationStateTask { get; set; }
+    private Paging Paging { get; set; } = new Paging(0, 5);
+    private BlogFilter Filter { get; set; }
+    private BlogFilter FilterFavorite { get; set; }
+    [Parameter] public IEnumerable<BlogListProfile>? BlogList { get; set; } = null;
+    [Parameter] public IEnumerable<BlogListProfile>? BlogListFavorite { get; set; } = null;
+    [CascadingParameter] Task<AuthenticationState> authenticationStateTask { get; set; }
     public IRequester? Requester;
     private bool IsOwner { get; set; } = false;
     private const string BaseImage = "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp";
     public bool IsLoading { get; set; } = false;
-
     protected override async Task OnInitializedAsync()
     {
         Requester = await AuthUtils.GetInfo(authenticationStateTask);
     }
-
+    private void ChangeUrlHome()
+    {
+        var url = $"profile/{Username}";
+        ChangeUrl(url);
+    }
+    private void ChangeUrlFavorite()
+    {
+        var url = $"profile/{Username}/favorite";
+        ChangeUrl(url);
+    }
+    private void ChangeUrlBookmark()
+    {
+        var url = $"profile/{Username}/bookmark";
+        ChangeUrl(url);
+    }
     protected override async Task OnParametersSetAsync()
     {
         IsLoading = true;
@@ -165,21 +198,31 @@
             IsPublished = null,
             UserId = UserProfile.Id,
         };
-        
-        
-        Name =UserProfile.LastName +" "+ UserProfile.FirstName ;
-        var i = await BlogGetService.GetBlogs(Filter, Paging);
+
+        FilterFavorite = new BlogFilter()
+        {
+            UserId = UserProfile.Id,
+        };
+        Name = UserProfile.FirstName + " " + UserProfile.LastName;
+        var i = await BlogGetService.GetBlogProfiles(Filter, Paging);
         if (!r.IsOk)
         {
             return;
         }
+
+        var f = await BlogGetService.GetBlogsFavorite(FilterFavorite, Paging);
+        if (!f.IsOk)
+        {
+            Console.WriteLine("loi "+ f.Error.Message );
+            return;
+        }
         BlogList = i.Value;
+        BlogListFavorite = f.Value;
         if (Requester.GetUsername() == Username) IsOwner = true;
         StateHasChanged();
-        Console.WriteLine(BlogList.Count().ToString());
-        Console.WriteLine(IsOwner);
         IsLoading = false;
     }
-    
-
+    void ChangeUrl(string url){
+        JSRuntime.InvokeVoidAsync("ChangeUrl", url);
+    }
 }

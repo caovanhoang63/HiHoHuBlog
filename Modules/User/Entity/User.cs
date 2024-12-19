@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
+using HiHoHuBlog.Modules.Blog.Entity;
 using HiHoHuBlog.Utils;
 
 namespace HiHoHuBlog.Modules.User.Entity;
@@ -19,7 +20,8 @@ public class User : BaseEntity
     public string FirstName { get; set; }
     public string? Phone { get; set; }
     
-    
+    public virtual ICollection<UserLikeBlog>? UserLikeBlogs { get; set; }
+
     public virtual UserDetails? UserDetails { get; set; }
     public string Role { get; set; } = "user";  // Enum type in MySQL can be represented as string in C#
     public Image? Avatar { get; set; }   // JSON type mapped to JsonDocument in C#

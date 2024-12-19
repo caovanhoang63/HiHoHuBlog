@@ -16,5 +16,7 @@ public class BlogMappingProfile : Profile
         CreateMap<User.Entity.User, UserDto>();
         CreateMap<BlogTagCreate, BlogTag>();
         CreateMap<UserReadBlog, UserReadBlogList>();
+        CreateMap<Entity.Blog, BlogListProfile>();
+        CreateMap<Entity.UserLikeBlog, BlogFavorite>();
     }
 }
