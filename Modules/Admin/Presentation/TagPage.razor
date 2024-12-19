@@ -278,11 +278,7 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        var r = await TagService.UpdateTotalBlogsForTagsAsync();
-        if (!r.IsOk)
-        {
-            Console.WriteLine("loi r");
-        }
+        await TagService.UpdateTotalBlogsForTagsAsync();
         if (AuthenticationStateTask is null)
         {
             NavigationManager.NavigateTo("/error");

@@ -66,7 +66,26 @@
     <div class="container mx-auto px-4 py-8">
         <!-- Header Section -->
         <div class="mb-8">
-            <h1 class="text-4xl font-bold mb-4">@_blog?.Title</h1>
+            <div class="flex justify-between">
+                <h1 class="text-4xl font-bold mb-4">@_blog?.Title</h1>
+                @{
+                    if (_requester?.GetId() == _blog?.UserId)
+                    {
+                        <div class="dropdown">
+                            <button tabindex="0" class="btn bg-white border-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
+                                </svg>
+                            </button>
+                            <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+                        
+                                <li><a @onclick="HandleUnPublishBlog" href="/p/@_blog?.Id/edit">Sửa bài viết</a></li>
+                                <li><a @onclick="HandleUnPublishBlog">Ẩn bài viết</a></li>
+                            </ul>
+                        </div> 
+                    }
+                }
+            </div>
             <div class="flex items-center gap-4 mb-4">
                 <div class="avatar" @onclick='() => NavigationManager.NavigateTo($"/profile/{_blog?.User?.UserName}")'>
                     <div class="h-11 rounded-full">
@@ -78,11 +97,11 @@
                         <span class="font-medium hover:underline cursor-pointer"
                               @onclick='() => NavigationManager.NavigateTo($"/profile/{_blog?.User?.UserName}")'>@_blog?.User?.FirstName @_blog?.User?.LastName</span>
                         @*<button class="btn btn-sm btn-outline btn-primary  @(_isFollowed? "bg-amber-300":   "") " @onclick="onFollowClick">Follow</button>*@
-                        @if(_requester?.GetId() !=_blog?.User?.Id)
+                        @if (_requester?.GetId() != _blog?.User?.Id)
                         {
                             <FollowButton IsFollow="_isFollowed" OnFollowClick="OnFollowClick"></FollowButton>
                         }
-                        </div>
+                    </div>
                     <div class="text-sm text-gray-600">
                         <span>@_blog?.MinToRead min read</span>
                         <span class="mx-2">·</span>
@@ -112,7 +131,7 @@
                 <div class="flex-grow"></div>
                 <button class="btn btn-circle btn-ghost" @onclick="OnBookmarkClick">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="@(_isBookmarked ? "yellow" : "none")" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"/>
                     </svg>
                 </button>
                 @*<button class="btn btn-circle btn-ghost">
@@ -470,7 +489,17 @@
         }
         StateHasChanged();
     }
-    
+
+    private async void HandleUnPublishBlog()
+    {
+
+        var r = await BlogUpdateService.UnPublish(_requester, _blog.Id);
+        if (!r.IsOk)
+        {
+            ToastService.ShowError(r.Error.Message);
+        }
+
+    }
     void ChangeUrl(string url){
         JSRuntime.InvokeVoidAsync("ChangeUrl", url);
     }
