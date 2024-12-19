@@ -22,9 +22,8 @@
 <HeadContent>
     <meta property="og:url"                                         content="https://www.hihohu.site/blog/@Slug" />
     <meta property="og:type"                                        content="website" />
-    <meta property="og:title"           id="fb-share-title"         content="" />
-    <meta property="og:description"     id="fb-share-description"   content="" />
-    <meta property="og:image"           id="fb-share-image"         content="" />
+    <meta property="og:title"         content="@_blog?.Title" />
+    <meta property="og:image"         content="@(_blog?.Thumbnail?.Url is null ? "https://placehold.co/600x400?text=Hihohublog" : _blog.Thumbnail.Url)" />
 </HeadContent>
 <Container>
     <ConfirmModal Open="OpenUnfollowModal" Title="Unfollow"
@@ -137,7 +136,7 @@
                 </div>
 
                 <div class="flex-grow"></div>
-                <div class="button fb-share-button"
+                <div class="fb-share-button"
                      data-href="https://www.hihohu.site/blog/@Slug"
                      data-layout="button_count">
                 </div>
@@ -232,7 +231,7 @@
     private readonly Paging _relatedPaging = new Paging(1, 4);
     private readonly Paging _authorPaging = new Paging(1, 4);
     private IRequester? _requester;
-    private BlogDetail _blog { get; set; }
+    private BlogDetail _blog { get; set; } = new BlogDetail();
     private int? _totalLikes = 0;
     private bool _isOpen = false;
     private bool _isLiked = false;
@@ -342,14 +341,24 @@
                 Console.WriteLine(isLiked.Error);
             }
             _isBookmarked = isBookmark.Value;
+        }
 
-            SetMetaData();
+
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("faceBookShareDSK", DotNetObjectReference.Create(this));
         }
         await InvokeAsync(StateHasChanged);
 
         _isLoading = false;
 
     }
+
     private async Task OnBookmarkClick()
     {
         if (_requester is not null)
@@ -526,17 +535,20 @@
         const fbShareTitle = document.querySelector('#fb-share-title');
         const fbShareDescription = document.querySelector('#fb-share-description');
         const fbShareImage = document.querySelector('#fb-share-image');
-        fbShareTitle.setAttribute('content', title);
-        fbShareDescription.setAttribute('content', description);
-        fbShareImage.setAttribute('content', image);
-
+        fbShareTitle.content = title;
+        fbShareDescription.content =  description;
+        fbShareImage.content=  image;
     }
 </script>
 
-<script>(function(d, s, id) {
-var js, fjs = d.getElementsByTagName(s)[0];
-if (d.getElementById(id)) return;
-js = d.createElement(s); js.id = id;
-js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
-fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));</script>
+<script>
+    function faceBookShareDSK() {
+        (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    }
+</script>
