@@ -56,6 +56,6 @@ jobs:
               -v ${PWD}/config/appsettings.Production.json:/app/appsettings.Production.json \
               -e ASPNETCORE_ENVIRONMENT=Production \
               -e VIRTUAL_HOST="www.hihohu.site" \
-              -p 8080:8080 \
+              -e VIRTUAL_POST=8080 \
               ${{ steps.login-ecr-public.outputs.registry }}/${{ secrets.REPO_NAME }}:hihohublog-${{ steps.get-commit-hash.outputs.commit-hash }}
           '
