@@ -13,7 +13,7 @@ public class BlogDetail
     public int TotalMark { get; set; } = 0;
     public int TotalLike { get; set; } = 0;
     public int TotalComment { get; set; } = 0;
-    public int TotalFollowers { get; set; } = 0;
+    public int TotalFollower { get; set; } = 0;
     public int TotalFollowing { get; set; } = 0;
     public int MinToRead { get; set; } = 0;
     public int Status { get; set; } = 1;

@@ -40,13 +40,13 @@
 
             <!-- Response Input -->
             <div class="bg-base-200 rounded-lg p-4 mb-6">
-                <div class="flex items-center justify-between">
-                    <input type="text"
+                <div class="flex items-center justify-between space-x-2">
+                    <textarea type="text"
                            @bind="_commentText"
                            @bind:event="oninput"
                            placeholder="What are your thoughts?"
-                           class="input input-ghost w-full max-w-xs"/>
-                    <button class="btn btn-primary" @onclick="OnSubmitComment">Respond</button>
+                           class="input input-ghost w-full max-w-xs"></textarea>
+                    <button class="btn btn-primary" @onclick="OnSubmitComment">Comment</button>
                 </div>
             </div>
 
@@ -75,7 +75,7 @@
                 </div>
                 <div>
                     <div class="flex items-center gap-2">
-                        <span class="font-medium hover:underline"
+                        <span class="font-medium hover:underline cursor-pointer"
                               @onclick='() => NavigationManager.NavigateTo($"/profile/{_blog?.User?.UserName}")'>@_blog?.User?.FirstName @_blog?.User?.LastName</span>
                         @*<button class="btn btn-sm btn-outline btn-primary  @(_isFollowed? "bg-amber-300":   "") " @onclick="onFollowClick">Follow</button>*@
                         @if(_requester?.GetId() !=_blog?.User?.Id)
@@ -144,7 +144,7 @@
                 <div class="flex items-center gap-4 mb-4">
                     <div class="avatar">
                         <div class="h-11 rounded-full">
-                            <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"/>
+                            <img src="@(_blog?.User?.Avatar?.Url is null ? "https://placehold.co/600x400?text=Hihohublog" : _blog?.User?.Avatar?.Url)" alt="avatar"/>
                         </div>
                     </div>
                     <div>
@@ -152,7 +152,7 @@
                             <span class="font-bold text-2xl">Written by @_blog?.User?.FirstName @_blog?.User?.LastName</span>
                         </div>
                         <div class="text-sm text-gray-600">
-                            <span>@_blog?.TotalFollowers Followers</span>
+                            <span>@_blog?.TotalFollower Followers</span>
                             <span class="mx-2">·</span>
                             <span>@_blog?.TotalFollowing Following</span>
                         </div>
@@ -175,8 +175,10 @@
            
             
             @*Recommended from Medium Section*@
+            <div class="divider m-0 "></div>
+
             <div class="divider mt-24 mb-20 w-screen relative left-1/2 -translate-x-1/2 m-0"></div>
-            <span class="font-bold text-2xl">Recommended from Medium</span>
+            <span class="font-bold text-2xl">Recommended from HiHoHu</span>
             <!-- Articles -->
             <div class="grid grid-cols-2 mt-8 gap-8">
                 @foreach (var blog in _relatedBlog)
