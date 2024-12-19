@@ -1,4 +1,6 @@
 @page "/censor"
+@using System.Reactive.Linq
+@using System.Reactive.Subjects
 @using AutoMapper
 @using HiHoHuBlog.Components.Layout
 @using HiHoHuBlog.Modules.Blog.Entity
@@ -41,7 +43,7 @@
 
                     <div>
                         <label class="input w-80 ml-5 input-bordered input-sm flex items-center gap-2 bg-white">
-                            <input type="text" class="grow " placeholder="Search"/>
+                            <input  @oninput="Callback"  type="text" class="grow " placeholder="Search"/>
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 viewBox="0 0 16 16"
@@ -75,7 +77,7 @@
                     </div>
 
 
-                    
+
                 </div>
                 @* Table *@
                 <div class="overflow-y-scroll">
@@ -180,11 +182,13 @@
                 <Pagination Paging="Paging" FetchDataAsync="GetBlogs"></Pagination>
             </div>
         </div>
-    </Authorized>   
+    </Authorized>
 </AuthorizeView>
 
 @code {
     [CascadingParameter] Task<AuthenticationState> authenticationStateTask { get; set; }
+    private readonly Subject<string?> _searchSubject = new();
+    private IDisposable? _searchSubscription;
 
     private IRequester _requester;
     [Parameter] public IEnumerable<BlogList>? BlogList { get; set; } = null;
@@ -196,7 +200,7 @@
     {
         IsOpenFilterModal = true;
     }
-    
+
     public async void OnConfirmFilter()
     {
         await GetBlogs();
@@ -208,7 +212,7 @@
     {
         IsOpenFilterModal = false;
     }
-    
+
     private Paging Paging { get; set; } = new Paging(0, 20);
     private BlogFilter BlogFilter { get; set; } = new BlogFilter
     {
@@ -216,7 +220,8 @@
         TagId = null,
         LtCreatedAt = null,
         IsPublished = null,
-        UserId = null
+        UserId = null,
+        Title = ""
     };
     public bool IsLoading { get; set; } = false;
     public bool OpenDeletedModal { get; set; } = false;
@@ -231,7 +236,7 @@
         _deleteMessage = $"Are you sure to delete \"{blog?.Title}\"";
         OpenDeletedModal = true;
     }
-    
+
     private async void OnConfirmDelete()
     {
         if (_selectedBlog is null) return;
@@ -318,6 +323,7 @@
     private async Task GetBlogs()
     {
         IsLoading = true;
+        StateHasChanged();
         var r = await BlogGetService.GetBlogs(BlogFilter, Paging);
         if (!r.IsOk)
         {
@@ -328,13 +334,26 @@
         IsLoading = false;
         StateHasChanged();
     }
-    
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         _requester = await AuthUtils.GetInfo(authenticationStateTask);
         _reason = (await ReasonBlogBlockService.ListAll()).Value;
+
+
         await GetBlogs();
+
+        _searchSubscription = _searchSubject
+            .Throttle(TimeSpan.FromMilliseconds(300))
+            .Subscribe(async content =>
+            {
+                await InvokeAsync(async () =>
+                {
+                    await GetBlogs();
+                    StateHasChanged();
+                });
+            });
     }
 
     private async Task OnRowClick(int id)
@@ -367,5 +386,11 @@
     }
 
 
+    private void Callback(ChangeEventArgs obj)
+    {
+        BlogFilter.Title =  obj?.Value?.ToString();
+        StateHasChanged();
+        _searchSubject.OnNext(obj?.Value?.ToString());
+    }
 
 }

@@ -10,4 +10,5 @@ public class BlogFilter
     public DateTime? GtUpdatedAt;
     public bool? IsPublished;
     public int? UserId;
+    public string? Title;
 }

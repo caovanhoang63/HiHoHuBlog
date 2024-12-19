@@ -199,6 +199,10 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
                     queryable = queryable.Where(b => b.UpdatedAt >= filter.GtUpdatedAt);
                 }
 
+                if (filter.Title is not null && filter.Title != "")
+                {
+                    queryable = queryable.Where(b => b.Title.StartsWith(filter.Title));
+                }
 
                 // if (filter.CategoryId is not null)
                 // {
