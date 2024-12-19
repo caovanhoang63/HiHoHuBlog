@@ -11,6 +11,7 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
 {
     private readonly DbSet<Entity.Blog> _dbSet = context.Set<Entity.Blog>();
     private readonly DbSet<Entity.UserLikeBlog> _dbSetULB = context.Set<Entity.UserLikeBlog>();
+    private readonly DbSet<Entity.UserBookmarkBlog> _dbSetUBB = context.Set<Entity.UserBookmarkBlog>();
     public async Task<Result<Unit, Err>> Create(BlogCreate blog)
     {
         try
@@ -564,14 +565,61 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
         {
             return Result<IEnumerable<BlogListProfile>?, Err>.Err(UtilErrors.InternalServerError(ex));
         }
-        
-        
-        /*var r =  await ListBlogs(filter, paging);
-        if (!r.IsOk)
+    }
+
+    public async Task<Result<IEnumerable<BlogListProfile>?, Err>> GetBlogListBookmark(BlogFilter? filter, Paging? paging)
+    {
+        try
         {
-            return Result<IEnumerable<BlogListProfile>?, Err>.Err(r.Error);
+            var queryable = _dbSetUBB.AsQueryable();
+            if (filter != null)
+            {
+                if (filter.UserId is not null)
+                {
+                    queryable = queryable.Where(b => b.UserId == filter.UserId);
+                }
+                
+            }
+
+            if (paging is null)
+            {
+                var result = await queryable
+                    .Include(b => b.Blog)
+                    .Select(b => b.Blog).ToListAsync();
+                return Result<IEnumerable<BlogListProfile>?, Err>.Ok(mapper.Map<IEnumerable<BlogListProfile>>(result));
+            }
+            
+            var totalCount = await queryable.CountAsync();
+            paging.Total = totalCount;
+
+            if (paging.Cursor != null)
+            {
+                queryable =  queryable.OrderByDescending(b=> b.BlogId).Where(b => b.BlogId < paging.Cursor);
+            }
+            else
+            {
+                queryable = queryable.OrderByDescending(b=> b.BlogId).Skip(paging.GetOffSet());
+            }
+            
+            var r = await queryable.Take(paging.PageSize)
+                .Include(b => b.Blog)
+                .Select(b => b.Blog).ToListAsync();
+
+            if (r.Count > 0)
+            {
+                paging.NextCursor = r[^1]?.Id - 1;
+            }
+            else
+            {
+                paging.NextCursor = null;
+            }
+            
+            return Result<IEnumerable<BlogListProfile>?, Err>.Ok(mapper.Map<IEnumerable<BlogListProfile>>(r));
         }
-        return Result<IEnumerable<BlogListProfile>?, Err>.Ok(mapper.Map<IEnumerable<BlogListProfile>>(r.Value));*/
+        catch (Exception ex)
+        {
+            return Result<IEnumerable<BlogListProfile>?, Err>.Err(UtilErrors.InternalServerError(ex));
+        }    
     }
 
     public async Task<Result<IEnumerable<UserCommentBlog>?, Err>> GetCommentsById(int blogId)

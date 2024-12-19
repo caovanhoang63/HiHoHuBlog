@@ -89,6 +89,16 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey(ulb => ulb.BlogId);
         modelBuilder.Entity<UserBookmarkBlog>()
             .HasKey(ulb=> new {ulb.UserId, ulb.BlogId});
+        
+        modelBuilder.Entity<UserBookmarkBlog>()
+            .HasOne(ubb => ubb.User)
+            .WithMany(u => u.UserBookmarkBlogs)
+            .HasForeignKey(ubb => ubb.UserId);
+
+        modelBuilder.Entity<UserBookmarkBlog>()
+            .HasOne(ubb => ubb.Blog)
+            .WithMany(b => b.UserBookmarkBlog)
+            .HasForeignKey(ubb => ubb.BlogId);
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
         {
             foreach (var property in entity.GetProperties())

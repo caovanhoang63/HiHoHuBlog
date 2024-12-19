@@ -10,6 +10,8 @@
 @layout MainLayout
 @inject IUserProfileService UserProfileService
 @inject IBlogGetService BlogGetService
+@inject NavigationManager NavigationManager
+
 <Container ContainerClass="flex justify-between space-x-10 max-w-7xl">
     <FullScreenSpinner IsLoading="IsLoading"></FullScreenSpinner>
     @if (!IsLoading)
@@ -64,22 +66,43 @@
                             }
                         }
                     </div>
-                    <input
-                        type="radio"
-                        name="my_tabs_1"
-                        role="tab"
-                        class="tab"
-                        aria-label="Bookmark"
-                        @onclick="ChangeUrlBookmark"/>
-                    <div class="grow max-w-4xl tab-content" role="tabpanel">
-                        @if (BlogListFavorite is not null)
+                    @{
+                        if (IsOwner)
                         {
-                        @foreach (var blog in BlogListFavorite)
-                        {
-                            <ProfileBlogCard BlogList="blog"/>
-                        }
-                        }
-                    </div>
+                            <input
+                                type="radio"
+                                name="my_tabs_1"
+                                role="tab"
+                                class="tab"
+                                aria-label="Bookmark"
+                                @onclick="ChangeUrlBookmark"/>
+                            <div class="grow max-w-4xl tab-content" role="tabpanel">
+                                @if (BlogListBookmark is not null)
+                                {
+                                    @foreach (var blog in BlogListBookmark)
+                                    {
+                                        <ProfileBlogCard BlogList="blog"/>
+                                    }
+                                }
+                            </div>
+                            <input
+                                type="radio"
+                                name="my_tabs_1"
+                                role="tab"
+                                class="tab"
+                                aria-label="Draft"
+                                @onclick="ChangeUrlUnPublish"/>
+                            <div class="grow max-w-4xl tab-content" role="tabpanel">
+                                @if (BlogListUnPublish is not null)
+                                {
+                                    @foreach (var blog in BlogListUnPublish)
+                                    {
+                                        <ProfileBlogCard BlogList="blog"/>
+                                    }
+                                }
+                            </div>
+                        }}
+                    
                 </div>
             </div>
         </div>
@@ -120,7 +143,8 @@
                         @foreach (var user in _userFollowing)
                         {
                             <li class="flex justify-between items-center">
-                                <a class="cursor-pointer link-hover" href="/profile/@user.UserName">
+                                <a class="cursor-pointer link-hover" @onclick='()=>OnNavClick($"/profile/{user.UserName}")'
+                                   >
                                     <div class="flex justify-between space-x-2">
                                         <div class="avatar pr-3">
                                             <div class="w-5 rounded-full">
@@ -154,6 +178,7 @@
     private Paging Paging { get; set; } = new Paging(0, 5);
     private BlogFilter Filter { get; set; }
     private BlogFilter FilterFavorite { get; set; }
+    private BlogFilter FilterUnPublish { get; set; }
 
     private List<UserList> _userFollower = new List<UserList>();
     private List<UserList> _userFollowing = new List<UserList>();
@@ -161,30 +186,43 @@
 
     [Parameter] public IEnumerable<BlogListProfile>? BlogList { get; set; } = null;
     [Parameter] public IEnumerable<BlogListProfile>? BlogListFavorite { get; set; } = null;
+    [Parameter] public IEnumerable<BlogListProfile>? BlogListBookmark { get; set; } = null;
+    [Parameter] public IEnumerable<BlogListProfile>? BlogListUnPublish { get; set; } = null;
     [CascadingParameter] Task<AuthenticationState> authenticationStateTask { get; set; }
     public IRequester? Requester;
     private bool IsOwner { get; set; } = false;
     private const string BaseImage = "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp";
     public bool IsLoading { get; set; } = false;
+
     protected override async Task OnInitializedAsync()
     {
         Requester = await AuthUtils.GetInfo(authenticationStateTask);
     }
+
     private void ChangeUrlHome()
     {
-        var url = $"profile/{Username}";
-        ChangeUrl(url);
+       // var url = $"profile/{Username}";
+       // ChangeUrl(url);
     }
+
     private void ChangeUrlFavorite()
     {
-        var url = $"profile/{Username}/favorite";
-        ChangeUrl(url);
+        //var url = $"profile/{Username}/favorite";
+        //ChangeUrl(url);
     }
+
     private void ChangeUrlBookmark()
     {
-        var url = $"profile/{Username}/bookmark";
-        ChangeUrl(url);
+        //var url = $"profile/{Username}/bookmark";
+        //ChangeUrl(url);
     }
+
+    private void ChangeUrlUnPublish()
+    {
+        //var url = $"profile/{Username}/draft";
+        //ChangeUrl(url);
+    }
+
     protected override async Task OnParametersSetAsync()
     {
         IsLoading = true;
@@ -196,41 +234,43 @@
         }
 
         UserProfile = r.Value;
+        if (Requester?.GetUsername() == Username) IsOwner = true;
         Filter = new BlogFilter()
         {
             Status = [1],
             TagId = null,
-            IsPublished = null,
+            IsPublished = true,
             UserId = UserProfile.Id,
         };
-
         FilterFavorite = new BlogFilter()
         {
             UserId = UserProfile.Id,
         };
+        FilterUnPublish = new BlogFilter()
+        {
+            UserId = UserProfile.Id,
+            IsPublished = false,
+        };
         Name = UserProfile.FirstName + " " + UserProfile.LastName;
         var i = await BlogGetService.GetBlogProfiles(Filter, Paging);
-        if (!r.IsOk)
-        {
-            return;
-        }
+        var u = await BlogGetService.GetBlogProfiles(FilterUnPublish, Paging);
+
 
         var f = await BlogGetService.GetBlogsFavorite(FilterFavorite, Paging);
-        if (!f.IsOk)
-        {
-            Console.WriteLine("loi "+ f.Error.Message );
-            return;
-        }
+
+        var b = await BlogGetService.GetBlogsBookmark(FilterFavorite, Paging);
+
         BlogList = i.Value;
         BlogListFavorite = f.Value;
-        if (Requester?.GetUsername() == Username) IsOwner = true;
+        BlogListBookmark = b.Value;
+        BlogListUnPublish = u.Value;
         StateHasChanged();
         IsLoading = false;
 
         var userFollowingR = await UserProfileService.GetFollowings(UserProfile.Id, new Paging(1, 5));
 
 
-        if (userFollowingR.IsOk && userFollowingR.Value!= null)
+        if (userFollowingR.IsOk && userFollowingR.Value != null)
         {
             _userFollowing = userFollowingR.Value.ToList();
         }
@@ -239,7 +279,15 @@
             Console.WriteLine(userFollowingR.Error);
         }
     }
-    void ChangeUrl(string url){
+
+    private void OnNavClick(string arg)
+    {
+        NavigationManager.NavigateTo($"{arg}",true);
+    }
+
+    void ChangeUrl(string url)
+    {
         JSRuntime.InvokeVoidAsync("ChangeUrl", url);
     }
+
 }

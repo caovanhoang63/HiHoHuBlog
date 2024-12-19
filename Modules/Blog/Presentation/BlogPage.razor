@@ -25,7 +25,6 @@
     <meta property="og:title"         content="@_blog?.Title" />
     <meta property="og:image"         content="@(_blog?.Thumbnail?.Url is null ? "https://placehold.co/600x400?text=Hihohublog" : _blog.Thumbnail.Url)" />
 </HeadContent>
-
 <div class="relative w-full h-fit">
 
     <a  onclick="document.body.scrollTop=0;document.documentElement.scrollTop=0;event.preventDefault()" class="btn btn-primary btn-circle fixed right-10 bottom-10">
@@ -33,24 +32,24 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
         </svg>
     </a>
-    <Container>
-        <ConfirmModal Open="OpenUnfollowModal" Title="Unfollow"
-                      Message="@_unfollowMessage" OnConfirm="OnConfirmUnFollow" OnDeny="OnDenyUnFollow">
-        </ConfirmModal>
-        <div class=" fixed flex inset-0 items-start mx-auto justify-end bg-gray-900 bg-opacity-50 rounded-lg z-[999999]  @(_isOpen ? " " : "hidden") "
-             @onclick="() => _isOpen = false">
-            <div class=" bg-white p-4  h-screen overflow-y-scroll" @onclick:stopPropagation="true">
-                <!-- Header -->
-                <div class="flex justify-between items-center mb-4">
-                    <h1 class="text-xl font-semibold">Responses (@_comments.Count)</h1>
-                    <div class="flex items-center gap-2">
-                        <button class="btn btn-ghost btn-circle" @onclick="() => _isOpen = false">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                            </svg>
-                        </button>
-                    </div>
+<Container>
+    <ConfirmModal Open="OpenUnfollowModal" Title="Unfollow"
+                  Message="@_unfollowMessage" OnConfirm="OnConfirmUnFollow" OnDeny="OnDenyUnFollow">
+    </ConfirmModal>
+    <div class=" fixed flex inset-0 items-start mx-auto justify-end bg-gray-900 bg-opacity-50 rounded-lg z-[999999]   @(_isOpen ? " " : "hidden") "
+         @onclick="() => _isOpen = false">
+        <div class=" bg-white p-4  h-screen overflow-y-scroll" @onclick:stopPropagation="true ">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-4">
+                <h1 class="text-xl font-semibold">Responses (@_comments.Count)</h1>
+                <div class="flex items-center gap-2">
+                    <button class="btn btn-ghost btn-circle" @onclick="() => _isOpen = false">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
                 </div>
+            </div>
 
                 <!-- Response Input -->
                 <div class="bg-base-200 rounded-lg p-4 mb-6">
@@ -75,73 +74,77 @@
 
             </div>
 
-        </div>
-        <FullScreenSpinner IsLoading="_isLoading"></FullScreenSpinner>
-        <div id="fb-root"></div>
-        <div class="container mx-auto px-4 py-8">
-            <!-- Header Section -->
-            <div class="mb-8">
-                <div class="flex justify-between">
-                    <h1 class="text-4xl font-bold mb-4">@_blog?.Title</h1>
-                    @{
-                        if (_requester?.GetId() == _blog?.UserId)
-                        {
-                            <div class="dropdown">
-                                <button tabindex="0" class="btn bg-white border-0">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
-                                    </svg>
-                                </button>
-                                <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
-
-                                    <li><a @onclick="HandleUnPublishBlog" href="/p/@_blog?.Id/edit">Sửa bài viết</a></li>
-                                    <li><a @onclick="HandleUnPublishBlog">Ẩn bài viết</a></li>
-                                </ul>
-                            </div>
-                        }
+    </div>
+    <FullScreenSpinner IsLoading="_isLoading"></FullScreenSpinner>
+    <div id="fb-root"></div>
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header Section -->
+        <div class="mb-8">
+            <div class="flex justify-between">
+                <h1 class="text-4xl font-bold mb-4">@_blog?.Title</h1>
+                @{
+                    if (_requester?.GetId() == _blog?.UserId)
+                    {
+                        <div class="dropdown">
+                            <button tabindex="0" class="btn bg-white border-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
+                                </svg>
+                            </button>
+                            <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+                        
+                                <li><a @onclick="HandleUnPublishBlog" href="/p/@_blog?.Id/edit">Sửa bài viết</a></li>
+                                @{
+                                    if (_blog?.IsPublished is true)
+                                    {
+                                        <li><a @onclick="HandleUnPublishBlog">Ẩn bài viết</a></li>
+                                    }}
+                            </ul>
+                        </div> 
                     }
-                </div>
-                <div class="flex items-center gap-4 mb-4">
-                    <div class="avatar" @onclick='() => NavigationManager.NavigateTo($"/profile/{_blog?.User?.UserName}")'>
-                        <div class="h-11 rounded-full">
-                            <img src="@(_blog?.User?.Avatar?.Url is null ? "https://placehold.co/600x400?text=Hihohublog" : _blog?.User?.Avatar?.Url)"/>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <span class="font-medium hover:underline cursor-pointer"
-                                  @onclick='() => NavigationManager.NavigateTo($"/profile/{_blog?.User?.UserName}")'>@_blog?.User?.FirstName @_blog?.User?.LastName</span>
-                            @*<button class="btn btn-sm btn-outline btn-primary  @(_isFollowed? "bg-amber-300":   "") " @onclick="onFollowClick">Follow</button>*@
-                            @if (_requester?.GetId() != _blog?.User?.Id)
-                            {
-                                <FollowButton IsFollow="_isFollowed" OnFollowClick="OnFollowClick"></FollowButton>
-                            }
-                        </div>
-                        <div class="text-sm text-gray-600">
-                            <span>@_blog?.MinToRead min read</span>
-                            <span class="mx-2">·</span>
-                            <span>@_blog?.CreatedAt</span>
-                        </div>
+                }
+            </div>
+            <div class="flex items-center gap-4 mb-4">
+                <div class="avatar" @onclick='() => NavigationManager.NavigateTo($"/profile/{_blog?.User?.UserName}")'>
+                    <div class="h-11 rounded-full">
+                        <img src="@(_blog?.User?.Avatar?.Url is null ? "https://placehold.co/600x400?text=Hihohublog" : _blog?.User?.Avatar?.Url)"/>
                     </div>
                 </div>
-                <div class="divider m-0"></div>
-                <div class="flex items-center gap-4">
+                <div>
                     <div class="flex items-center gap-2">
-                        <button class="btn btn-circle btn-ghost" @onclick="OnLikeClick">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 " fill="@(_isLiked ? "red" : "none")" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                            </svg>
-                        </button>
-                        <span>@_totalLikes</span>
+                        <span class="font-medium hover:underline cursor-pointer"
+                              @onclick='() => NavigationManager.NavigateTo($"/profile/{_blog?.User?.UserName}")'>@_blog?.User?.FirstName @_blog?.User?.LastName</span>
+                        @*<button class="btn btn-sm btn-outline btn-primary  @(_isFollowed? "bg-amber-300":   "") " @onclick="onFollowClick">Follow</button>*@
+                        @if (_requester?.GetId() != _blog?.User?.Id)
+                        {
+                            <FollowButton IsFollow="_isFollowed" OnFollowClick="OnFollowClick"></FollowButton>
+                        }
                     </div>
-                    <div class="flex items-center gap-2">
-                        <button class="btn btn-circle btn-ghost" @onclick="OnOpenComment">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                            </svg>
-                        </button>
-                        <span>@_totalComments</span>
+                    <div class="text-sm text-gray-600">
+                        <span>@_blog?.MinToRead min read</span>
+                        <span class="mx-2">·</span>
+                        <span>@_blog?.CreatedAt</span>
                     </div>
+                </div>
+            </div>
+            <div class="divider m-0"></div>
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <button class="btn btn-circle btn-ghost" @onclick="OnLikeClick">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 " fill="@(_isLiked ? "red" : "none")" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                        </svg>
+                    </button>
+                    <span>@_totalLikes</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="btn btn-circle btn-ghost" @onclick="OnOpenComment">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                    </button>
+                    <span>@_totalComments</span>
+                </div>
 
                     <div class="flex-grow"></div>
                     <div class="fb-share-button"
