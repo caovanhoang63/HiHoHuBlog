@@ -20,11 +20,11 @@
 @attribute [Authorize]
 @attribute [AllowAnonymous]
 <HeadContent>
-    <meta property="og:url"           content="https://www.hihohu.site/blog/@Slug" />
-    <meta property="og:type"          content="website" />
-    <meta property="og:title"         content="@_blog.Title" />
-    <meta property="og:description"   content="@_blog?.Content.Substring(0, 100)" />
-    <meta property="og:image"         content="@(_blog?.Thumbnail?.Url is null ? "https://placehold.co/600x400?text=Hihohublog" : _blog.Thumbnail.Url)" />
+    <meta property="og:url"                                         content="https://www.hihohu.site/blog/@Slug" />
+    <meta property="og:type"                                        content="website" />
+    <meta property="og:title"           id="fb-share-title"         content="" />
+    <meta property="og:description"     id="fb-share-description"   content="" />
+    <meta property="og:image"           id="fb-share-image"         content="" />
 </HeadContent>
 <Container>
     <ConfirmModal Open="OpenUnfollowModal" Title="Unfollow"
@@ -284,6 +284,8 @@
                 Console.WriteLine(isLiked.Error);
             }
             _isBookmarked = isBookmark.Value;
+
+            SetMetaData();
         }
     }
     private async Task OnBookmarkClick()
@@ -406,8 +408,25 @@
     void ChangeUrl(string url){
         JSRuntime.InvokeVoidAsync("ChangeUrl", url);
     }
-    
+
+
+    private async Task  SetMetaData()
+    {
+        await JSRuntime.InvokeVoidAsync("blazorSetFbShareMeta", DotNetObjectReference.Create(this), _blog.Title, _blog?.Content.Substring(0, 100), (_blog?.Thumbnail?.Url is null ? "https://placehold.co/600x400?text=Hihohublog" : _blog.Thumbnail.Url));
+    }
 }
+
+<script>
+    function blazorSetFbShareMeta(title, description, image) {
+        const fbShareTitle = document.querySelector('#fb-share-title');
+        const fbShareDescription = document.querySelector('#fb-share-description');
+        const fbShareImage = document.querySelector('#fb-share-image');
+        fbShareTitle.setAttribute('content', title);
+        fbShareDescription.setAttribute('content', description);
+        fbShareImage.setAttribute('content', image);
+
+    }
+</script>
 
 <script>(function(d, s, id) {
 var js, fjs = d.getElementsByTagName(s)[0];
