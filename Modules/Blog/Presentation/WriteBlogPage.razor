@@ -114,7 +114,7 @@
                     <button @onclick="AddTag" class="btn btn-success @(_blog.Id == 0 ? "btn-disabled" : " ") text-base-200 btn-sm ">Publish</button>
                 </div>
                 <div class="flex justify-between pt-5 ">
-                    <input value="@_blog.Title" @oninput="OnSearchQueryInput" placeholder="title" class="text-4xl w-full input focus:ring-0 border-transparent focus:border-transparent px-0 !outline-none"/>
+                    <input @oninput="OnSearchQueryInput" placeholder="title" class="text-4xl w-full input focus:ring-0 border-transparent focus:border-transparent px-0 !outline-none"/>
                 </div>
                 @if (_firstChange)
                 {
@@ -206,6 +206,7 @@
     private  void OnSearchQueryInput(ChangeEventArgs args)
     {
             _isSaving = true;
+            _blog.Title = args.Value?.ToString();
             var title = args.Value?.ToString();
             _titleSubject.OnNext(title?.Trim());
             _isSaving = false;
