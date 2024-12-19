@@ -32,12 +32,12 @@
             <Container ContainerClass="pb-80">
                 <FullScreenSpinner IsLoading="_isLoading"></FullScreenSpinner>
                 <!-- You can open the modal using ID.showModal() method -->
-                <dialog id="publish_modal" class="modal">
+                <dialog id="publish_modal" class="modal ">
                     <div class="w-full max-w-full h-full max-h-full bg-white flex justify-center items-center " >
                         <div class="modal-box bg-transparent max-w-5xl h-full p-10">
-                            <div class="flex">
-                                <div class="flex flex-col w-1/2 space-y-2 p-4">
-                                    <h3 class="text-lg font-bold pt-4">Story Preview</h3>
+                            <div class="sm:flex">
+                                <div class="flex flex-col sm:w-1/2 space-y-2 p-4">
+                                    <h3 class="text-lg font-bold pt-4">Blog Preview</h3>
                                     <div class="bg-gray-100 h-52 flex items-center text-center">
                                         @if (FirstImage is not null)
                                         {
@@ -58,7 +58,7 @@
                                         story appears in public places like HiHoHu’s 
                                         homepage and in subscribers’ inboxes — not the contents of the story itself.</p>
                                 </div>
-                                <div class="flex flex-col w-1/2 p-4 space-y-5">
+                                <div class="flex flex-col sm:w-1/2 p-4 space-y-5">
                                     <h3 class="text-lg font-bold pt-4">Publishing to: @_requester.GetUsername()</h3>
                                     <h3 class="text-sm font-medium">Add or change topics (up to 5) 
                                         so readers know what your story is about</h3>
@@ -115,12 +115,12 @@
                 <div class="flex flex-row-reverse pt-2">
                     <button @onclick="AddTag" class="btn btn-success @(_blog.Id == 0 ? "btn-disabled" : " ") text-base-200 btn-sm ">Publish</button>
                 </div>
-                <div class="flex justify-between pt-5 ">
+                <div class="flex justify-between pt-5 px-2 ">
                     <input value="@_title" @oninput="OnSearchQueryInput" placeholder="title" class="text-4xl w-full input focus:ring-0 border-transparent focus:border-transparent px-0 !outline-none"/>
                 </div>
                 @if (_firstChange)
                 {
-                    <div class="py-2">
+                    <div class="py-2 px-2 ">
                         @if (_isSaving)
                         {
                             <div class="flex align-middle text-gray-500 space-x-2">
