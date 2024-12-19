@@ -20,8 +20,8 @@
 @attribute [Authorize]
 @attribute [AllowAnonymous]
 <HeadContent>
-    <meta property="og:url"                                         content="https://www.hihohu.site/blog/@Slug" />
-    <meta property="og:type"                                        content="website" />
+    <meta property="og:url"           content="https://www.hihohu.site/blog/@Slug" />
+    <meta property="og:type"          content="website" />
     <meta property="og:title"         content="@_blog?.Title" />
     <meta property="og:image"         content="@(_blog?.Thumbnail?.Url is null ? "https://placehold.co/600x400?text=Hihohublog" : _blog.Thumbnail.Url)" />
 </HeadContent>
@@ -203,7 +203,6 @@
             </div>
            
             
-            @*Recommended from Medium Section*@
             <div class="divider m-0 "></div>
 
             <div class="divider mt-24 mb-20 w-screen relative left-1/2 -translate-x-1/2 m-0"></div>
