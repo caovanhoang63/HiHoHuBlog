@@ -1,4 +1,4 @@
-﻿# HIHOLive - Modern Blogging Platform
+﻿# HiHoHu - Modern Blogging Platform
 
 [![Build Status](https://github.com/caovanhoang63/HiHoHuBlog/workflows/ci/badge.svg)](https://github.com/caovanhoang63/HiHoHuBlog/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
