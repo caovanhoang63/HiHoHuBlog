@@ -95,6 +95,40 @@ public class EfTagRepository : ITagRepository
         }
     }
 
+    public async Task<Result<Unit, Err>> UpdateTotalBlogsForTagsAsync()
+    {
+        try
+        {
+            var tagCounts = await _context.BlogTags
+                .GroupBy(bt => bt.TagId)
+                .Select(group => new
+                {
+                    TagId = group.Key,
+                    TotalBlog = group.Count()
+                })
+                .ToListAsync();
+
+            foreach (var tagCount in tagCounts)
+            {
+                var tag = await _dbSet.FindAsync(tagCount.TagId);
+                if (tag != null)
+                {
+                    await _dbSet.
+                        Where(x => x.Id == tagCount.TagId).
+                        ExecuteUpdateAsync( t => t.SetProperty(u => u.TotalBlog,tagCount.TotalBlog));
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return Result<Unit, Err>.Ok(new Unit());
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error updating total blogs for tags: {ex.Message}");
+            return Result<Unit, Err>.Err(UtilErrors.InternalServerError(ex));
+        }
+    }
+
     public async Task<Result<IEnumerable<Entity.Tag>?, Err>> ListWithPaging(TagFilter? tagFilter, Paging paging)
     {
         try
