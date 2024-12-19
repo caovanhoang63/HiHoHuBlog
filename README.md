@@ -11,7 +11,6 @@ Hihohu is a modern blogging platform built with Blazor Server Side, inspired by 
 
 - **Production Site**: [https://wwww.hihohu.site](https://wwww.hihohu.site)
 
-[Rest of README content remains the same...]
 ## 🚀 Features
 
 - Real-time collaborative editing
@@ -46,6 +45,8 @@ Hihohu is a modern blogging platform built with Blazor Server Side, inspired by 
     - GitHub Actions (CI/CD)
     - Docker
     - Nginx
+  - **DNS** 
+    - Cloudflare
 
 ## DEV
 ```bash 
@@ -79,25 +80,13 @@ dotnet restore
 npm install
 ```
 
-3. Configure environment variables:
-```bash
-cp .env.example .env
-# Update .env with your configuration
-```
-
-4. Start local services:
+3. Start local services:
 ```bash
 docker-compose up -d
 ```
-
-5. Run database migrations:
+4. Start the application:
 ```bash
-dotnet ef database update
-```
-
-6. Start the application:
-```bash
-dotnet watch run --project src/HIHOLive.Web
+dotnet watch 
 ```
 
 ## 🚀 Deployment
@@ -138,7 +127,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🤝 Support
 
-For support, email support@hiholive.com or open an issue in the GitHub repository.
+For support, email caovanhoang204@gmail.com or open an issue in the GitHub repository.
 
 ## 🙏 Acknowledgments
 
@@ -146,6 +135,7 @@ For support, email support@hiholive.com or open an issue in the GitHub repositor
 - Tailwind CSS & Daisy UI Communities
 - AWS for cloud infrastructure
 - All contributors and supporters
+- Demo blogs from [Medium](https://medium.com), [Viblo](https://viblo.asia), ...
 
 
 ## Ref
