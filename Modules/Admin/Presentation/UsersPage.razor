@@ -261,6 +261,7 @@
     private async Task GetUsers()
     {
         _isLoading = true;
+        await InvokeAsync(StateHasChanged);
         var resultGetUsers = await UsersService.GetUsers(_filter, _paging);
         if (!resultGetUsers.IsOk)
         {

@@ -264,6 +264,7 @@
     private async Task GetTags()
     {
         _isLoading = true;
+        await InvokeAsync(StateHasChanged);
         var r  = await TagService.List(_requester!,_filter,_paging);
 
         if (!r.IsOk)
