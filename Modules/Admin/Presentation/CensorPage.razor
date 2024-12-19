@@ -10,6 +10,7 @@
 @using HiHoHuBlog.Components.Components
 @using HiHoHuBlog.Modules.Admin.Entity
 @using HiHoHuBlog.Modules.Admin.Service.Interface
+@using HiHoHuBlog.Modules.Blog.Service.Implementation
 @using HiHoHuBlog.Modules.Search.Entity
 @using HiHoHuBlog.Modules.Search.Repository.Interface
 @using HiHoHuBlog.Modules.Search.Service.Interface
@@ -18,6 +19,7 @@
 @inject IBlogGetService BlogGetService
 @inject IToastService ToastService
 @inject IBlogDeleteService BlogDeleteService
+@inject IBlogUpdateService BlogUpdateService
 @inject NavigationManager NavigationManager
 @inject IReasonBlogBlockService ReasonBlogBlockService
 @inject IBlogBlockedService BlogBlockedService
@@ -43,7 +45,7 @@
 
                     <div>
                         <label class="input w-80 ml-5 input-bordered input-sm flex items-center gap-2 bg-white">
-                            <input  @oninput="Callback"  type="text" class="grow " placeholder="Search"/>
+                            <input   @oninput="OnSearch"  type="text" class="grow " placeholder="Search"/>
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 viewBox="0 0 16 16"
@@ -112,7 +114,9 @@
                             <td class="w-36">@blog.PublishedAt</td>
                             <td class="w-16">
                                 <label>
-                                    <input checked="@blog.IsPublished" type="checkbox" class="checkbox checkbox-md"/>
+                                    <input @onclick:stopPropagation="true"
+                                           @onclick:preventDefault="true"
+                                           @onclick="() =>OnCheckPublish(blog)"  checked="@blog.IsPublished" type="checkbox" class="checkbox checkbox-md"/>
                                 </label>
                             </td>
                             <td class="w-20">
@@ -388,11 +392,28 @@
     }
 
 
-    private void Callback(ChangeEventArgs obj)
+    private void OnSearch(ChangeEventArgs obj)
     {
         BlogFilter.Title =  obj?.Value?.ToString();
         StateHasChanged();
         _searchSubject.OnNext(obj?.Value?.ToString());
+    }
+
+    private async Task  OnCheckPublish( BlogList blog)
+    {
+        if (!blog.IsPublished) return;
+
+        var r = await BlogUpdateService.UnPublish(_requester, blog.Id);
+
+        if (r.IsOk)
+        {
+            blog.IsPublished = false;
+        }
+        else
+        {
+            ToastService.ShowError(r.Error.Message);
+            Console.WriteLine(r.Error);
+        }
     }
 
 }
