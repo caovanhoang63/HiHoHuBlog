@@ -114,7 +114,7 @@
                     <button @onclick="AddTag" class="btn btn-success @(_blog.Id == 0 ? "btn-disabled" : " ") text-base-200 btn-sm ">Publish</button>
                 </div>
                 <div class="flex justify-between pt-5 ">
-                    <input value="@_blog.Title" @oninput="OnSearchQueryInput" placeholder="title" class="text-4xl w-full input focus:ring-0 border-transparent focus:border-transparent px-0 !outline-none"/>
+                    <input value="@_title" @oninput="OnSearchQueryInput" placeholder="title" class="text-4xl w-full input focus:ring-0 border-transparent focus:border-transparent px-0 !outline-none"/>
                 </div>
                 @if (_firstChange)
                 {
@@ -154,6 +154,7 @@
     TextEditor? _textEditor;
     
     private bool _isLoading = false;
+    private string? _title = "";
     private IDisposable? _titleSubscription;
     private IDisposable? _contentSubscription;
     private readonly Subject<string?> _titleSubject = new();
@@ -206,8 +207,9 @@
     private  void OnSearchQueryInput(ChangeEventArgs args)
     {
             _isSaving = true;
-            var title = args.Value?.ToString();
-            _titleSubject.OnNext(title?.Trim());
+            _blog.Title = args.Value?.ToString();
+            _title = args.Value?.ToString();
+            _titleSubject.OnNext(args.Value?.ToString()?.Trim());
             _isSaving = false;
     }
 
@@ -239,6 +241,7 @@
             _blog.Title = r.Value.Title;
             _blog.UserId = r.Value.UserId;
             _blog.Content = r.Value.Content;
+            _title = _blog.Title;
             if (_textEditor is null)
             {
                 NavigationManager.NavigateTo("error");
@@ -292,7 +295,7 @@
                     }
                     else
                     {
-                        var r = await BlogUpdateService.UpdateTitle(_requester, _blog.Id, title);
+                        var r = await BlogUpdateService.UpdateTitle(_requester, _blog.Id, _blog.Title);
                     }
                     _isSaving = false;
                     StateHasChanged();

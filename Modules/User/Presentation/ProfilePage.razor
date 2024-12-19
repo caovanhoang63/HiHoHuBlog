@@ -1,15 +1,12 @@
 @page "/profile/{Username}"
-@using HiHoHuBlog.Components.Layout
 @using HiHoHuBlog.Components.Components
+@using HiHoHuBlog.Components.Layout
 @using HiHoHuBlog.Modules.Blog.Entity
-@using HiHoHuBlog.Modules.Blog.Presentation.Components
-@using HiHoHuBlog.Modules.Blog.Service.Implementation
 @using HiHoHuBlog.Modules.Blog.Service.Interface
 @using HiHoHuBlog.Modules.User.Entity
-@using HiHoHuBlog.Modules.User.Service.Implementation
+@using HiHoHuBlog.Modules.User.Presentation.components
 @using HiHoHuBlog.Modules.User.Service.Interface
 @using HiHoHuBlog.Utils
-@using HiHoHuBlog.Modules.User.Presentation.components
 @layout MainLayout
 @inject IUserProfileService UserProfileService
 @inject IBlogGetService BlogGetService
@@ -120,25 +117,28 @@
                 <div class="mt-6">
                     <span class=" font-medium font-sans text-base ">Following</span>
                     <ul class="mt-2">
-                        <li class="flex justify-between items-center">
-                            <a class="cursor-pointer link-hover" href="">
-                                <div class="flex justify-between space-x-2">
-                                    <div class="avatar pr-3">
-                                        <div class="w-5 rounded-full">
-                                            <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-                                                 alt="Tailwind CSS Navbar component"/>
+                        @foreach (var user in _userFollowing)
+                        {
+                            <li class="flex justify-between items-center">
+                                <a class="cursor-pointer link-hover" href="/profile/@user.UserName">
+                                    <div class="flex justify-between space-x-2">
+                                        <div class="avatar pr-3">
+                                            <div class="w-5 rounded-full">
+                                                <img src="@user.Avatar?.Url"
+                                                     alt="Tailwind CSS Navbar component"/>
+                                            </div>
                                         </div>
+                                        <span class="font-medium font-sans text-sm ">@user.FirstName @user.LastName</span>
                                     </div>
-                                    <span class="font-medium font-sans text-sm ">Sylvain Tiset</span>
-                                </div>
-                            </a>
+                                </a>
+                                <button class="btn bg-white btn-sm border-0 px-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
+                                    </svg>
+                                </button>
+                            </li>
+                        }
 
-                            <button class="btn bg-white btn-sm border-0 px-0">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
-                                </svg>
-                            </button>
-                        </li>
                     </ul>
                 </div>
 
@@ -154,6 +154,11 @@
     private Paging Paging { get; set; } = new Paging(0, 5);
     private BlogFilter Filter { get; set; }
     private BlogFilter FilterFavorite { get; set; }
+
+    private List<UserList> _userFollower = new List<UserList>();
+    private List<UserList> _userFollowing = new List<UserList>();
+
+
     [Parameter] public IEnumerable<BlogListProfile>? BlogList { get; set; } = null;
     [Parameter] public IEnumerable<BlogListProfile>? BlogListFavorite { get; set; } = null;
     [CascadingParameter] Task<AuthenticationState> authenticationStateTask { get; set; }
@@ -221,6 +226,18 @@
         if (Requester.GetUsername() == Username) IsOwner = true;
         StateHasChanged();
         IsLoading = false;
+
+        var userFollowingR = await UserProfileService.GetFollowings(UserProfile.Id, new Paging(1, 5));
+
+
+        if (userFollowingR.IsOk && userFollowingR.Value!= null)
+        {
+            _userFollowing = userFollowingR.Value.ToList();
+        }
+        else
+        {
+            Console.WriteLine(userFollowingR.Error);
+        }
     }
     void ChangeUrl(string url){
         JSRuntime.InvokeVoidAsync("ChangeUrl", url);

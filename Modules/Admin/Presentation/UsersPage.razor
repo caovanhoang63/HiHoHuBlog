@@ -1,4 +1,6 @@
-﻿@page "/users"
+﻿@page "/admin/users"
+@using System.Reactive.Linq
+@using System.Reactive.Subjects
 @using HiHoHuBlog.Components.Components
 @using HiHoHuBlog.Components.Layout
 @using HiHoHuBlog.Modules.Tag.Service.Interface
@@ -66,7 +68,7 @@
                 <div class="flex mb-5 flex-row-reverse align-middle space-x-5">
                     <div>
                         <label class="input w-80 ml-5 input-bordered input-sm flex items-center gap-2 bg-white">
-                            <input type="text" class="grow " placeholder="Search"/>
+                            <input @oninput="OnSearch" type="text" class="grow " placeholder="Search"/>
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 viewBox="0 0 16 16"
@@ -193,12 +195,16 @@
     [CascadingParameter]
     Task<AuthenticationState>? AuthenticationStateTask { get; set; }
     [Parameter] public string Reason { get; set; } = "";
+    private readonly Subject<string?> _searchSubject = new();
+    private IDisposable? _searchSubscription;
     private IRequester? _requester = null;
     private IEnumerable<UserList>? _users;
     private readonly Paging _paging = new Paging(1,20);
     private string? _newRole = "";
     private bool _isLoading = false;
     private UserList? _selectedUser = null;
+
+
     private readonly UserFilter _filter = new UserFilter()
     {
         Status = new int[]
@@ -255,6 +261,7 @@
     private async Task GetUsers()
     {
         _isLoading = true;
+        await InvokeAsync(StateHasChanged);
         var resultGetUsers = await UsersService.GetUsers(_filter, _paging);
         if (!resultGetUsers.IsOk)
         {
@@ -279,6 +286,18 @@
         }
         _requester = await AuthUtils.GetInfo(AuthenticationStateTask);
         await GetUsers();
+
+
+        _searchSubscription = _searchSubject
+            .Throttle(TimeSpan.FromMilliseconds(300))
+            .Subscribe(async content =>
+            {
+                await InvokeAsync(async () =>
+                {
+                    await GetUsers();
+                    StateHasChanged();
+                });
+            });
     }
 
     private async Task OnDelete()
@@ -332,6 +351,14 @@
        // await JSRuntime.InvokeVoidAsync("closeModal", "update_modal");
         await InvokeAsync(StateHasChanged);
     }
+
+    private void OnSearch(ChangeEventArgs obj)
+    {
+        _filter.Email =  obj?.Value?.ToString();
+        StateHasChanged();
+        _searchSubject.OnNext(obj?.Value?.ToString());
+    }
+
 }
 
 <script>

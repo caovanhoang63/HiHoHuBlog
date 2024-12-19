@@ -1,9 +1,13 @@
+using HiHoHuBlog.Utils;
+
 namespace HiHoHuBlog.Modules.Blog.Entity;
 
 public class BlogDetail
 {
     public int Id { get; set; }
     public int UserId { get; set; }
+    public Image? Thumbnail  {get; set; }
+
     public string Title { get; set; }
     public string Content { get; set; }
     public UserDto? User { get; set; }
@@ -14,6 +18,7 @@ public class BlogDetail
     public int TotalLike { get; set; } = 0;
     public int TotalComment { get; set; } = 0;
     public int TotalFollower { get; set; } = 0;
+
     public int TotalFollowing { get; set; } = 0;
     public int MinToRead { get; set; } = 0;
     public int Status { get; set; } = 1;

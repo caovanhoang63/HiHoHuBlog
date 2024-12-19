@@ -3,6 +3,7 @@ using HiHoHuBlog.Modules.User.Entity;
 using HiHoHuBlog.Utils;
 using Microsoft.EntityFrameworkCore;
 using HiHoHuBlog.Utils;
+using Nest;
 using Newtonsoft.Json;
 
 namespace HiHoHuBlog.Modules.User.Repository.Implementation;
@@ -70,6 +71,11 @@ public class EfRepo  : IUserRepository
             if (filter.GtUpdatedAt is not null)
             {
                 queryable = queryable.Where(b => b.UpdatedAt >= filter.GtUpdatedAt);
+            }
+
+            if (filter.Email is not null && filter.Email != "")
+            {
+                queryable = queryable.Where(b => b.Email.StartsWith(filter.Email));
             }
         }
 
@@ -203,6 +209,41 @@ public class EfRepo  : IUserRepository
             return Result<UserSettingsProfile?, Err>.Err(UtilErrors.InternalServerError(e));
         }
     }
+
+    public async Task<Result<IEnumerable<UserList>?, Err>> GetFollower(int userId, Paging paging)
+    {
+        try
+        {
+            var user = await _dbContext.UserFollows
+                .Join(_dbSet,u => u.UserId, u => u.Id,(uf,u) => new {uf,u})
+                .Where(u => u.uf.UserFollowing == userId)
+                .Skip(paging.GetOffSet()).Take(paging.PageSize).Select(u => u.u).ToListAsync();
+
+            return Result<IEnumerable<UserList>?, Err>.Ok(_mapper.Map<IEnumerable<UserList>?>(user) );
+        }
+        catch (Exception e)
+        {
+            return Result<IEnumerable<UserList>?, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+    }
+
+    public async Task<Result<IEnumerable<UserList>?, Err>> GetFollowing(int userId, Paging paging)
+    {
+        try
+        {
+            var user = await _dbContext.UserFollows
+                .Join(_dbSet,u => u.UserFollowing, u => u.Id,(uf,u) => new {uf,u})
+                .Where(u => u.uf.UserId == userId)
+                .Skip(paging.GetOffSet()).Take(paging.PageSize).Select(u => u.u).ToListAsync();
+
+            return Result<IEnumerable<UserList>?, Err>.Ok(_mapper.Map<IEnumerable<UserList>?>(user) );
+        }
+        catch (Exception e)
+        {
+            return Result<IEnumerable<UserList>?, Err>.Err(UtilErrors.InternalServerError(e));
+        }
+    }
+
 
     public async Task<Result<Unit, Err>> UpdatePassword(string email, string password)
     {

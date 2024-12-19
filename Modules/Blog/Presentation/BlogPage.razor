@@ -19,6 +19,13 @@
 @inject IUserFollowService UserFollowService
 @attribute [Authorize]
 @attribute [AllowAnonymous]
+<HeadContent>
+    <meta property="og:url"                                         content="https://www.hihohu.site/blog/@Slug" />
+    <meta property="og:type"                                        content="website" />
+    <meta property="og:title"           id="fb-share-title"         content="" />
+    <meta property="og:description"     id="fb-share-description"   content="" />
+    <meta property="og:image"           id="fb-share-image"         content="" />
+</HeadContent>
 <Container>
     <ConfirmModal Open="OpenUnfollowModal" Title="Unfollow"
                   Message="@_unfollowMessage" OnConfirm="OnConfirmUnFollow" OnDeny="OnDenyUnFollow">
@@ -63,6 +70,7 @@
 
     </div>
     <FullScreenSpinner IsLoading="_isLoading"></FullScreenSpinner>
+    <div id="fb-root"></div>
     <div class="container mx-auto px-4 py-8">
         <!-- Header Section -->
         <div class="mb-8">
@@ -129,6 +137,10 @@
                 </div>
 
                 <div class="flex-grow"></div>
+                <div class="button fb-share-button"
+                     data-href="https://www.hihohu.site/blog/@Slug"
+                     data-layout="button_count">
+                </div>
                 <button class="btn btn-circle btn-ghost" @onclick="OnBookmarkClick">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="@(_isBookmarked ? "yellow" : "none")" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"/>
@@ -146,7 +158,6 @@
 
         @* Content *@
         <div>
-
             @if (_blog is not null)
             {
                 <TextEditor @key="_blog.Id" @ref="_textEditor" ReadOnly="true">
@@ -232,11 +243,8 @@
     private int? _totalComments { get; set; } = 0;
     private string _commentText = string.Empty;
 
-
-
     private List<UserCommentBlog> _comments = new List<UserCommentBlog>();
-    
-    
+
     private async Task OnOpenComment()
     {
         var result = await BlogUpdateService.GetCommentsById(_blog.Id);
@@ -334,6 +342,8 @@
                 Console.WriteLine(isLiked.Error);
             }
             _isBookmarked = isBookmark.Value;
+
+            SetMetaData();
         }
         await InvokeAsync(StateHasChanged);
 
@@ -503,5 +513,30 @@
     void ChangeUrl(string url){
         JSRuntime.InvokeVoidAsync("ChangeUrl", url);
     }
-    
+
+
+    private async Task  SetMetaData()
+    {
+        await JSRuntime.InvokeVoidAsync("blazorSetFbShareMeta", DotNetObjectReference.Create(this), _blog.Title, _blog?.Content.Substring(0, 100), (_blog?.Thumbnail?.Url is null ? "https://placehold.co/600x400?text=Hihohublog" : _blog.Thumbnail.Url));
+    }
 }
+
+<script>
+    function blazorSetFbShareMeta(title, description, image) {
+        const fbShareTitle = document.querySelector('#fb-share-title');
+        const fbShareDescription = document.querySelector('#fb-share-description');
+        const fbShareImage = document.querySelector('#fb-share-image');
+        fbShareTitle.setAttribute('content', title);
+        fbShareDescription.setAttribute('content', description);
+        fbShareImage.setAttribute('content', image);
+
+    }
+</script>
+
+<script>(function(d, s, id) {
+var js, fjs = d.getElementsByTagName(s)[0];
+if (d.getElementById(id)) return;
+js = d.createElement(s); js.id = id;
+js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>

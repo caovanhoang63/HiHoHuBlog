@@ -23,4 +23,30 @@ public class UserProfileService(IUserRepository userRepository) : IUserProfileSe
         
         return Result<UserProfile?, Err>.Ok(r.Value);
     }
+
+    public async Task<Result<IEnumerable<UserList>?,Err>> GetFollowers(int userId,Paging paging)
+    {
+
+        var r = await userRepository.GetFollower(userId,paging);
+        if (!r.IsOk)
+        {
+            return Result<IEnumerable<UserList>?, Err>.Err(r.Error);
+        }
+
+
+        return Result<IEnumerable<UserList>?, Err>.Ok(r.Value);
+    }
+
+    public async Task<Result<IEnumerable<UserList>?,Err>> GetFollowings(int userId,Paging paging)
+    {
+
+        var r = await userRepository.GetFollowing(userId,paging);
+        if (!r.IsOk)
+        {
+            return Result<IEnumerable<UserList>?, Err>.Err(r.Error);
+        }
+
+
+        return Result<IEnumerable<UserList>?, Err>.Ok(r.Value);
+    }
 }

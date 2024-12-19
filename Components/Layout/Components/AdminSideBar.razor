@@ -2,24 +2,7 @@
 @rendermode InteractiveServer
 <ul class="menu w-40 p-2 sticky top-0">
     <li>
-        <a class="@(ActivePage == "/dashboard" ? "active" : "")" @onclick='() => Nav("/dashboard")'>
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-            </svg>
-            Home
-        </a>
-    </li>
-    <li>
-        <a class="@(ActivePage == "/censor" ? "active" : "")" @onclick='() => Nav("/censor")'>
+        <a class="@(ActivePage == "/admin/censor" ? "active" : "")" @onclick='() => Nav("/admin/censor")'>
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="h-5 w-5"
@@ -36,24 +19,7 @@
         </a>
     </li>
     <li>
-        <a class="@(ActivePage == "/trend" ? "active" : "")" @onclick='() => Nav("/trend")'>
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            Trend
-        </a>
-    </li>
-    <li>
-        <a class="@(ActivePage == "/users" ? "active" : "")" @onclick='() => Nav("/users")'>
+        <a class="@(ActivePage == "/admin/users" ? "active" : "")" @onclick='() => Nav("/admin/users")'>
             <svg xmlns="http://www.w3.org/2000/svg"
                  fill="none"
                  viewBox="0 0 24 24"
@@ -68,24 +34,7 @@
         </a>
     </li>
     <li>
-        <a class="@(ActivePage == "/report" ? "active" : "")" @onclick='() => Nav("/report")'>
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                class="h-5 w-5"
-                stroke="currentColor">
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 0-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5" />
-            </svg>
-            Report
-        </a>
-    </li>
-    <li>
-        <a class="@(ActivePage == "/tags" ? "active" : "")" @onclick='() => Nav("/tags")'>
+        <a class="@(ActivePage == "/admin/tags" ? "active" : "")" @onclick='() => Nav("/admin/tags")'>
             <svg 
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -101,7 +50,7 @@
         </a>
     </li>
     <li>
-        <a class="@(ActivePage == "/email" ? "active" : "")" @onclick='() => Nav("/email")'>
+        <a class="@(ActivePage == "/admin/email" ? "active" : "")" @onclick='() => Nav("/admin/email")'>
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -115,7 +64,7 @@
         </a>
     </li>
     <li>
-        <a class="@(ActivePage == "/setting" ? "active" : "")" @onclick='() => Nav("/setting")'>
+        <a class="@(ActivePage == "/admin/setting" ? "active" : "")" @onclick='() => Nav("/admin/setting")'>
             <svg 
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none" 
@@ -133,7 +82,7 @@
 
 @code {
     [Parameter]
-    public string ActivePage { get; set; } = "/dashboard";
+    public string ActivePage { get; set; } = "/admin/censor";
 
     private void Nav(string page)
     {

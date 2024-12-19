@@ -133,7 +133,12 @@ public class BlogUpdateService(IBlogRepository blogRepo) : IBlogUpdateService
         {
             return Result<Unit, Err>.Err(old.Error);
         }
-        
+
+        if (old.Value?.UserId != requester.GetId() || requester.GetSystemRole() != "admin")
+        {
+            return Result<Unit, Err>.Err(UtilErrors.ErrNoPermission());
+        }
+
         var r = await _blogRepo.UnPublish(id);
         
         if (!r.IsOk)
