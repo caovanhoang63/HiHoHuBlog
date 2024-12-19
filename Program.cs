@@ -141,9 +141,9 @@ Console.WriteLine(builder.Configuration.GetConnectionString("DefaultConnection")
 builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
             new MySqlServerVersion("8.0.35"))
-    // .LogTo(Console.WriteLine, LogLevel.Information)
-    // .EnableSensitiveDataLogging()
-    // .EnableDetailedErrors()
+    .LogTo(Console.WriteLine, LogLevel.Information)
+    .EnableSensitiveDataLogging()
+    .EnableDetailedErrors()
     );
 
 builder.Services.AddBlazoredToast();

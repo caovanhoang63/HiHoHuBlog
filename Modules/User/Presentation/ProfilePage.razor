@@ -227,7 +227,7 @@
         StateHasChanged();
         IsLoading = false;
 
-        var userFollowingR = await UserProfileService.GetFollowers(UserProfile.Id, new Paging(1, 5));
+        var userFollowingR = await UserProfileService.GetFollowings(UserProfile.Id, new Paging(1, 5));
 
 
         if (userFollowingR.IsOk && userFollowingR.Value!= null)
