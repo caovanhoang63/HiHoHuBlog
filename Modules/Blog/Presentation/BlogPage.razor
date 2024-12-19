@@ -22,9 +22,6 @@
 <HeadContent>
     <meta property="og:url"                                         content="https://www.hihohu.site/blog/@Slug" />
     <meta property="og:type"                                        content="website" />
-    @* <meta property="og:title"           id="fb-share-title"         content="" /> *@
-    @* <meta property="og:description"     id="fb-share-description"   content="" /> *@
-    @* <meta property="og:image"           id="fb-share-image"         content="" /> *@
     <meta property="og:title"         content="@_blog?.Title" />
     <meta property="og:image"         content="@(_blog?.Thumbnail?.Url is null ? "https://placehold.co/600x400?text=Hihohublog" : _blog.Thumbnail.Url)" />
 </HeadContent>
@@ -296,6 +293,7 @@
     {
         if (firstRender)
         {
+            await JSRuntime.InvokeVoidAsync("faceBookShareDSK", DotNetObjectReference.Create(this));
         }
     }
 
@@ -438,10 +436,14 @@
     }
 </script>
 
-<script>(function(d, s, id) {
-var js, fjs = d.getElementsByTagName(s)[0];
-if (d.getElementById(id)) return;
-js = d.createElement(s); js.id = id;
-js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
-fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));</script>
+<script>
+    function faceBookShareDSK() {
+        (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    }
+</script>
