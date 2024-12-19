@@ -40,6 +40,7 @@
                                 <ProfileBlogCard BlogList="blog"/>
                             }
                         }
+                        <Pagination Paging="OwnBlogPaging" FetchDataAsync="GetBlogProfile" ></Pagination>
                     </div>
                     @*<input
                         type="radio"
@@ -65,6 +66,7 @@
                                 <ProfileBlogCard BlogList="blog"/>
                             }
                         }
+                        <Pagination Paging="FavoritePaging" FetchDataAsync="GetFavoriteBlog"></Pagination>
                     </div>
                     @{
                         if (IsOwner)
@@ -84,6 +86,8 @@
                                         <ProfileBlogCard BlogList="blog"/>
                                     }
                                 }
+                                <Pagination Paging="BookmarkBlogPaging" FetchDataAsync="GetMarkedBlog" ></Pagination>
+
                             </div>
                             <input
                                 type="radio"
@@ -100,9 +104,10 @@
                                         <ProfileBlogCard BlogList="blog"/>
                                     }
                                 }
+                                <Pagination Paging="DraftBlogPaging" FetchDataAsync="GetDraftBlog" ></Pagination>
+
                             </div>
                         }}
-                    
                 </div>
             </div>
         </div>
@@ -175,7 +180,10 @@
     [Parameter] public string Username { get; set; }
     public string Name { get; set; }
     public UserProfile UserProfile { get; set; }
-    private Paging Paging { get; set; } = new Paging(0, 5);
+    private Paging OwnBlogPaging { get; set; } = new Paging(1, 4);
+    private Paging FavoritePaging { get; set; } = new Paging(1, 4);
+    private Paging BookmarkBlogPaging { get; set; } = new Paging(1, 4);
+    private Paging DraftBlogPaging { get; set; } = new Paging(1, 4);
     private BlogFilter Filter { get; set; }
     private BlogFilter FilterFavorite { get; set; }
     private BlogFilter FilterUnPublish { get; set; }
@@ -252,20 +260,11 @@
             IsPublished = false,
         };
         Name = UserProfile.FirstName + " " + UserProfile.LastName;
-        var i = await BlogGetService.GetBlogProfiles(Filter, Paging);
-        var u = await BlogGetService.GetBlogProfiles(FilterUnPublish, Paging);
 
-
-        var f = await BlogGetService.GetBlogsFavorite(FilterFavorite, Paging);
-
-        var b = await BlogGetService.GetBlogsBookmark(FilterFavorite, Paging);
-
-        BlogList = i.Value;
-        BlogListFavorite = f.Value;
-        BlogListBookmark = b.Value;
-        BlogListUnPublish = u.Value;
-        StateHasChanged();
-        IsLoading = false;
+        await GetBlogProfile();
+        await GetMarkedBlog();
+        await GetFavoriteBlog();
+        await GetDraftBlog();
 
         var userFollowingR = await UserProfileService.GetFollowings(UserProfile.Id, new Paging(1, 5));
 
@@ -278,6 +277,48 @@
         {
             Console.WriteLine(userFollowingR.Error);
         }
+    }
+
+    private async Task GetBlogProfile()
+    {
+        IsLoading = true;
+        StateHasChanged();
+        var i = await BlogGetService.GetBlogProfiles(Filter, OwnBlogPaging);
+        BlogList = i.Value;
+        IsLoading = false;
+        StateHasChanged();
+    }
+
+
+    private async Task GetDraftBlog()
+    {
+        IsLoading = true;
+        StateHasChanged();
+        var u = await BlogGetService.GetBlogProfiles(FilterUnPublish, DraftBlogPaging);
+        BlogListUnPublish = u.Value;
+        IsLoading = false;
+        StateHasChanged();
+    }
+
+
+    private async Task GetFavoriteBlog()
+    {
+        IsLoading = true;
+        StateHasChanged();
+        var f = await BlogGetService.GetBlogsFavorite(FilterFavorite, FavoritePaging);
+        BlogListFavorite = f.Value;
+        IsLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task GetMarkedBlog()
+    {
+        IsLoading = true;
+        StateHasChanged();
+        var b = await BlogGetService.GetBlogsBookmark(FilterFavorite, BookmarkBlogPaging);
+        BlogListBookmark = b.Value;
+        IsLoading = false;
+        StateHasChanged();
     }
 
     private void OnNavClick(string arg)
