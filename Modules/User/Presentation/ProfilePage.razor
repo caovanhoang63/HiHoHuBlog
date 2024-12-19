@@ -12,22 +12,23 @@
 @inject IBlogGetService BlogGetService
 @inject NavigationManager NavigationManager
 
-<Container ContainerClass="flex justify-between space-x-10 max-w-7xl">
+<Container ContainerClass="flex sm:flex-row flex-col-reverse  justify-between sm:space-x-10 max-w-7xl">
+    @* <div class="sm:flex flex-col-reverse"></div> *@
     <FullScreenSpinner IsLoading="IsLoading"></FullScreenSpinner>
     @if (!IsLoading)
     {
-        <div class="max-w-4xl py-10 w-full">
-            <div class="flex flex-col justify-between space-y-10 px-8 mt-3 mb-4">
+        <div class="max-w-4xl sm:py-10 w-full">
+            <div class="flex flex-col justify-between space-y-10 sm:px-8 px-2 mt-3 mb-4">
                 <div class="flex justify-between">
-                    <span class="font-medium font-sans text-5xl">@Name</span>
-                    <button class="btn bg-white border-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
-                        </svg>
-                    </button>
+                    <span class="sm:visible invisible font-medium font-sans text-5xl">@Name</span>
+                    @* <button class="btn bg-white border-0"> *@
+                    @*     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"> *@
+                    @*         <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/> *@
+                    @*     </svg> *@
+                    @* </button> *@
                 </div>
             </div>
-            <div class="flex flex-col justify-between space-y-10 px-8 mt-3 mb-4">
+            <div class="flex flex-col justify-between space-y-10 sm:px-8 px-2 mt-3 mb-4">
                 <div role="tablist" class="tabs tabs-bordered">
                     <input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="Home" checked="checked"
                     @onclick="ChangeUrlHome"
@@ -111,7 +112,7 @@
                 </div>
             </div>
         </div>
-        <div class="border-l-[1px] grow p-10 max-w-sm">
+        <div class="sm:border-l-[1px] grow sm:p-10 p-5 max-w-sm">
             <div class="flex flex-col sticky top-20">
                 <div class="avatar">
                     <div class="w-24 rounded-full">
