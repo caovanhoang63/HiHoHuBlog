@@ -20,12 +20,18 @@
 @attribute [Authorize]
 @attribute [AllowAnonymous]
 <HeadContent>
-    <meta property="og:url"                                         content="https://www.hihohu.site/blog/@Slug" />
-    <meta property="og:type"                                        content="website" />
-    <meta property="og:title"           id="fb-share-title"         content="" />
-    <meta property="og:description"     id="fb-share-description"   content="" />
-    <meta property="og:image"           id="fb-share-image"         content="" />
+    <meta property="og:url"           content="https://www.hihohu.site/blog/@Slug" />
+    <meta property="og:type"          content="website" />
+    <meta property="og:title"         content="@_blog?.Title" />
+    <meta property="og:image"         content="@(_blog?.Thumbnail?.Url is null ? "https://placehold.co/600x400?text=Hihohublog" : _blog.Thumbnail.Url)" />
 </HeadContent>
+<div class="relative w-full h-fit">
+
+    <a  onclick="document.body.scrollTop=0;document.documentElement.scrollTop=0;event.preventDefault()" class="btn btn-primary btn-circle fixed right-10 bottom-10">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
+        </svg>
+    </a>
 <Container>
     <ConfirmModal Open="OpenUnfollowModal" Title="Unfollow"
                   Message="@_unfollowMessage" OnConfirm="OnConfirmUnFollow" OnDeny="OnDenyUnFollow">
@@ -45,28 +51,28 @@
                 </div>
             </div>
 
-            <!-- Response Input -->
-            <div class="bg-base-200 rounded-lg p-4 mb-6">
-                <div class="flex items-center justify-between space-x-2">
-                    <textarea type="text"
-                           @bind="_commentText"
-                           @bind:event="oninput"
-                           placeholder="What are your thoughts?"
-                           class="input input-ghost w-full max-w-xs"></textarea>
-                    <button class="btn btn-primary" @onclick="OnSubmitComment">Comment</button>
+                <!-- Response Input -->
+                <div class="bg-base-200 rounded-lg p-4 mb-6">
+                    <div class="flex items-center justify-between space-x-2">
+                        <textarea type="text"
+                              @bind="_commentText"
+                              @bind:event="oninput"
+                              placeholder="What are your thoughts?"
+                              class="input input-ghost w-full max-w-xs"></textarea>
+                        <button class="btn btn-primary" @onclick="OnSubmitComment">Comment</button>
+                    </div>
                 </div>
+
+                <!-- Response List -->
+                <div class="space-y-4">
+                    @foreach (var comment in _comments)
+                    {
+                        <CommentContent UserCommentBlog="comment"></CommentContent>
+                    }
+
+                </div>
+
             </div>
-
-            <!-- Response List -->
-            <div class="space-y-4">
-                @foreach (var comment in _comments)
-                {
-                <CommentContent UserCommentBlog="comment"></CommentContent>
-                }
-
-            </div>
-
-        </div>
 
     </div>
     <FullScreenSpinner IsLoading="_isLoading"></FullScreenSpinner>
@@ -140,89 +146,90 @@
                     <span>@_totalComments</span>
                 </div>
 
-                <div class="flex-grow"></div>
-                <div class="button fb-share-button"
-                     data-href="https://www.hihohu.site/blog/@Slug"
-                     data-layout="button_count">
-                </div>
-                <button class="btn btn-circle btn-ghost" @onclick="OnBookmarkClick">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="@(_isBookmarked ? "yellow" : "none")" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"/>
-                    </svg>
-                </button>
-                @*<button class="btn btn-circle btn-ghost">
+                    <div class="flex-grow"></div>
+                    <div class="fb-share-button"
+                         data-href="https://www.hihohu.site/blog/@Slug"
+                         data-layout="button_count">
+                    </div>
+                    <button class="btn btn-circle btn-ghost" @onclick="OnBookmarkClick">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="@(_isBookmarked ? "yellow" : "none")" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"/>
+                        </svg>
+                    </button>
+                    @*<button class="btn btn-circle btn-ghost">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
                     </svg>
                 </button>*@
-            </div>
-            <div class="divider m-0"></div>
-
-        </div>
-
-        @* Content *@
-        <div>
-            @if (_blog is not null)
-            {
-                <TextEditor @key="_blog.Id" @ref="_textEditor" ReadOnly="true">
-                    <EditorContent>
-                        @((@MarkupString)_blog.Content)
-                    </EditorContent>
-                </TextEditor>
-            }
-        </div>
-        <div class="divider m-0 "></div>
-        <div class="container mx-auto px-4 py-8">
-            <!-- Header -->
-            <header class="flex items-center justify-between mb-8">
-                <div class="flex items-center gap-4 mb-4">
-                    <div class="avatar">
-                        <div class="h-11 rounded-full">
-                            <img src="@(_blog?.User?.Avatar?.Url is null ? "https://placehold.co/600x400?text=Hihohublog" : _blog?.User?.Avatar?.Url)" alt="avatar"/>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <span class="font-bold text-2xl">Written by @_blog?.User?.FirstName @_blog?.User?.LastName</span>
-                        </div>
-                        <div class="text-sm text-gray-600">
-                            <span>@_blog?.TotalFollower Followers</span>
-                            <span class="mx-2">·</span>
-                            <span>@_blog?.TotalFollowing Following</span>
-                        </div>
-                    </div>
                 </div>
-                @if(_requester?.GetId() !=_blog?.User?.Id)
+                <div class="divider m-0"></div>
+
+            </div>
+
+            @* Content *@
+            <div>
+                @if (_blog is not null)
                 {
-                    <FollowButton IsFollow="_isFollowed" OnFollowClick="OnFollowClick"></FollowButton>
-                }            
-                </header>
-            @* More From this Author Section *@
-            <span class="font-bold text-2xl">More from @_blog?.User?.FirstName @_blog?.User?.LastName</span>
-            <!-- Articles -->
-            <div class="grid grid-cols-2 mt-8 gap-8">
-                @foreach (var blog in _authorBlogs)
-                {
-                    <BlogRelatedCard Blog="blog"/>
+                    <TextEditor @key="_blog.Id" @ref="_textEditor" ReadOnly="true">
+                        <EditorContent>
+                            @((@MarkupString)_blog.Content)
+                        </EditorContent>
+                    </TextEditor>
                 }
             </div>
-           
-            
-            @*Recommended from Medium Section*@
             <div class="divider m-0 "></div>
+            <div class="container mx-auto px-4 py-8">
+                <!-- Header -->
+                <header class="flex items-center justify-between mb-8">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="avatar">
+                            <div class="h-11 rounded-full">
+                                <img src="@(_blog?.User?.Avatar?.Url is null ? "https://placehold.co/600x400?text=Hihohublog" : _blog?.User?.Avatar?.Url)" alt="avatar"/>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-2xl">Written by @_blog?.User?.FirstName @_blog?.User?.LastName</span>
+                            </div>
+                            <div class="text-sm text-gray-600">
+                                <span>@_blog?.TotalFollower Followers</span>
+                                <span class="mx-2">·</span>
+                                <span>@_blog?.TotalFollowing Following</span>
+                            </div>
+                        </div>
+                    </div>
+                    @if (_requester?.GetId() != _blog?.User?.Id)
+                    {
+                        <FollowButton IsFollow="_isFollowed" OnFollowClick="OnFollowClick"></FollowButton>
+                    }
+                </header>
+                @* More From this Author Section *@
+                <span class="font-bold text-2xl">More from @_blog?.User?.FirstName @_blog?.User?.LastName</span>
+                <!-- Articles -->
+                <div class="grid grid-cols-2 mt-8 gap-8">
+                    @foreach (var blog in _authorBlogs)
+                    {
+                        <BlogRelatedCard Blog="blog"/>
+                    }
+                </div>
 
-            <div class="divider mt-24 mb-20 w-screen relative left-1/2 -translate-x-1/2 m-0"></div>
-            <span class="font-bold text-2xl">Recommended from HiHoHu</span>
-            <!-- Articles -->
-            <div class="grid grid-cols-2 mt-8 gap-8">
-                @foreach (var blog in _relatedBlog)
-                {
-                    <BlogRelatedCard Blog="blog"/>
-                }
+
+                <div class="divider m-0 "></div>
+
+                <div class="divider mt-24 mb-20 w-screen relative left-1/2 -translate-x-1/2 m-0"></div>
+                <span class="font-bold text-2xl">Recommended from HiHoHu</span>
+                <!-- Articles -->
+                <div class="grid grid-cols-2 mt-8 gap-8">
+                    @foreach (var blog in _relatedBlog)
+                    {
+                        <BlogRelatedCard Blog="blog"/>
+                    }
+                </div>
             </div>
         </div>
-    </div>
-</Container>
+    </Container>
+</div>
+
 
 @code {
     [Parameter]
@@ -236,7 +243,7 @@
     private readonly Paging _relatedPaging = new Paging(1, 4);
     private readonly Paging _authorPaging = new Paging(1, 4);
     private IRequester? _requester;
-    private BlogDetail _blog { get; set; }
+    private BlogDetail _blog { get; set; } = new BlogDetail();
     private int? _totalLikes = 0;
     private bool _isOpen = false;
     private bool _isLiked = false;
@@ -346,14 +353,24 @@
                 Console.WriteLine(isLiked.Error);
             }
             _isBookmarked = isBookmark.Value;
+        }
 
-            SetMetaData();
+
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("faceBookShareDSK", DotNetObjectReference.Create(this));
         }
         await InvokeAsync(StateHasChanged);
 
         _isLoading = false;
 
     }
+
     private async Task OnBookmarkClick()
     {
         if (_requester is not null)
@@ -530,17 +547,20 @@
         const fbShareTitle = document.querySelector('#fb-share-title');
         const fbShareDescription = document.querySelector('#fb-share-description');
         const fbShareImage = document.querySelector('#fb-share-image');
-        fbShareTitle.setAttribute('content', title);
-        fbShareDescription.setAttribute('content', description);
-        fbShareImage.setAttribute('content', image);
-
+        fbShareTitle.content = title;
+        fbShareDescription.content =  description;
+        fbShareImage.content=  image;
     }
 </script>
 
-<script>(function(d, s, id) {
-var js, fjs = d.getElementsByTagName(s)[0];
-if (d.getElementById(id)) return;
-js = d.createElement(s); js.id = id;
-js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
-fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));</script>
+<script>
+    function faceBookShareDSK() {
+        (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    }
+</script>

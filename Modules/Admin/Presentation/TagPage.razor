@@ -285,7 +285,6 @@
     {
 
         await base.OnInitializedAsync();
-        await TagService.UpdateTotalBlogsForTagsAsync();
 
         if (AuthenticationStateTask is null)
         {
