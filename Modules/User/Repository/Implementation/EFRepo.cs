@@ -71,6 +71,11 @@ public class EfRepo  : IUserRepository
             {
                 queryable = queryable.Where(b => b.UpdatedAt >= filter.GtUpdatedAt);
             }
+
+            if (filter.Email is not null && filter.Email != "")
+            {
+                queryable = queryable.Where(b => b.Email.StartsWith(filter.Email));
+            }
         }
 
         if (paging is not null)
