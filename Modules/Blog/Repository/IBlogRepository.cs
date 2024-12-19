@@ -23,7 +23,12 @@ public interface IBlogRepository
     Task<Result<Unit,Err>> UpdateTotalLikes(int id);
     Task<Result<Unit,Err>> LikeBlog(int userId,int blogId);
     Task<Result<Unit,Err>> DislikeBlog(int userId,int blogId);
-    Task<Result<bool,Err>> IsLiked(int userId,int blogId);
+    Task<Result<bool,Err>> IsLiked(int userId,int blogId); 
+    Task<Result<Unit,Err>> UpdateTotalBookmarks(int blogId);
+
+    Task<Result<Unit,Err>> BookmarkBlog(int userId,int blogId);
+    Task<Result<Unit,Err>> UnBookmarkBlog(int userId,int blogId);
+    Task<Result<bool,Err>> IsBookmarked(int userId,int blogId);
     
     Task<Result<Unit,Err>> UpdateTotalComments(int id);
     Task<Result<Unit,Err>> Comment(int userId,int blogId,string content);
