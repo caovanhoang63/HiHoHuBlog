@@ -1,4 +1,6 @@
 @page "/admin/tags"
+@using System.Reactive.Linq
+@using System.Reactive.Subjects
 @using HiHoHuBlog.Components.Layout
 @using HiHoHuBlog.Modules.Admin.Entity
 @using HiHoHuBlog.Modules.Admin.Service.Interface
@@ -61,7 +63,7 @@
                 <div class="flex mb-5 flex-row-reverse align-middle space-x-5">
                     <div>
                         <label class="input w-80 ml-5 input-bordered input-sm flex items-center gap-2 bg-white">
-                            <input type="text" class="grow " placeholder="Search"/>
+                            <input @oninput="OnSearch" type="text" class="grow " placeholder="Search"/>
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 viewBox="0 0 16 16"
@@ -181,6 +183,8 @@
     [CascadingParameter]
     Task<AuthenticationState>? AuthenticationStateTask { get; set; }
     [Parameter] public string Reason { get; set; } = "";
+    private readonly Subject<string?> _searchSubject = new();
+    private IDisposable? _searchSubscription;
     private IRequester? _requester = null;
     private IEnumerable<Tag>? _tags;
     private readonly Paging _paging = new Paging(1,20);
@@ -192,7 +196,8 @@
         Status = new int[]
         {
             1
-        }
+        },
+        Name = ""
     };
 
     private async void OnClickReactive(Tag tag)
@@ -277,7 +282,6 @@
     
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
         if (AuthenticationStateTask is null)
         {
             NavigationManager.NavigateTo("/error");
@@ -285,6 +289,18 @@
         }
         _requester = await AuthUtils.GetInfo(AuthenticationStateTask);
         await GetTags();
+
+
+        _searchSubscription = _searchSubject
+            .Throttle(TimeSpan.FromMilliseconds(300))
+            .Subscribe(async content =>
+            {
+                await InvokeAsync(async () =>
+                {
+                    await GetTags();
+                    StateHasChanged();
+                });
+            });
     }
 
     private async Task OnDelete()
@@ -310,6 +326,13 @@
         _selectedTag = null;
         await JSRuntime.InvokeVoidAsync("closeModal", "delete_modal");
         await InvokeAsync(StateHasChanged);
+    }
+
+    private void OnSearch(ChangeEventArgs obj)
+    {
+        _filter.Name =  obj?.Value?.ToString();
+        StateHasChanged();
+        _searchSubject.OnNext(obj?.Value?.ToString());
     }
 
 }

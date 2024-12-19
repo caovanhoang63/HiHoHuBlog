@@ -81,6 +81,11 @@ public class EfTagRepository : ITagRepository
                 {
                     queryable = queryable.Where(b => b.UpdatedAt >= tagFilter.GtUpdatedAt);
                 }
+
+                if (tagFilter.Name is not null && tagFilter.Name != "")
+                {
+                    queryable = queryable.Where(b => b.Name.StartsWith(tagFilter.Name));
+                }
             }
             
             
@@ -106,6 +111,29 @@ public class EfTagRepository : ITagRepository
                 if (tagFilter.Status is not null)
                 {
                     queryable = queryable.Where(t => tagFilter.Status.Contains(t.Status));
+                }
+
+                if (tagFilter.LtCreatedAt is not null)
+                {
+                    queryable = queryable.Where(b => b.CreatedAt <= tagFilter.LtCreatedAt);
+                }
+                if (tagFilter.GtCreatedAt is not null)
+                {
+                    queryable = queryable.Where(b => b.CreatedAt >= tagFilter.GtCreatedAt);
+                }
+
+                if (tagFilter.LtUpdatedAt is not null)
+                {
+                    queryable = queryable.Where(b => b.UpdatedAt <= tagFilter.LtUpdatedAt);
+                }
+                if (tagFilter.GtUpdatedAt is not null)
+                {
+                    queryable = queryable.Where(b => b.UpdatedAt >= tagFilter.GtUpdatedAt);
+                }
+
+                if (tagFilter.Name is not null && tagFilter.Name != "")
+                {
+                    queryable = queryable.Where(b => b.Name.StartsWith(tagFilter.Name));
                 }
             }
             
