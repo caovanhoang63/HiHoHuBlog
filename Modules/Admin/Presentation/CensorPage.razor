@@ -41,7 +41,7 @@
             <BlogModal Close="Close" Open="IsOpenDetailModal" Blog="Blog"></BlogModal>
             <BlogFilterModal BlogFilter="BlogFilter" Open="IsOpenFilterModal" OnConfirm="OnConfirmFilter" OnDeny="OnDenyFilter" ></BlogFilterModal>
             @* content *@
-            <div class="flex flex-col max-h-full">
+            <div class="flex flex-col flex-grow max-h-full">
                 @* Search bar *@
                 <div class="flex mb-5 flex-row-reverse align-middle space-x-5">
 
@@ -84,7 +84,7 @@
 
                 </div>
                 @* Table *@
-                <div class="overflow-y-scroll">
+                <div class="flex-grow overflow-y-scroll">
                     <table class="table table-xs text-center">
                         <thead class="sticky top-0 z-50 bg-white">
                         <tr class="font-bold">
@@ -151,7 +151,7 @@
                                     </svg>
                                 </a>
                             </td>
-                            <td class="w-20 relative">
+                            <td class="w-20 ">
                                 <div @onclick:stopPropagation="true" class="dropdown dropdown-hover dropdown-bottom dropdown-end">
                                     <a tabindex="0" role="button">
                                         <svg xmlns="http://www.w3.org/2000/svg"
@@ -162,7 +162,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"/>
                                         </svg>
                                     </a>
-                                    <ul tabindex="0" class="absolute dropdown-content menu bg-base-100 rounded-box z-50 w-40 p-2 shadow">
+                                    <ul tabindex="0" class="absolute dropdown-content menu bg-base-100 rounded-box z-40 w-40 p-2 shadow">
                                         @if (blog.Status != (int)Status.Active)
                                         {
                                         <li class="text-success">
