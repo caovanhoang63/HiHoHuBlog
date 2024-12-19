@@ -7,9 +7,14 @@
 Hihohu is a modern blogging platform built with Blazor Server Side, inspired by Medium's user experience. It provides a seamless writing and reading experience with powerful search capabilities and robust cloud infrastructure.
 
 
+## Members
+- **[Cao Văn Hoàng](https://github.com/caovanhoang63)**
+- **[Bùi Trọng Hoàng Huy](https://github.com/BuiTrongHoangHuy)**
+- **[Nguyễn Huỳnh Duy Hiếu](https://github.com/nhdhieuu)**
+
 ## 🔗 Demo
 
-- **Production Site**: [https://wwww.hihohu.site](https://wwww.hihohu.site)
+- **Production Site**: [https://wwww.hihohu.site](https://www.hihohu.site)
 
 ## 🚀 Features
 
