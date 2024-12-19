@@ -11,6 +11,7 @@
 @using HiHoHuBlog.Modules.Blog.Service.Interface
 @using HiHoHuBlog.Modules.Search.Entity
 @using HiHoHuBlog.Modules.Search.Service.Interface
+@using HiHoHuBlog.Modules.Tag.Service.Interface
 @using HiHoHuBlog.Modules.User.Entity
 @using HiHoHuBlog.Utils
 @using Toolbar = HiHoHuBlog.Modules.Blog.Presentation.Components.TextEditor.Toolbar
@@ -23,6 +24,7 @@
 @inject IToastService ToastService
 @inject ISearchTagService SearchTagService
 @inject IBlogTagService BlogTagService
+@inject ITagService TagService
 @attribute [Authorize]
 <AuthorizeView Roles="admin, user, mod">
     <Authorized>
@@ -341,7 +343,8 @@
                 //ToastService.ShowError(aR.Error.Message);
             }
         }
-        
+        await TagService.UpdateTotalBlogsForTagsAsync();
+
         ToastService.ShowSuccess("Publish success!");
         NavigationManager.NavigateTo($"blog/{_blog.Id}",true);
     }
