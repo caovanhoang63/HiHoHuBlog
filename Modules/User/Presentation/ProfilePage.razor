@@ -197,13 +197,28 @@
         }
 
         UserProfile = r.Value;
-        Filter = new BlogFilter()
+        if (Requester.GetUsername() == Username) IsOwner = true;
+        if (IsOwner)
         {
-            Status = [1],
-            TagId = null,
-            IsPublished = null,
-            UserId = UserProfile.Id,
-        };
+            Filter = new BlogFilter()
+            {
+                Status = [1],
+                TagId = null,
+                IsPublished = null,
+                UserId = UserProfile.Id,
+            };
+        }
+        else
+        {
+            Filter = new BlogFilter()
+            {
+                Status = [1],
+                TagId = null,
+                IsPublished = true,
+                UserId = UserProfile.Id,
+            };
+        }
+        
 
         FilterFavorite = new BlogFilter()
         {
@@ -220,7 +235,6 @@
         BlogList = i.Value;
         BlogListFavorite = f.Value;
         BlogListBookmark = b.Value;
-        if (Requester.GetUsername() == Username) IsOwner = true;
         StateHasChanged();
         IsLoading = false;
 
