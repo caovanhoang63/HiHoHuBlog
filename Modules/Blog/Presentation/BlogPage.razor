@@ -30,13 +30,70 @@
     <ConfirmModal Open="OpenUnfollowModal" Title="Unfollow"
                   Message="@_unfollowMessage" OnConfirm="OnConfirmUnFollow" OnDeny="OnDenyUnFollow">
     </ConfirmModal>
-    <CommentSection TotalComments="_totalComments" IsOpen="_isOpen" comments="_comments" OnClose='() => _isOpen = false' Blog="_blog" Requester="_requester"></CommentSection>
+    <div class=" fixed flex inset-0 items-start mx-auto justify-end bg-gray-900 bg-opacity-50 rounded-lg z-[999999]  @(_isOpen ? " " : "hidden") "
+         @onclick="() => _isOpen = false">
+        <div class=" bg-white p-4  h-screen overflow-y-scroll" @onclick:stopPropagation="true ">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-4">
+                <h1 class="text-xl font-semibold">Responses (@_comments.Count)</h1>
+                <div class="flex items-center gap-2">
+                    <button class="btn btn-ghost btn-circle" @onclick="() => _isOpen = false">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Response Input -->
+            <div class="bg-base-200 rounded-lg p-4 mb-6">
+                <div class="flex items-center justify-between space-x-2">
+                    <textarea type="text"
+                           @bind="_commentText"
+                           @bind:event="oninput"
+                           placeholder="What are your thoughts?"
+                           class="input input-ghost w-full max-w-xs"></textarea>
+                    <button class="btn btn-primary" @onclick="OnSubmitComment">Comment</button>
+                </div>
+            </div>
+
+            <!-- Response List -->
+            <div class="space-y-4">
+                @foreach (var comment in _comments)
+                {
+                <CommentContent UserCommentBlog="comment"></CommentContent>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
     <FullScreenSpinner IsLoading="_isLoading"></FullScreenSpinner>
     <div id="fb-root"></div>
     <div class="container mx-auto px-4 py-8">
         <!-- Header Section -->
         <div class="mb-8">
-            <h1 class="text-4xl font-bold mb-4">@_blog?.Title</h1>
+            <div class="flex justify-between">
+                <h1 class="text-4xl font-bold mb-4">@_blog?.Title</h1>
+                @{
+                    if (_requester?.GetId() == _blog?.UserId)
+                    {
+                        <div class="dropdown">
+                            <button tabindex="0" class="btn bg-white border-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
+                                </svg>
+                            </button>
+                            <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+                        
+                                <li><a @onclick="HandleUnPublishBlog" href="/p/@_blog?.Id/edit">Sửa bài viết</a></li>
+                                <li><a @onclick="HandleUnPublishBlog">Ẩn bài viết</a></li>
+                            </ul>
+                        </div> 
+                    }
+                }
+            </div>
             <div class="flex items-center gap-4 mb-4">
                 <div class="avatar" @onclick='() => NavigationManager.NavigateTo($"/profile/{_blog?.User?.UserName}")'>
                     <div class="h-11 rounded-full">
@@ -45,14 +102,14 @@
                 </div>
                 <div>
                     <div class="flex items-center gap-2">
-                        <span class="font-medium hover:underline"
+                        <span class="font-medium hover:underline cursor-pointer"
                               @onclick='() => NavigationManager.NavigateTo($"/profile/{_blog?.User?.UserName}")'>@_blog?.User?.FirstName @_blog?.User?.LastName</span>
                         @*<button class="btn btn-sm btn-outline btn-primary  @(_isFollowed? "bg-amber-300":   "") " @onclick="onFollowClick">Follow</button>*@
-                        @if(_requester?.GetId() !=_blog?.User?.Id)
+                        @if (_requester?.GetId() != _blog?.User?.Id)
                         {
                             <FollowButton IsFollow="_isFollowed" OnFollowClick="OnFollowClick"></FollowButton>
                         }
-                        </div>
+                    </div>
                     <div class="text-sm text-gray-600">
                         <span>@_blog?.MinToRead min read</span>
                         <span class="mx-2">·</span>
@@ -68,7 +125,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                         </svg>
                     </button>
-                    <span>@_blog?.TotalLike</span>
+                    <span>@_totalLikes</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <button class="btn btn-circle btn-ghost" @onclick="OnOpenComment">
@@ -86,7 +143,7 @@
                 </div>
                 <button class="btn btn-circle btn-ghost" @onclick="OnBookmarkClick">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="@(_isBookmarked ? "yellow" : "none")" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"/>
                     </svg>
                 </button>
                 @*<button class="btn btn-circle btn-ghost">
@@ -117,7 +174,7 @@
                 <div class="flex items-center gap-4 mb-4">
                     <div class="avatar">
                         <div class="h-11 rounded-full">
-                            <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"/>
+                            <img src="@(_blog?.User?.Avatar?.Url is null ? "https://placehold.co/600x400?text=Hihohublog" : _blog?.User?.Avatar?.Url)" alt="avatar"/>
                         </div>
                     </div>
                     <div>
@@ -125,7 +182,7 @@
                             <span class="font-bold text-2xl">Written by @_blog?.User?.FirstName @_blog?.User?.LastName</span>
                         </div>
                         <div class="text-sm text-gray-600">
-                            <span>@_blog?.TotalFollowers Followers</span>
+                            <span>@_blog?.TotalFollower Followers</span>
                             <span class="mx-2">·</span>
                             <span>@_blog?.TotalFollowing Following</span>
                         </div>
@@ -148,8 +205,10 @@
            
             
             @*Recommended from Medium Section*@
+            <div class="divider m-0 "></div>
+
             <div class="divider mt-24 mb-20 w-screen relative left-1/2 -translate-x-1/2 m-0"></div>
-            <span class="font-bold text-2xl">Recommended from Medium</span>
+            <span class="font-bold text-2xl">Recommended from HiHoHu</span>
             <!-- Articles -->
             <div class="grid grid-cols-2 mt-8 gap-8">
                 @foreach (var blog in _relatedBlog)
@@ -181,13 +240,13 @@
     private bool _isBookmarked = false;
     private string _unfollowMessage = "";
     public bool OpenUnfollowModal { get; set; } = false;
-    private int? _totalComments = 0;
+    private int? _totalComments { get; set; } = 0;
+    private string _commentText = string.Empty;
 
     private List<UserCommentBlog> _comments = new List<UserCommentBlog>();
 
     private async Task OnOpenComment()
     {
-        _isOpen = !_isOpen;
         var result = await BlogUpdateService.GetCommentsById(_blog.Id);
         if (result.IsOk)
         {
@@ -199,6 +258,7 @@
             }
                 
         }
+        _isOpen = !_isOpen;
     }
     
     protected override async Task OnInitializedAsync()
@@ -230,9 +290,8 @@
         }
 
         _blog = r.Value;
-        _isLoading = false;
         _totalComments = _blog.TotalComment;
-        await InvokeAsync(StateHasChanged);
+        //await InvokeAsync(StateHasChanged);
         
         var relatedBlog = await SearchBlogService.RecommendSearchBlogByBlog(null, _blog.Id, _relatedPaging);
 
@@ -248,7 +307,6 @@
             _authorBlogs = authorBlog.Value;
         }
         
-        await InvokeAsync(StateHasChanged);
         
         
 
@@ -287,6 +345,10 @@
 
             SetMetaData();
         }
+        await InvokeAsync(StateHasChanged);
+
+        _isLoading = false;
+
     }
     private async Task OnBookmarkClick()
     {
@@ -377,6 +439,8 @@
                 _isLiked = !_isLiked;
                 _totalLikes--;
             }
+
+            StateHasChanged();
         }
         else
         {
@@ -405,6 +469,47 @@
         OpenUnfollowModal= false;
     }
     
+    private async void OnSubmitComment()
+    {
+
+        if (_requester != null && !string.IsNullOrWhiteSpace(_commentText) && _blog != null)
+        {
+
+            var response = await BlogUpdateService.Comments(_requester.GetId(), _blog.Id, _commentText);
+            if (response.IsOk)
+            {
+                _commentText = string.Empty;
+                var result = await BlogUpdateService.GetCommentsById(_blog.Id);
+                if (result.IsOk)
+                {
+                    
+                    if (result.Value != null)
+                    {
+                        _comments = result.Value.ToList();
+                        _totalComments = _comments.Count;
+                        await InvokeAsync(StateHasChanged);
+                    }
+                }
+                _commentText = string.Empty;
+            }
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/login?ReturnUrl=%2Fblog/{Slug}");
+        }
+        StateHasChanged();
+    }
+
+    private async void HandleUnPublishBlog()
+    {
+
+        var r = await BlogUpdateService.UnPublish(_requester, _blog.Id);
+        if (!r.IsOk)
+        {
+            ToastService.ShowError(r.Error.Message);
+        }
+
+    }
     void ChangeUrl(string url){
         JSRuntime.InvokeVoidAsync("ChangeUrl", url);
     }

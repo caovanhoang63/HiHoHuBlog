@@ -10,4 +10,5 @@ public interface ITagRepository
     Task<Result<Unit, Err>> Delete(int id);
     Task<Result<IEnumerable<Entity.Tag>?,Err>> ListWithPaging(TagFilter? tagFilter,Paging paging);
     Task<Result<IEnumerable<Entity.Tag>?, Err>> FindWithFilter(TagFilter? tagFilter);
+    Task<Result<Unit, Err>> UpdateTotalBlogsForTagsAsync();
 }

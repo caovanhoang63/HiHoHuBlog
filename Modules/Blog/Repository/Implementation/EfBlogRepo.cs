@@ -107,8 +107,14 @@ public class EfBlogRepo(IMapper mapper, ApplicationDbContext context) : IBlogRep
         try
         {
             var entity = await _dbSet.Include(b=>b.User).SingleOrDefaultAsync(b => b.Id == id);
-            
-            return Result<BlogDetail?, Err>.Ok(mapper.Map<Entity.Blog?,BlogDetail>(entity));
+            var blogDetail = mapper.Map<BlogDetail>(entity);
+            if (entity?.User != null)
+            {
+                blogDetail.TotalFollower = entity.User.TotalFollower;
+                blogDetail.TotalFollowing = entity.User.TotalFollowing;
+            }
+
+            return Result<BlogDetail?, Err>.Ok(blogDetail);
         }
         catch (Exception e)
         {

@@ -44,4 +44,14 @@ public class TagService(ITagRepository tagRepo) : ITagService
         
         return Result<IEnumerable<Entity.Tag>?, Err>.Ok(r.Value);
     }
+
+    public async Task<Result<Unit, Err>> UpdateTotalBlogsForTagsAsync()
+    {
+        
+        var r = await _tagRepo.UpdateTotalBlogsForTagsAsync();
+        if (!r.IsOk) return Result<Unit, Err>.Err(r.Error);
+        
+        return Result<Unit, Err>.Ok(new Unit());
+
+    }
 }

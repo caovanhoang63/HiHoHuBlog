@@ -283,12 +283,17 @@
     
     protected override async Task OnInitializedAsync()
     {
+
+        await base.OnInitializedAsync();
+        await TagService.UpdateTotalBlogsForTagsAsync();
+
         if (AuthenticationStateTask is null)
         {
             NavigationManager.NavigateTo("/error");
             return;
         }
         _requester = await AuthUtils.GetInfo(AuthenticationStateTask);
+        
         await GetTags();
 
 
