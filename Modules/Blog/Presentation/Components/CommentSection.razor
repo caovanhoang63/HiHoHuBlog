@@ -6,7 +6,7 @@
 @inject NavigationManager NavigationManager
 <div class=" fixed flex inset-0 items-start mx-auto justify-end bg-gray-900 bg-opacity-50 rounded-lg z-[999999]  @(IsOpen ? " " : "hidden") "
      @onclick="OnClose">
-    <div class=" bg-white h-full p-4  h-screen overflow-y-scroll" @onclick:stopPropagation="true ">
+    <div class=" bg-white p-4  h-screen overflow-y-scroll" @onclick:stopPropagation="true ">
         <!-- Header -->
         <div class="flex justify-between items-center mb-4">
             <h1 class="text-xl font-semibold">Responses (@comments.Count)</h1>    
@@ -54,9 +54,9 @@
     [Parameter] public EventCallback OnClose { get; set; }
     private string commentText = string.Empty;
     [Parameter] public List<UserCommentBlog> comments { get; set; }
-    [Parameter] public int? TotalComments { get; set; }
+    //[Parameter] public int? TotalComments { get; set; }
     [Parameter] public string? SlugComment { get; set; }
-
+    [Parameter] public EventCallback<int?> OnTotalCommentsUpdated { get; set; }
     /*protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -93,9 +93,10 @@
                     
                     if (result.Value != null)
                     {
-                        TotalComments = result.Value.ToList().Count;
+                        //TotalComments = result.Value.ToList().Count;
                         comments = result.Value.ToList();
-                        StateHasChanged();
+                        await InvokeAsync(StateHasChanged);
+                        await OnTotalCommentsUpdated.InvokeAsync(comments.Count);
                     }
                 }
             }
