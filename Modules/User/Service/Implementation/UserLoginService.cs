@@ -25,7 +25,7 @@ public class UserLoginService(IUserRepository userLoginStore, IMapper mapper) : 
             return Result<UserAuth, Err>.Err(old.Error);
         }
 
-        if (old.Value == null)
+        if (old.Value is not { Status: 1 })
         {
             return Result<UserAuth, Err>.Err(UserErrors.ErrInvalidEmailOrPassword());
         }
