@@ -172,8 +172,6 @@
                await new Promise(r => setTimeout(r, 500))
               continue;
             };
-            console.log(blogList.offsetHeight)
-            console.log(window.innerHeight)
         await dotNetHelper.invokeMethodAsync('LoadMoreBlogs');
        }
     }
