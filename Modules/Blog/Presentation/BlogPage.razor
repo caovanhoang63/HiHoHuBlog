@@ -30,7 +30,7 @@
     <ConfirmModal Open="OpenUnfollowModal" Title="Unfollow"
                   Message="@_unfollowMessage" OnConfirm="OnConfirmUnFollow" OnDeny="OnDenyUnFollow">
     </ConfirmModal>
-    <div class=" fixed flex inset-0 items-start mx-auto justify-end bg-gray-900 bg-opacity-50 rounded-lg z-[999999]  @(_isOpen ? " " : "hidden") "
+    <div class=" fixed flex inset-0 items-start mx-auto justify-end bg-gray-900 bg-opacity-50 rounded-lg z-[999999]   @(_isOpen ? " " : "hidden") "
          @onclick="() => _isOpen = false">
         <div class=" bg-white p-4  h-screen overflow-y-scroll" @onclick:stopPropagation="true ">
             <!-- Header -->
@@ -88,7 +88,11 @@
                             <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
                         
                                 <li><a @onclick="HandleUnPublishBlog" href="/p/@_blog?.Id/edit">Sửa bài viết</a></li>
-                                <li><a @onclick="HandleUnPublishBlog">Ẩn bài viết</a></li>
+                                @{
+                                    if (_blog?.IsPublished is true)
+                                    {
+                                        <li><a @onclick="HandleUnPublishBlog">Ẩn bài viết</a></li>
+                                    }}
                             </ul>
                         </div> 
                     }

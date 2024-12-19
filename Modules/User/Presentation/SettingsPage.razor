@@ -37,7 +37,7 @@
                             <div class="flex flex-col w-full">
                                 <div class="flex space-x-4">
                                     <label class="cursor-pointer text-green-600" for="hiddenFileInput">Update</label>
-                                    <p class="cursor-pointer text-red-600" @onclick="() => { NewImage = null; UserSettingsProfile.Avatar = null; StateHasChanged(); }">Remove
+                                    <p class="cursor-pointer text-red-600" @onclick="() => { NewImage = null; if (UserSettingsProfile != null) { UserSettingsProfile.Avatar = null; } StateHasChanged(); }">Remove
                                     </p>
                                 </div>
                                 <p class="text-sm font-normal">Recommended: Square JPG, PNG, or GIF, at least 1,000 pixels
@@ -143,24 +143,24 @@
                 <input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="Account" checked="checked"/>
                 <div class="grow max-w-4xl tab-content" role="tabpanel">
                     <div class="w-full flex flex-col py-10 justify-between space-y-8 ">
-                        <div class="max-w-full flex justify-between items-center hover:cursor-pointer">
+                        <div class="max-w-full flex justify-between px-2 items-center">
                             <span class=" font-sans text-sm">Email address</span>
-                            <span class=" font-sans text-sm">@UserProfile?.Email</span>
+                            <span class=" font-sans text-gray-400 text-sm">@UserProfile?.Email</span>
                         </div>
-                        <div class="max-w-full flex justify-between items-center hover:cursor-pointer">
+                        <div class="max-w-full flex justify-between px-2 items-center">
                             <span class=" font-sans text-sm">Username and subdomain</span>
-                            <span class=" font-sans text-sm">@UserProfile?.UserName</span>
+                            <span class=" font-sans text-gray-400 text-sm">@UserProfile?.UserName</span>
                         </div>
-                        <div class="max-w-full flex justify-between items-center hover:cursor-pointer"
+                        <div class="max-w-full flex justify-between rounded-b px-2 h-10 items-center hover:cursor-pointer hover:bg-base-200"
                              onclick="profile_modal.showModal()">
                             <span class=" font-sans text-sm">Profile information</span>
                             <span class=" font-sans text-sm">@Name</span>
                         </div>
-                        <div class="max-w-full flex justify-between items-center hover:cursor-pointer">
+                        <div class="max-w-full flex justify-between px-2 items-center hover:cursor-pointer">
                             <span class=" font-sans text-sm text-red-700">Deactivate account</span>
                             <span class=" font-sans text-sm"></span>
                         </div>
-                        <div class="max-w-full flex justify-between items-center hover:cursor-pointer">
+                        <div class="max-w-full flex justify-between px-2 items-center hover:cursor-pointer">
                             <span class=" font-sans text-sm text-red-700">Delete account</span>
                             <span class=" font-sans text-sm"></span>
                         </div>
@@ -202,8 +202,7 @@
                 <span class="font-medium font-sans text-base text-gray-500"> @UserProfile?.TotalFollower Followers</span>
             </div>
             <div class="mt-2">
-                <span class="font-medium font-sans text-sm text-gray-500">I'm Tiset, a CS/Physics student at Brown
-                    University. I write about science and technology here and on my blog harysdalvi.com</span>
+                <span class="font-medium font-sans text-sm text-gray-500">@UserProfile?.UserDetails?.Bio</span>
             </div>
 
         </div>
